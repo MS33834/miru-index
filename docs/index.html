@@ -3,11 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="dark" />
   <title>漫藏 · MIRU INDEX — 漫画 / GalGame / ACG 资源导航</title>
   <meta name="description" content="一个精选 GitHub 开源项目 + 实用站点导航的 ACG 资源索引站。" />
   <meta name="theme-color" content="#0a0a0a" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='6' fill='%23d92020'/><text x='50%25' y='38%25' dominant-baseline='central' text-anchor='middle' font-size='22' fill='%23fff8e8' font-weight='900' font-family='serif'>漫</text><text x='50%25' y='72%25' dominant-baseline='central' text-anchor='middle' font-size='22' fill='%23fff8e8' font-weight='900' font-family='serif'>藏</text></svg>" />
 
-  <!-- Fonts: Dela Gothic One (display, Japanese gothic) + Noto Serif SC (Chinese body) + Bricolage Grotesque (English) + JetBrains Mono (tech) + Shippori Mincho (Japanese editorial) -->
+  <!-- Fonts: Dela Gothic One + Noto Serif SC + Bricolage Grotesque + JetBrains Mono + Shippori Mincho -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
@@ -33,7 +35,7 @@
   <header class="site-header">
     <div class="header-inner">
       <div class="brand">
-        <div class="hanko" aria-hidden="true">
+        <div class="hanko" role="img" aria-label="漫藏印章">
           <span>漫</span>
           <span>藏</span>
         </div>
@@ -42,7 +44,7 @@
           <div class="brand-cn">漫画 / GalGame / ACG 资源导航</div>
         </div>
       </div>
-      <nav class="header-nav">
+      <nav class="header-nav" aria-label="主导航">
         <a class="nav-link" href="https://github.com/" target="_blank" rel="noopener">GitHub ↗</a>
         <a class="nav-link" href="../README.md" target="_blank">README</a>
         <a class="nav-link" href="../LINKS.md" target="_blank">LINKS</a>
@@ -52,10 +54,10 @@
   </header>
 
   <!-- ================== HERO ================== -->
-  <section class="hero">
+  <section class="hero" aria-label="首页介绍">
     <div class="hero-grid">
       <div class="hero-main">
-        <div class="kicker"><span class="dot"></span>RESOURCE&nbsp;AGGREGATOR · 2026 EDITION</div>
+        <div class="kicker"><span class="dot" aria-hidden="true"></span>RESOURCE&nbsp;AGGREGATOR · 2026 EDITION</div>
         <h1 class="hero-title">
           找一个<br />
           <span class="accent">开源</span>的<br />
@@ -74,39 +76,39 @@
       </div>
 
       <div class="hero-meta">
-        <div class="meta-card">
+        <article class="meta-card">
           <div class="meta-label">UPDATED</div>
           <div class="meta-value" id="stat-updated">—</div>
-        </div>
-        <div class="meta-card">
+        </article>
+        <article class="meta-card">
           <div class="meta-label">PROJECTS</div>
           <div class="meta-value" id="stat-projects">—</div>
           <div class="meta-foot">GitHub 仓库</div>
-        </div>
-        <div class="meta-card">
+        </article>
+        <article class="meta-card">
           <div class="meta-label">SITES</div>
           <div class="meta-value" id="stat-sites">—</div>
           <div class="meta-foot">实用站点</div>
-        </div>
-        <div class="meta-card">
+        </article>
+        <article class="meta-card">
           <div class="meta-label">CATEGORIES</div>
           <div class="meta-value" id="stat-categories">—</div>
           <div class="meta-foot">资源分类</div>
-        </div>
+        </article>
       </div>
     </div>
   </section>
 
   <!-- ================== TABS ================== -->
-  <section class="tabs-bar" id="explore">
-    <div class="tabs">
-      <button class="tab is-active" data-tab="projects">
-        <span class="tab-num">01</span>
+  <section class="tabs-bar" id="explore" aria-label="内容切换">
+    <div class="tabs" role="tablist" aria-label="内容分类">
+      <button class="tab is-active" role="tab" aria-selected="true" aria-controls="panel-projects" id="tab-projects" data-tab="projects">
+        <span class="tab-num" aria-hidden="true">01</span>
         <span class="tab-label">开源项目</span>
         <span class="tab-sub">GitHub Repositories</span>
       </button>
-      <button class="tab" data-tab="sites">
-        <span class="tab-num">02</span>
+      <button class="tab" role="tab" aria-selected="false" aria-controls="panel-sites" id="tab-sites" data-tab="sites">
+        <span class="tab-num" aria-hidden="true">02</span>
         <span class="tab-label">实用站点</span>
         <span class="tab-sub">Useful Sites</span>
       </button>
@@ -117,33 +119,41 @@
       <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
       </svg>
-      <input id="search" type="search" placeholder="搜索项目 / 站点 / 标签…" autocomplete="off" />
-      <kbd class="kbd">/</kbd>
+      <label for="search" class="sr-only">搜索项目或站点</label>
+      <input id="search" type="search" placeholder="搜索项目 / 站点 / 标签…" autocomplete="off" aria-label="搜索项目或站点" />
+      <kbd class="kbd" aria-hidden="true">/</kbd>
     </div>
   </section>
 
-  <!-- ================== CATEGORY FILTER ================== -->
-  <section class="filters" id="filters" data-section="projects">
-    <button class="chip is-active" data-cat="all">
-      <span class="chip-mark">All</span>全部
-    </button>
-    <!-- chips by JS -->
-  </section>
+  <!-- Tab panels -->
+  <div id="panel-projects" role="tabpanel" aria-labelledby="tab-projects">
+    <!-- ================== CATEGORY FILTER ================== -->
+    <section class="filters" id="filters" data-section="projects" aria-label="分类筛选">
+      <button class="chip is-active" data-cat="all" aria-pressed="true">
+        <span class="chip-mark" aria-hidden="true">All</span>全部
+      </button>
+    </section>
 
-  <!-- ================== GRID ================== -->
-  <main class="grid-wrap">
-    <div id="grid" class="grid" aria-live="polite"></div>
-    <div id="empty" class="empty" hidden>
-      <div class="empty-mark">無</div>
-      <p>没有匹配的结果。试试其他关键词？</p>
-    </div>
-  </main>
+    <!-- ================== GRID ================== -->
+    <main class="grid-wrap" id="projects">
+      <div id="grid" class="grid" aria-live="polite" aria-label="资源列表"></div>
+      <div id="empty" class="empty" hidden>
+        <div class="empty-mark" aria-hidden="true">無</div>
+        <p>没有匹配的结果。试试其他关键词？</p>
+      </div>
+      <div id="load-more-wrap" class="load-more-wrap" hidden>
+        <button id="load-more" class="btn btn-ghost" aria-label="加载更多卡片">加载更多 ↓</button>
+      </div>
+    </main>
+  </div>
+
+  <div id="panel-sites" role="tabpanel" aria-labelledby="tab-sites" hidden></div>
 
   <!-- ================== FOOTER ================== -->
   <footer class="site-footer">
     <div class="footer-inner">
       <div class="footer-left">
-        <div class="hanko hanko-sm" aria-hidden="true">
+        <div class="hanko hanko-sm" role="img" aria-label="漫藏印章">
           <span>漫</span><span>藏</span>
         </div>
         <div>
@@ -174,7 +184,6 @@
     </div>
   </footer>
 
-  <script src="data.js"></script>
-  <script src="script.js"></script>
+  <script type="module" src="script.js"></script>
 </body>
 </html>

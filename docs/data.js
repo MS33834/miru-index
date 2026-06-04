@@ -3,7 +3,7 @@
  * 数据更新：2026-06-04
  * ============================================================ */
 
-const CATEGORIES = [
+export const CATEGORIES = [
   // GitHub 开源项目分类
   { id: "jm",       name: "JM 漫画",       emoji: "🈲",  section: "projects" },
   { id: "pica",     name: "哔咔哔咔",      emoji: "🐱",  section: "projects" },
@@ -22,7 +22,7 @@ const CATEGORIES = [
   { id: "book",     name: "书籍",           emoji: "📕",  section: "sites" },
 ];
 
-const PROJECTS = [
+export const PROJECTS = [
   // JM 漫画
   { name: "JMComic-Crawler-Python", cat: "jm",
     url: "https://github.com/hect0x7/JMComic-Crawler-Python",
@@ -180,7 +180,7 @@ const PROJECTS = [
     tags: ["Launcher"], badge: "—" },
 ];
 
-const SITES = [
+export const SITES = [
   // 工具
   { name: "起飞 VPN", cat: "tools",
     url: "https://goflyvpn.com/",
@@ -362,15 +362,9 @@ const SITES = [
     tags: ["学术", "开放"] },
 ];
 
-const STATS = {
+export const STATS = {
   projects: PROJECTS.length,
   sites:    SITES.length,
   categories: CATEGORIES.length,
   updated:  "2026-06-04",
 };
-
-// 顶层 const 不会挂到 window；显式暴露给 script.js 使用
-window.CATEGORIES = CATEGORIES;
-window.PROJECTS   = PROJECTS;
-window.SITES      = SITES;
-window.STATS      = STATS;
