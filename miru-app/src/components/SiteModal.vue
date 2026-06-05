@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
+import { ref, onMounted, onBeforeUnmount, nextTick } from 'vue'
 
 const props = defineProps({
   item: { type: Object, required: true },
@@ -39,7 +39,6 @@ async function copyUrl() {
     copied.value = true
     setTimeout(() => (copied.value = false), 1500)
   } catch {
-    // 回退：创建临时 input
     const ta = document.createElement('textarea')
     ta.value = props.item.url
     document.body.appendChild(ta)
@@ -51,7 +50,6 @@ async function copyUrl() {
 
 onMounted(() => {
   document.addEventListener('keydown', onKeydown)
-  // 锁滚动
   document.body.style.overflow = 'hidden'
   nextTick(() => enterBtnRef.value?.focus())
 })
@@ -64,98 +62,181 @@ onBeforeUnmount(() => {
 <template>
   <Teleport to="body">
     <div
-      class="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/70 backdrop-blur-md modal-backdrop"
+      class="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-6 modal-backdrop"
+      style="background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(12px);"
       role="dialog" aria-modal="true" :aria-label="item.name"
       @click="onBackdropClick"
     >
       <div
         ref="dialogRef"
-        class="modal-panel relative w-full sm:max-w-2xl max-h-[92vh] overflow-y-auto bg-[#181818] border border-[#2a2520] sm:border-[#d92020]/40 sm:rounded-2xl rounded-t-2xl shadow-2xl"
+        class="modal-screen relative w-full sm:max-w-2xl max-h-[94vh] overflow-y-auto modal-panel"
+        style="
+          background: linear-gradient(180deg, #f3ece0 0%, #e6dcc8 100%);
+          color: #1a1410;
+          border-radius: 4px;
+          box-shadow:
+            inset 0 0 0 1px rgba(243, 236, 224, 0.5),
+            0 30px 80px rgba(0, 0, 0, 0.7),
+            0 0 0 1px rgba(217, 32, 32, 0.3);
+        "
       >
-        <!-- 关闭按钮 -->
-        <button
-          @click="emit('close')"
-          aria-label="关闭"
-          class="absolute top-3 right-3 w-9 h-9 rounded-full bg-[#0a0a0a]/80 border border-[#2a2520] text-[#9a9590] hover:text-[#d92020] hover:border-[#d92020] flex items-center justify-center transition z-10"
-        >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-            <line x1="6" y1="6" x2="18" y2="18" />
-            <line x1="18" y1="6" x2="6" y2="18" />
-          </svg>
-        </button>
+        <!-- 和纸纹理 -->
+        <div aria-hidden="true" class="absolute inset-0 pointer-events-none rounded-[4px]" style="
+          background-image: url(&quot;data:image/svg+xml;utf8,<svg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.3  0 0 0 0 0.2  0 0 0 0 0.1  0 0 0 0.18 0'/></filter><rect width='200' height='200' filter='url(%23n)'/></svg>&quot;);
+          mix-blend-mode: multiply;
+          opacity: 0.7;
+        "></div>
 
-        <!-- 头部 -->
-        <header class="p-6 sm:p-8 pb-4 border-b border-[#2a2520]">
-          <div class="flex items-center gap-2 mb-3 text-xs">
-            <span v-if="category" class="text-[#6b6560]">{{ category.icon }} {{ category.name }}</span>
-            <span v-if="category && item.proxy" class="text-[#2a2520]">·</span>
-            <span v-if="item.proxy" class="text-[#d92020] border border-[#d92020]/40 bg-[#d92020]/10 px-2 py-0.5 rounded">需梯子</span>
-          </div>
-          <h2 class="text-2xl sm:text-3xl font-bold text-[#f3ece0] leading-tight pr-8">{{ item.name }}</h2>
-          <p v-if="item.desc" class="text-[#9a9590] mt-2 text-sm">{{ item.desc }}</p>
-        </header>
+        <!-- 顶部朱红虚线边 -->
+        <div aria-hidden="true" class="absolute top-0 left-0 right-0 h-[3px] z-10" style="
+          background: linear-gradient(90deg, #d92020 0%, #d92020 30%, transparent 30%, transparent 36%, #d92020 36%, #d92020 44%, transparent 44%);
+          background-size: 12px 3px;
+        "></div>
 
-        <!-- 主体 -->
-        <div class="p-6 sm:p-8 space-y-5">
-          <!-- 标签 -->
-          <div v-if="item.tags?.length" class="flex flex-wrap gap-2">
-            <span
-              v-for="t in item.tags" :key="t"
-              class="text-xs px-2.5 py-1 rounded-full bg-[#c9a55c]/10 text-[#c9a55c] border border-[#c9a55c]/30"
-            >#{{ t }}</span>
-          </div>
-
-          <!-- 详细介绍 -->
-          <section v-if="item.fullDesc">
-            <h3 class="text-xs uppercase tracking-widest text-[#6b6560] mb-2">介绍</h3>
-            <p class="text-[#f3ece0] leading-relaxed text-[15px]">{{ item.fullDesc }}</p>
-          </section>
-
-          <!-- 特色 -->
-          <section v-if="item.features?.length">
-            <h3 class="text-xs uppercase tracking-widest text-[#6b6560] mb-2">特色</h3>
-            <ul class="space-y-1.5">
-              <li
-                v-for="(f, i) in item.features" :key="i"
-                class="flex items-start gap-2 text-[#f3ece0] text-[15px]"
-              >
-                <span class="text-[#d92020] mt-1 shrink-0">▸</span>
-                <span>{{ f }}</span>
-              </li>
-            </ul>
-          </section>
-
-          <!-- URL 显示 -->
-          <section>
-            <h3 class="text-xs uppercase tracking-widest text-[#6b6560] mb-2">链接</h3>
-            <code class="block bg-[#0a0a0a] border border-[#2a2520] rounded px-3 py-2 text-[#c9a55c] text-sm break-all">
-              {{ item.url }}
-            </code>
-          </section>
-        </div>
-
-        <!-- 底部按钮 -->
-        <footer class="p-6 sm:p-8 pt-4 border-t border-[#2a2520] flex flex-col sm:flex-row gap-3">
-          <a
-            ref="enterBtnRef"
-            :href="item.url" target="_blank" rel="noopener noreferrer"
-            class="flex-1 text-center px-6 py-3 bg-[#d92020] hover:bg-[#b8181a] text-white font-semibold rounded-lg transition shadow-lg shadow-[#d92020]/20 focus:outline-none focus:ring-2 focus:ring-[#d92020] focus:ring-offset-2 focus:ring-offset-[#181818]"
-          >
-            进入 →
-          </a>
-          <button
-            @click="copyUrl"
-            class="px-6 py-3 bg-[#0a0a0a] border border-[#2a2520] hover:border-[#c9a55c] hover:text-[#c9a55c] text-[#9a9590] font-semibold rounded-lg transition focus:outline-none focus:ring-2 focus:ring-[#c9a55c] focus:ring-offset-2 focus:ring-offset-[#181818]"
-          >
-            {{ copied ? '已复制 ✓' : '复制 URL' }}
-          </button>
+        <div class="relative">
+          <!-- 关闭 -->
           <button
             @click="emit('close')"
-            class="px-6 py-3 bg-transparent text-[#6b6560] hover:text-[#9a9590] font-medium rounded-lg transition focus:outline-none"
+            aria-label="关闭"
+            class="absolute top-3 right-3 w-10 h-10 rounded-full flex items-center justify-center transition z-20"
+            style="background: rgba(184, 35, 31, 0.08); border: 1px solid rgba(184, 35, 31, 0.3); color: #a8161a;"
+            onmouseover="this.style.background='rgba(184,35,31,0.18)'"
+            onmouseout="this.style.background='rgba(184,35,31,0.08)'"
           >
-            关闭
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+              <line x1="6" y1="6" x2="18" y2="18" />
+              <line x1="18" y1="6" x2="6" y2="18" />
+            </svg>
           </button>
-        </footer>
+
+          <!-- 头部：卷首 -->
+          <header class="px-6 sm:px-10 pt-10 sm:pt-12 pb-5 border-b border-[#1a1410]/10">
+            <!-- 卷首 标识 -->
+            <div class="flex items-center gap-3 mb-5">
+              <div class="hanko text-xs px-2.5 py-1 stamp-anim" v-if="category">
+                <span class="mr-1">{{ category.icon }}</span>{{ category.name }}
+              </div>
+              <div
+                v-if="item.proxy"
+                class="font-serif-cn text-xs px-2.5 py-1 rounded-sm"
+                style="background: rgba(201, 165, 92, 0.2); color: #a4853e; border: 1px solid rgba(201, 165, 92, 0.4);"
+              >
+                需梯子
+              </div>
+            </div>
+
+            <h2 class="font-serif-cn text-3xl sm:text-4xl font-black text-[#1a1410] leading-tight pr-10 tracking-tight">
+              {{ item.name }}
+            </h2>
+            <p v-if="item.desc" class="mt-3 font-kai-cn text-[#3a2e22] text-base sm:text-lg leading-relaxed">
+              {{ item.desc }}
+            </p>
+          </header>
+
+          <!-- 主体 -->
+          <div class="px-6 sm:px-10 py-6 sm:py-8 space-y-7">
+            <!-- 标签 -->
+            <section v-if="item.tags?.length">
+              <div class="flex items-center gap-2 mb-3">
+                <div class="font-mono text-[10px] tracking-[0.3em] text-[#a8161a]">▎印 · TAGS</div>
+                <div class="flex-1 h-px" style="background: linear-gradient(90deg, rgba(168, 22, 26, 0.3), transparent);"></div>
+              </div>
+              <div class="flex flex-wrap gap-2">
+                <span
+                  v-for="t in item.tags" :key="t"
+                  class="tag-stamp"
+                  style="background: rgba(168, 22, 26, 0.1); border-color: rgba(168, 22, 26, 0.4); color: #a8161a; font-size: 0.78rem; padding: 0.3rem 0.65rem;"
+                >#{{ t }}</span>
+              </div>
+            </section>
+
+            <!-- 详细介绍 -->
+            <section v-if="item.fullDesc">
+              <div class="flex items-center gap-2 mb-3">
+                <div class="font-mono text-[10px] tracking-[0.3em] text-[#a8161a]">▎叙 · INTRO</div>
+                <div class="flex-1 h-px" style="background: linear-gradient(90deg, rgba(168, 22, 26, 0.3), transparent);"></div>
+              </div>
+              <p class="font-kai-cn text-[#1a1410] leading-[1.95] text-[15px] sm:text-[16px]">
+                {{ item.fullDesc }}
+              </p>
+            </section>
+
+            <!-- 特色 -->
+            <section v-if="item.features?.length">
+              <div class="flex items-center gap-2 mb-3">
+                <div class="font-mono text-[10px] tracking-[0.3em] text-[#a8161a]">▎特 · FEATURES</div>
+                <div class="flex-1 h-px" style="background: linear-gradient(90deg, rgba(168, 22, 26, 0.3), transparent);"></div>
+              </div>
+              <ul class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                <li
+                  v-for="(f, i) in item.features" :key="i"
+                  class="font-kai-cn text-[#1a1410] text-sm flex items-center gap-2 px-3 py-2 rounded-sm"
+                  style="background: rgba(201, 165, 92, 0.08); border: 1px solid rgba(201, 165, 92, 0.25);"
+                >
+                  <span class="text-[#a8161a] font-serif-cn font-bold">·</span>
+                  <span>{{ f }}</span>
+                </li>
+              </ul>
+            </section>
+
+            <!-- URL -->
+            <section>
+              <div class="flex items-center gap-2 mb-3">
+                <div class="font-mono text-[10px] tracking-[0.3em] text-[#a8161a]">▎址 · URL</div>
+                <div class="flex-1 h-px" style="background: linear-gradient(90deg, rgba(168, 22, 26, 0.3), transparent);"></div>
+              </div>
+              <code class="block bg-[#0a0a0a] border border-[#1a1410] rounded-sm px-4 py-3 text-[#c9a55c] text-xs sm:text-sm break-all font-mono">
+                {{ item.url }}
+              </code>
+            </section>
+          </div>
+
+          <!-- 底部按钮 -->
+          <footer class="px-6 sm:px-10 py-6 sm:py-8 border-t border-[#1a1410]/10 flex flex-col sm:flex-row gap-3">
+            <a
+              ref="enterBtnRef"
+              :href="item.url" target="_blank" rel="noopener noreferrer"
+              class="flex-1 text-center px-6 py-3.5 font-serif-cn font-bold text-base transition stamp-anim flex items-center justify-center gap-2"
+              style="
+                background: linear-gradient(180deg, #d92020 0%, #a8161a 100%);
+                color: #f3ece0;
+                border: 1px solid #a8161a;
+                box-shadow: 0 4px 14px rgba(217, 32, 32, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+                border-radius: 2px;
+                letter-spacing: 0.1em;
+              "
+            >
+              <span>入</span>
+              <span class="text-sm opacity-80">→</span>
+              <span>覌</span>
+            </a>
+            <button
+              @click="copyUrl"
+              class="px-6 py-3.5 font-serif-cn font-bold text-base transition flex items-center justify-center gap-2"
+              style="
+                background: transparent;
+                color: #1a1410;
+                border: 1px solid #1a1410;
+                border-radius: 2px;
+                letter-spacing: 0.1em;
+              "
+              onmouseover="this.style.background='rgba(0,0,0,0.05)'"
+              onmouseout="this.style.background='transparent'"
+            >
+              <span v-if="!copied">抄 · 录 URL</span>
+              <span v-else class="text-[#a8161a]">已抄录 ✓</span>
+            </button>
+            <button
+              @click="emit('close')"
+              class="px-6 py-3.5 font-kai-cn text-base transition"
+              style="background: transparent; color: #5a4a3a; letter-spacing: 0.1em;"
+              onmouseover="this.style.color='#1a1410'"
+              onmouseout="this.style.color='#5a4a3a'"
+            >
+              闭
+            </button>
+          </footer>
+        </div>
       </div>
     </div>
   </Teleport>

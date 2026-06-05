@@ -4,45 +4,34 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="color-scheme" content="dark" />
-    <!--
-      F-01 fix: GitHub Pages does not allow custom HTTP headers, so we ship a
-      baseline CSP via <meta>. The policy is intentionally restrictive:
-        - default-src 'self': deny everything by default
-        - script-src 'self' 'unsafe-inline' is NOT included; we do not use
-          any inline scripts (the only inline asset is the data: favicon)
-        - style-src allows 'unsafe-inline' for Tailwind v4 utility classes
-          that Vite emits as inline <style> blocks during the build
-        - img-src 'self' data: https: covers local icons + remote thumbnails
-          the user may follow (no third-party image trackers loaded by us)
-        - object-src 'none': block plugin abuse (Flash/Java/legacy vectors)
-        - base-uri 'self': prevent <base href> injection / DOM clobbering
-        - form-action 'self': only same-origin form submissions
-      'unsafe-inline' on style is the standard escape hatch documented by
-      MDN/OWASP for Tailwind-injected inline styles; it does not weaken
-      XSS protection because style-src only governs CSS, not script-src.
-      'frame-ancestors' and 'X-Frame-Options' cannot be set via meta and
-      are therefore missing here; this is a known GitHub Pages limitation.
-    -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'; base-uri 'self'; form-action 'self'; object-src 'none'">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com; base-uri 'self'; form-action 'self'; object-src 'none'">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta name="referrer" content="strict-origin-when-cross-origin">
-    <meta name="description" content="漫藏 MIRU INDEX — ACGN 资源导航站，聚合 18 个分类 100+ 条精选资源：网络代理、下载器、解压工具、搜图、AI 工具、GalGame 资源、漫画、番剧、游戏、GitHub 开源等。">
-    <meta name="keywords" content="ACGN, 漫画, GalGame, 番剧, AI 翻译, 搜图, 资源导航, GitHub, Mihon, JM, 哔咔">
-    <meta name="theme-color" content="#d92020">
+    <meta name="description" content="漫藏 MIRU INDEX — ACGN 资源导航站，新和风杂志美学，聚合 26 个细分分类 166 条精选资源：网络代理、下载器、AI 工具、漫画、番剧、GalGame、轻小说、音乐、周边、资讯、绘画、视频、社区、GitHub 开源等。">
+    <meta name="keywords" content="ACGN, 漫藏, 漫画, GalGame, 番剧, AI 翻译, 搜图, 资源导航, GitHub, Mihon, JM, 哔咔, 二次元, 印泥, 朱砂, 新和风">
+    <meta name="theme-color" content="#0a0a0a">
     <meta name="author" content="badhope">
     <meta property="og:title" content="漫藏 · MIRU INDEX — ACGN 资源导航">
-    <meta property="og:description" content="聚合 18 个分类 100+ 条精选 ACGN 资源的导航站。">
+    <meta property="og:description" content="新和风杂志美学的 ACGN 资源导航 · 26 分类 · 166 条资源">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://badhope.github.io/miru-index/">
     <meta property="og:image" content="https://badhope.github.io/miru-index/favicon.svg">
     <meta property="og:locale" content="zh_CN">
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="漫藏 · MIRU INDEX — ACGN 资源导航">
-    <meta name="twitter:description" content="聚合 18 个分类 100+ 条精选 ACGN 资源的导航站。">
+    <meta name="twitter:description" content="新和风杂志美学的 ACGN 资源导航 · 26 分类 · 166 条资源">
     <title>漫藏 · MIRU INDEX — ACGN 资源导航</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='8' fill='%23d92020'/><text x='50' y='42' text-anchor='middle' fill='white' font-size='32' font-weight='bold'>漫</text><text x='50' y='78' text-anchor='middle' fill='white' font-size='32' font-weight='bold'>藏</text></svg>" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700;900&family=LXGW+WenKai+Screen:wght@400;700&family=JetBrains+Mono:wght@400;600;700&family=Long+Cang&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,%3Csvg xmlns='http%3A//www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='6' fill='%23f3ece0'/%3E%3Crect x='6' y='6' width='88' height='88' fill='none' stroke='%23d92020' stroke-width='4' rx='2'/%3E%3Ctext x='50' y='40' text-anchor='middle' fill='%23d92020' font-family='serif' font-size='34' font-weight='900'%3E漫%3C/text%3E%3Ctext x='50' y='78' text-anchor='middle' fill='%23d92020' font-family='serif' font-size='34' font-weight='900'%3E藏%3C/text%3E%3C/svg%3E" />
   </head>
-  <body class="bg-[#0a0a0a] text-[#f3ece0] min-h-screen">
+  <body class="bg-[#0a0a0a] text-[#f3ece0] min-h-screen antialiased">
     <div id="app"></div>
     <script type="module" src="/src/main.js"></script>
   </body>

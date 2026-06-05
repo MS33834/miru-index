@@ -1,88 +1,474 @@
+/* ==========================================================================
+   漫藏 MIRU INDEX — 新和风杂志 / 印章美学
+   ========================================================================== */
+
 @import "tailwindcss";
 
-/* 隐藏滚动条（分类 chip 行） */
-.scrollbar-hide {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
+/* ----------------------------------------------------------------------------
+   字体与基础排版
+---------------------------------------------------------------------------- */
+:root {
+  --ink: #0a0a0a;
+  --ink-2: #1a1410;
+  --ink-3: #221a14;
+  --seal: #d92020;       /* 印泥朱砂 */
+  --seal-deep: #a8161a;  /* 深朱 */
+  --gold: #c9a55c;       /* 御金 */
+  --gold-2: #a4853e;     /* 沉金 */
+  --washi: #f3ece0;      /* 和纸 */
+  --washi-2: #e6dcc8;    /* 旧和纸 */
+  --mushime: #5a4a3a;    /* 虫食 */
+  --ashi: #8a7a68;       /* 足袋 */
+  --bun: #2a1e16;        /* 文 */
+  --cinnabar: #b8231f;   /* 朱 */
+
+  --serif: 'Noto Serif SC', 'Songti SC', 'STSong', 'SimSun', serif;
+  --kai: 'LXGW WenKai Screen', 'STKaiti', 'KaiTi', 'STZhongsong', serif;
+  --mono: 'JetBrains Mono', 'SF Mono', 'Consolas', monospace;
+  --cursive: 'Long Cang', cursive;
+
+  --shadow-seal: 0 0 0 1px rgba(217, 32, 32, 0.3), 0 4px 12px rgba(217, 32, 32, 0.18);
+  --shadow-paper: 0 1px 0 rgba(243, 236, 224, 0.05), 0 8px 24px rgba(0, 0, 0, 0.4);
+  --shadow-paper-hover: 0 1px 0 rgba(243, 236, 224, 0.08), 0 18px 48px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(201, 165, 92, 0.25);
 }
 
-/* line-clamp 工具（Tailwind v4 默认已含 line-clamp-*，但补全安全） */
-.line-clamp-2 {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-.line-clamp-3 {
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+html {
+  font-family: var(--kai);
+  font-feature-settings: 'palt';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  letter-spacing: 0.01em;
 }
 
-/* 性能优化：远离视口的 section 跳过渲染 */
-.content-visibility-auto {
-  content-visibility: auto;
-  contain-intrinsic-size: 1px 800px;
+body {
+  background: var(--ink);
+  color: var(--washi);
+  position: relative;
+  overflow-x: hidden;
 }
 
-/* Modal 入场动画 */
-@keyframes modal-fade-in {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+/* 全站噪点纹理 + 暗朱氛围光 */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse 80% 50% at 12% 0%, rgba(217, 32, 32, 0.08), transparent 60%),
+    radial-gradient(ellipse 60% 40% at 88% 18%, rgba(201, 165, 92, 0.06), transparent 60%),
+    radial-gradient(ellipse 100% 60% at 50% 100%, rgba(184, 35, 31, 0.05), transparent 60%);
 }
-@keyframes modal-scale-in {
-  from { opacity: 0; transform: scale(0.94) translateY(8px); }
-  to   { opacity: 1; transform: scale(1) translateY(0); }
-}
-@keyframes modal-sheet-in {
-  from { transform: translateY(100%); }
-  to   { transform: translateY(0); }
-}
-
-.modal-backdrop {
-  animation: modal-fade-in 180ms ease-out;
-}
-.modal-panel {
-  animation: modal-scale-in 220ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-@media (max-width: 639px) {
-  .modal-panel {
-    animation: modal-sheet-in 240ms cubic-bezier(0.16, 1, 0.3, 1);
-  }
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image: url("data:image/svg+xml;utf8,<svg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.95  0 0 0 0 0.93  0 0 0 0 0.88  0 0 0 0.06 0'/></filter><rect width='200' height='200' filter='url(%23n)'/></svg>");
+  opacity: 0.6;
+  mix-blend-mode: overlay;
 }
 
-/* Modal 内部滚动条暗色化 */
-.modal-panel::-webkit-scrollbar {
-  width: 8px;
-}
-.modal-panel::-webkit-scrollbar-track {
-  background: transparent;
-}
-.modal-panel::-webkit-scrollbar-thumb {
-  background: #2a2520;
-  border-radius: 4px;
-}
-.modal-panel::-webkit-scrollbar-thumb:hover {
-  background: #3a342e;
+#app {
+  position: relative;
+  z-index: 1;
 }
 
-/* 全局选择颜色 */
+/* 选区 */
 ::selection {
-  background: #d92020;
-  color: #fff;
+  background: var(--seal);
+  color: var(--washi);
 }
 
-/* 减弱动效（无障碍偏好） */
+/* 滚动条 */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--bun); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--seal); }
+
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { scrollbar-width: none; }
+
+/* 文字截断 */
+.line-clamp-1 { display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+.line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.line-clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+
+/* 性能 */
+.content-auto { content-visibility: auto; contain-intrinsic-size: 200px; }
+
+/* ----------------------------------------------------------------------------
+   字体工具
+---------------------------------------------------------------------------- */
+.font-serif-cn { font-family: var(--serif); }
+.font-kai-cn { font-family: var(--kai); }
+.font-mono { font-family: var(--mono); }
+.font-cursive { font-family: var(--cursive); }
+
+/* ----------------------------------------------------------------------------
+   印章 (hanko) — 圆形朱红印 + 白字
+---------------------------------------------------------------------------- */
+.hanko {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--seal);
+  color: var(--washi);
+  font-family: var(--serif);
+  font-weight: 900;
+  border-radius: 6px;
+  position: relative;
+  letter-spacing: 0.05em;
+  transform: rotate(-3deg);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.12),
+    inset 0 0 6px rgba(0, 0, 0, 0.18),
+    0 0 0 1px rgba(217, 32, 32, 0.3),
+    0 2px 6px rgba(217, 32, 32, 0.25);
+}
+.hanko::before {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
+  border-radius: 3px;
+  pointer-events: none;
+}
+.hanko::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 30% 25%, rgba(255, 255, 255, 0.18), transparent 50%);
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+/* 圆形印章 */
+.hanko-circle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--seal);
+  color: var(--washi);
+  font-family: var(--serif);
+  font-weight: 900;
+  border-radius: 50%;
+  position: relative;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.12),
+    inset 0 0 6px rgba(0, 0, 0, 0.18),
+    0 0 0 1px rgba(217, 32, 32, 0.3),
+    0 2px 8px rgba(217, 32, 32, 0.3);
+}
+.hanko-circle::before {
+  content: '';
+  position: absolute;
+  inset: 6%;
+  border: 1.5px solid rgba(255, 255, 255, 0.45);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* 盖章动画 */
+@keyframes stamp-down {
+  0% { transform: rotate(-3deg) scale(1.6); opacity: 0; }
+  60% { transform: rotate(-3deg) scale(0.95); opacity: 1; }
+  100% { transform: rotate(-3deg) scale(1); opacity: 1; }
+}
+.stamp-anim { animation: stamp-down 0.45s cubic-bezier(0.22, 1, 0.36, 1) backwards; }
+
+/* ----------------------------------------------------------------------------
+   卡片 — 和纸浮起
+---------------------------------------------------------------------------- */
+.card-paper {
+  position: relative;
+  background: linear-gradient(180deg, var(--washi) 0%, var(--washi-2) 100%);
+  color: var(--ink);
+  border-radius: 4px;
+  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.4s;
+  box-shadow: var(--shadow-paper);
+  overflow: hidden;
+  isolation: isolate;
+}
+/* 和纸纤维纹理 */
+.card-paper::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml;utf8,<svg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.3  0 0 0 0 0.2  0 0 0 0 0.1  0 0 0 0.18 0'/></filter><rect width='200' height='200' filter='url(%23n)'/></svg>");
+  opacity: 0.7;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+  z-index: 0;
+}
+/* 顶部朱红线 */
+.card-paper::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--seal) 0%, var(--seal) 30%, transparent 30%, transparent 36%, var(--seal) 36%, var(--seal) 44%, transparent 44%);
+  background-size: 12px 3px;
+  z-index: 1;
+}
+.card-paper > * { position: relative; z-index: 2; }
+
+.card-paper:hover {
+  transform: translateY(-6px) rotate(-0.3deg);
+  box-shadow: var(--shadow-paper-hover);
+}
+
+/* ----------------------------------------------------------------------------
+   Hero — 卷首标题
+---------------------------------------------------------------------------- */
+.hero-kanji {
+  font-family: var(--serif);
+  font-weight: 900;
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+  background: linear-gradient(180deg, #fefcf6 0%, #d4c8b0 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow:
+    0 0 40px rgba(217, 32, 32, 0.18);
+  position: relative;
+}
+
+@keyframes ink-spread {
+  0% {
+    opacity: 0;
+    filter: blur(8px);
+    transform: translateY(8px);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0);
+  }
+}
+.ink-spread {
+  animation: ink-spread 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+}
+
+@keyframes brush-stroke {
+  0% { stroke-dashoffset: 800; opacity: 0; }
+  100% { stroke-dashoffset: 0; opacity: 1; }
+}
+.brush-stroke {
+  stroke-dasharray: 800;
+  stroke-dashoffset: 800;
+  animation: brush-stroke 1.4s cubic-bezier(0.4, 0, 0.2, 1) 0.2s forwards;
+}
+
+/* ----------------------------------------------------------------------------
+   搜索框 — 卷轴
+---------------------------------------------------------------------------- */
+.scroll-input {
+  background: var(--ink-2);
+  border: 1px solid rgba(201, 165, 92, 0.2);
+  color: var(--washi);
+  font-family: var(--kai);
+  border-radius: 2px;
+  position: relative;
+  transition: all 0.3s;
+}
+.scroll-input::placeholder {
+  color: var(--ashi);
+  font-style: italic;
+  letter-spacing: 0.1em;
+}
+.scroll-input:focus {
+  border-color: var(--gold);
+  background: var(--ink-3);
+  box-shadow: 0 0 0 3px rgba(201, 165, 92, 0.1), inset 0 0 12px rgba(0, 0, 0, 0.4);
+  outline: none;
+}
+.scroll-input:focus + .scroll-end,
+.scroll-input:not(:placeholder-shown) + .scroll-end {
+  opacity: 1;
+}
+.scroll-end {
+  opacity: 0.4;
+  transition: opacity 0.3s;
+}
+
+/* ----------------------------------------------------------------------------
+   分类 tabs — 印章
+---------------------------------------------------------------------------- */
+.tab-seal {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+  padding: 0.4rem 0.9rem;
+  color: var(--ashi);
+  background: transparent;
+  border: 1px solid rgba(243, 236, 224, 0.1);
+  border-radius: 2px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.tab-seal:hover {
+  color: var(--washi);
+  border-color: rgba(201, 165, 92, 0.4);
+  background: rgba(201, 165, 92, 0.05);
+}
+.tab-seal.is-active {
+  color: var(--washi);
+  background: var(--seal);
+  border-color: var(--seal);
+  box-shadow: 0 0 0 1px rgba(217, 32, 32, 0.4), 0 4px 12px rgba(217, 32, 32, 0.25);
+}
+.tab-seal.is-active::before {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 1px;
+  pointer-events: none;
+}
+
+/* ----------------------------------------------------------------------------
+   装饰 — 章节编号 / 卷尾花
+---------------------------------------------------------------------------- */
+.chapter-num {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  color: var(--gold);
+  text-transform: uppercase;
+}
+
+.kanji-num {
+  font-family: var(--serif);
+  font-weight: 900;
+  font-size: 3.5rem;
+  line-height: 1;
+  color: var(--seal);
+  display: inline-block;
+  position: relative;
+  -webkit-text-stroke: 1.5px var(--seal);
+  -webkit-text-fill-color: transparent;
+}
+.kanji-num::before {
+  content: attr(data-num);
+  position: absolute;
+  inset: 0;
+  -webkit-text-fill-color: var(--seal);
+  opacity: 0.18;
+  filter: blur(1px);
+}
+
+.scroll-divider {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--ashi);
+}
+.scroll-divider::before,
+.scroll-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--ashi), transparent);
+}
+.scroll-divider .ornament {
+  font-family: var(--serif);
+  color: var(--seal);
+  font-size: 0.9rem;
+}
+
+/* ----------------------------------------------------------------------------
+   Modal — 屏风
+---------------------------------------------------------------------------- */
+@keyframes screen-open {
+  0% { transform: scale(0.92) translateY(20px); opacity: 0; filter: blur(4px); }
+  100% { transform: scale(1) translateY(0); opacity: 1; filter: blur(0); }
+}
+.modal-screen { animation: screen-open 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) backwards; }
+
+@keyframes backdrop-fade {
+  0% { opacity: 0; backdrop-filter: blur(0); }
+  100% { opacity: 1; backdrop-filter: blur(12px); }
+}
+.modal-backdrop { animation: backdrop-fade 0.3s ease-out backwards; }
+
+/* ----------------------------------------------------------------------------
+   卡片入场 — 分批浮起
+---------------------------------------------------------------------------- */
+@keyframes card-rise {
+  0% { opacity: 0; transform: translateY(20px) scale(0.97); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+.card-rise {
+  animation: card-rise 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+}
+
+/* ----------------------------------------------------------------------------
+   进度 — 朱墨笔
+---------------------------------------------------------------------------- */
+.ink-bar {
+  height: 2px;
+  background: linear-gradient(90deg, var(--seal) 0%, var(--gold) 50%, transparent 100%);
+  border-radius: 1px;
+  position: relative;
+  overflow: hidden;
+}
+.ink-bar::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  animation: ink-flow 2.5s ease-in-out infinite;
+}
+@keyframes ink-flow {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* ----------------------------------------------------------------------------
+   标签小章
+---------------------------------------------------------------------------- */
+.tag-stamp {
+  font-family: var(--serif);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  padding: 0.2rem 0.5rem;
+  background: rgba(184, 35, 31, 0.1);
+  color: var(--seal-deep);
+  border: 1px solid rgba(184, 35, 31, 0.3);
+  border-radius: 2px;
+  white-space: nowrap;
+  position: relative;
+}
+
+/* ----------------------------------------------------------------------------
+   减少动效
+---------------------------------------------------------------------------- */
 @media (prefers-reduced-motion: reduce) {
-  .modal-backdrop,
-  .modal-panel {
-    animation: none;
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
-  .hover\:-translate-y-0\.5:hover {
-    transform: none;
-  }
+}
+
+/* ----------------------------------------------------------------------------
+   响应式
+---------------------------------------------------------------------------- */
+@media (max-width: 640px) {
+  .hero-kanji { font-size: clamp(3rem, 18vw, 5.5rem); }
+  .kanji-num { font-size: 2.5rem; }
+}
+@media (min-width: 641px) {
+  .hero-kanji { font-size: clamp(4rem, 12vw, 8.5rem); }
 }
