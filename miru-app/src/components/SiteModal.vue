@@ -48,6 +48,18 @@ async function copyUrl() {
   }
 }
 
+function openInNewTab() {
+  // 显式 window.open 比 <a target="_blank"> 更可靠：
+  //   1. 不依赖 click 事件冒泡后的浏览器默认行为
+  //   2. 避免 CSP / 弹窗拦截器 / autofocus 触发的安全策略
+  //   3. 可拿到 window 引用，便于检测是否被拦截
+  const w = window.open(props.item.url, '_blank', 'noopener,noreferrer')
+  if (!w) {
+    // 弹窗被拦截：兜底为同窗口跳转
+    window.location.href = props.item.url
+  }
+}
+
 onMounted(() => {
   document.addEventListener('keydown', onKeydown)
   document.body.style.overflow = 'hidden'
@@ -193,9 +205,10 @@ onBeforeUnmount(() => {
 
           <!-- 底部按钮 -->
           <footer class="px-6 sm:px-10 py-6 sm:py-8 border-t border-[#1a1410]/10 flex flex-col sm:flex-row gap-3">
-            <a
+            <button
               ref="enterBtnRef"
-              :href="item.url" target="_blank" rel="noopener noreferrer"
+              type="button"
+              @click="openInNewTab"
               class="flex-1 text-center px-6 py-3.5 font-serif-cn font-bold text-base transition stamp-anim flex items-center justify-center gap-2"
               style="
                 background: linear-gradient(180deg, #d92020 0%, #a8161a 100%);
@@ -204,12 +217,13 @@ onBeforeUnmount(() => {
                 box-shadow: 0 4px 14px rgba(217, 32, 32, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.15);
                 border-radius: 2px;
                 letter-spacing: 0.1em;
+                cursor: pointer;
               "
             >
               <span>入</span>
               <span class="text-sm opacity-80">→</span>
               <span>覌</span>
-            </a>
+            </button>
             <button
               @click="copyUrl"
               class="px-6 py-3.5 font-serif-cn font-bold text-base transition flex items-center justify-center gap-2"
