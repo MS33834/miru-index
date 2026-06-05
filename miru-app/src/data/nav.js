@@ -1,4 +1,4 @@
-// Miru Index 数据：18 个细分分类，约 110+ 条资源
+// Miru Index 数据：22 个细分分类，约 145+ 条资源
 // 字段：name, url, desc, fullDesc, tags, features, proxy
 // proxy: true 表示需要科学上网
 
@@ -146,6 +146,16 @@ export const categories = [
         fullDesc: 'Stable Diffusion WebUI 的抠图插件，基于 RMBG-1.4 模型，识别发丝级边缘细节，二次元图抠图表现尤其好。',
         tags: ['AI', '抠图', 'SD'], features: ['发丝级', '二次元优化', 'SD 插件'], proxy: false
       },
+      {
+        name: 'comic-translate', url: 'https://github.com/ogkalu2/comic-translate', desc: 'AI 漫画批量翻译',
+        fullDesc: 'Comic Translate 是支持多服务（Sugoi / DeepL / GPT-4 / Gemini）的开源漫画翻译工具，界面现代，批量处理友好。',
+        tags: ['AI', '翻译', '批量'], features: ['多服务', '现代 UI', '批量'], proxy: false
+      },
+      {
+        name: 'kohya_ss GUI', url: 'https://github.com/bmaltais/kohya_ss', desc: 'SD 训练 GUI',
+        fullDesc: 'Kohya 的 Stable Diffusion 训练 WebUI 包装，支持 LoRA / DreamBooth / Textual Inversion 训练，是训练二次元模型的事实标准。',
+        tags: ['SD', 'LoRA', '训练'], features: ['LoRA', 'DreamBooth', 'WebUI'], proxy: false
+      },
     ]
   },
   {
@@ -236,6 +246,16 @@ export const categories = [
         name: 'MikiACG', url: 'https://www.mikiacg.org/', desc: 'GalGame 资讯',
         fullDesc: 'GalGame 圈资讯 / 评测 / 攻略专业站，编辑团队稳定，文章质量在圈内有口皆碑。',
         tags: ['GalGame', '评测', '攻略'], features: ['专业编辑', '高质文章', '稳定更新'], proxy: false
+      },
+      {
+        name: '触乐网', url: 'https://www.chuapp.com/', desc: '游戏深度媒体',
+        fullDesc: '国内一线游戏 / ACG 深度媒体，专栏文章质量业内顶尖，常有制作组访谈与行业洞察。',
+        tags: ['游戏', '媒体', '深度'], features: ['深度文', '访谈', '行业'], proxy: false
+      },
+      {
+        name: '游民星空', url: 'https://www.gamersky.com/', desc: '游戏资讯门户',
+        fullDesc: '老牌游戏综合门户，资讯 / 评测 / 攻略 / 视频全覆盖，AI / ACG / 主机 / 单机内容均有。',
+        tags: ['游戏', '门户', '评测'], features: ['资讯全', '评测多', '视频'], proxy: false
       },
     ]
   },
@@ -343,6 +363,21 @@ export const categories = [
         fullDesc: '基于 Mihon 衍生的"漫画 + 番剧"二合一客户端，一个 App 同时管漫画和追番，扩展源打通番剧 / 漫画两个生态。',
         tags: ['漫画', '番剧', '二合一'], features: ['二合一', 'Mihon 同源', '扩展互通'], proxy: false
       },
+      {
+        name: 'YACReader', url: 'https://github.com/YACReader/yacreader', desc: '桌面漫画阅读器',
+        fullDesc: '跨平台桌面漫画阅读器（Windows / macOS / Linux），支持 CBZ/CBR/PDF 漫画库管理 + 远程 YACReaderLibrary 服务。',
+        tags: ['桌面', '三端', '阅读器'], features: ['三端', '漫画库', '远程'], proxy: false
+      },
+      {
+        name: 'OpenComic', url: 'https://github.com/ollm/OpenComic', desc: '开源漫画阅读',
+        fullDesc: 'Electron 写的开源漫画阅读器（Windows / macOS / Linux），UI 现代，支持 manga / comic / 双页模式。',
+        tags: ['Electron', '开源', '桌面'], features: ['现代 UI', '多格式', '三端'], proxy: false
+      },
+      {
+        name: 'PeriHubo', url: 'https://github.com/nicobooz/PeriHubo', desc: '哔咔桌面客户端',
+        fullDesc: '哔咔的桌面端第三方客户端，基于 Tauri 框架，支持 Win/Mac/Linux 三大平台。',
+        tags: ['Tauri', '哔咔', '桌面'], features: ['三端', '现代 UI', '轻量'], proxy: false
+      },
     ]
   },
   {
@@ -369,6 +404,16 @@ export const categories = [
         name: '弹弹play', url: 'https://www.dandanplay.com/', desc: '老牌弹幕播放器',
         fullDesc: '老牌本地视频 + 弹幕匹配播放器，可自动从视频文件匹配第三方弹幕库（包含部分番剧），是下载党追番利器。',
         tags: ['弹幕', '本地', '匹配'], features: ['弹幕匹配', '本地播放', '多格式'], proxy: false
+      },
+      {
+        name: 'EasyBangumi', url: 'https://github.com/easybangumi/easybangumi', desc: '免费开源追番',
+        fullDesc: 'Java 写的开源番剧 App，提供资源采集 + 弹幕 + Web 端管理后台，可自部署后端 + 多端 App 追番。',
+        tags: ['番剧', 'Java', '自部署'], features: ['资源采集', 'Web 后台', '开源'], proxy: false
+      },
+      {
+        name: 'Bangumi-Android', url: 'https://github.com/czy0729/Bangumi', desc: 'React Native 追番',
+        fullDesc: '基于 React Native 的 Bangumi 第三方客户端（iOS / Android / WSA），UI 现代化，与 bgm.tv 账号体系完全打通。',
+        tags: ['React Native', 'Bangumi', 'iOS'], features: ['原生体验', '追番同步', '多端'], proxy: false
       },
     ]
   },
@@ -507,6 +552,21 @@ export const categories = [
         name: '幻梦轻小说', url: 'https://www.huanmengacg.com/', desc: '轻小说',
         fullDesc: '轻小说专门站，资源多为高质量翻译 / 转载，附带书评与推荐。',
         tags: ['轻小说', '翻译', '书评'], features: ['高质量', '附书评', '推荐'], proxy: false
+      },
+      {
+        name: '刺猬猫阅读', url: 'https://www.ciweimao.com/', desc: '二次元网文头部',
+        fullDesc: '国内二次元网文头部平台，书籍量超百万册，首创弹幕互动阅读，主打二次元穿越 / 综漫同人 / 娘化百合。',
+        tags: ['网文', '二次元', '弹幕'], features: ['百万册', '弹幕互动', '综漫'], proxy: false
+      },
+      {
+        name: '轻之文库', url: 'https://www.linovel.net/', desc: '国轻原创',
+        fullDesc: '国内最早轻小说分享交流平台之一，主打新作首发与读者共创生态，大量国轻作者 / 原创作品。',
+        tags: ['轻小说', '原创', '国轻'], features: ['新作首发', '国轻', '移动端'], proxy: false
+      },
+      {
+        name: 'Kadokado', url: 'https://kadokado.com.tw/', desc: '角川正版',
+        fullDesc: '角川官方正版平台，台湾繁体区，庞大正版日轻库藏 + 漫画 / 插画资源，版权保障稳定性高。',
+        tags: ['角川', '正版', '日轻'], features: ['正版', '库藏大', '漫画'], proxy: true
       },
     ]
   },
@@ -660,6 +720,159 @@ export const categories = [
         name: 'Animeko', url: 'https://myani.org/', desc: 'Compose 番剧',
         fullDesc: 'JetBrains Compose Multiplatform 番剧 App，UI 现代，Bangumi 追番同步。',
         tags: ['番剧', 'Compose', 'Bangumi'], features: ['现代 UI', '追番同步', 'KMP'], proxy: false
+      },
+      {
+        name: 'Waifu2x-Extension-GUI', url: 'https://github.com/AaronFeng753/Waifu2x-Extension-GUI', desc: 'AI 图像超分 GUI',
+        fullDesc: '集成了 Waifu2x / SRMD / RealSR / Real-ESRGAN / Real-CUGAN 等多种超分算法的 GUI 客户端，批量处理视频 / 番剧 / 漫画图片。',
+        tags: ['超分', 'GUI', '批量'], features: ['多算法', '批量', '视频帧'], proxy: false
+      },
+      {
+        name: 'Real-ESRGAN', url: 'https://github.com/xinntao/Real-ESRGAN', desc: 'AI 图像超分',
+        fullDesc: '腾讯 ARC 实验室开源的图像 / 视频超分算法，Anime6B / Video 多个模型，是当前开源超分的事实标准之一。',
+        tags: ['超分', '腾讯', '开源'], features: ['多模型', '视频支持', '高质量'], proxy: false
+      },
+      {
+        name: 'Real-CUGAN', url: 'https://github.com/bilibili/ailab/Real-CUGAN', desc: 'B站开源超分',
+        fullDesc: 'B站 AI Lab 开源的动漫专用超分算法，WebUI + 命令行双模式，对二次元画面细节保留好。',
+        tags: ['超分', 'B站', '二次元'], features: ['二次元', 'WebUI', '开源'], proxy: false
+      },
+      {
+        name: 'EasySpider', url: 'https://github.com/NaiboWang/EasySpider', desc: '可视化爬虫',
+        fullDesc: '零代码可视化爬虫工具，图形化选择元素 + 流程编排，可批量抓取番剧 / 漫画 / 小说章节。',
+        tags: ['爬虫', '零代码', 'GUI'], features: ['可视化', '零代码', '批量'], proxy: false
+      },
+    ]
+  },
+  {
+    id: 'music',
+    name: '二次元音乐',
+    icon: '🎵',
+    items: [
+      {
+        name: 'ACG 漫音社', url: 'https://www.acgjc.com/', desc: 'ACG 音乐下载',
+        fullDesc: '老牌 ACG 音乐 / 番剧 / 漫画综合下载站，资源以网盘 / 磁力分发，OP / ED / BGM / OST 一应俱全。',
+        tags: ['ACG', '音乐', '网盘'], features: ['音乐', 'OP/ED', '综合'], proxy: false
+      },
+      {
+        name: 'Biu.Moe', url: 'https://biu.moe/', desc: '二次元音乐',
+        fullDesc: '专做 ACG 音乐分享的小众站，资源以单曲 / 专辑形式组织，UI 简洁无广告，是音乐党的纯享选择。',
+        tags: ['ACG', '单曲', '纯享'], features: ['单曲专辑', '无广告', '纯享'], proxy: false
+      },
+      {
+        name: '源音塘', url: 'https://www.yuanyintang.org/', desc: '原声带 / OST',
+        fullDesc: '专注动画 / 游戏原声带分享的 ACG 音乐站，资源以 OST / BGM 专辑为主，标签细致。',
+        tags: ['OST', 'BGM', '标签'], features: ['OST', '标签细', '动画'], proxy: false
+      },
+      {
+        name: '千千音乐', url: 'https://www.taihe.com/', desc: '在线音乐',
+        fullDesc: '老牌在线音乐平台（前百度音乐），ACG / 二次元专区收录丰富，资源齐全 + 智能推荐。',
+        tags: ['音乐', '平台', 'ACG'], features: ['ACG 专区', '推荐', '老牌'], proxy: false
+      },
+      {
+        name: 'MyFreeMP3', url: 'https://tool.liumingye.cn/music/', desc: '在线试听 / 下载',
+        fullDesc: '聚合多音乐平台资源的免费试听 / 下载站，ACG 资源丰富，UI 简洁，支持歌词 / 封面下载。',
+        tags: ['音乐', '免费', '聚合'], features: ['多源聚合', '免费', '歌词'], proxy: false
+      },
+    ]
+  },
+  {
+    id: 'figure',
+    name: '周边 / 谷子',
+    icon: '🎁',
+    items: [
+      {
+        name: '哔哩哔哩会员购', url: 'https://mall.bilibili.com/', desc: '官方周边商城',
+        fullDesc: 'B 站官方周边商城，主打二次元 IP 衍生品（手办 / 吧唧 / 亚克力 / 周边），全部正版授权。',
+        tags: ['B站', '官方', '周边'], features: ['正版', '品类多', '官方'], proxy: false
+      },
+      {
+        name: '萌购', url: 'https://www.amiami.com/', desc: '日淘手办',
+        fullDesc: '日本最大手办 / 周边网上商城，中文界面，支持直邮 / 转运，价格比国内便宜，是手办党日淘首选。',
+        tags: ['日淘', '手办', '转运'], features: ['日淘', '中文', '转运'], proxy: true
+      },
+      {
+        name: '闲鱼', url: 'https://www.goofish.com/', desc: '二手交易',
+        fullDesc: '阿里旗下二手交易平台，二次元"回血"主场，2026 年新上线"鱼鲤次元"频道专注谷子经济，提供官方仓鉴定服务。',
+        tags: ['二手', '回血', '谷子'], features: ['二手大', '官方仓', '谷子'], proxy: false
+      },
+      {
+        name: '千岛 App', url: 'https://www.qdobos.com/', desc: '潮玩 / 谷子',
+        fullDesc: '潮玩 / 谷子垂类交易平台，闪购模式 + 行情榜 + 圈子社区，潮玩圈和谷圈核心用户的"查价 + 闪购"双优选。',
+        tags: ['潮玩', '谷子', '闪购'], features: ['闪购', '行情榜', '社区'], proxy: false
+      },
+      {
+        name: 'Animate 中国', url: 'https://www.animate-onlineshop.com.cn/', desc: '动漫周边',
+        fullDesc: '日本 Animate 在华官方商城，IP 周边齐全（手办 / 周边 / CD / 漫画），常有限定商品。',
+        tags: ['Animate', '官方', 'IP'], features: ['官方', 'IP 全', '限定'], proxy: true
+      },
+    ]
+  },
+  {
+    id: 'news',
+    name: '资讯 / 评分',
+    icon: '📰',
+    items: [
+      {
+        name: 'Bangumi 番组计划', url: 'https://bgm.tv/', desc: 'ACG 评分核心',
+        fullDesc: '中文 ACG 圈最权威的评分 / 资讯 / 社区平台，覆盖动画 / 漫画 / 游戏 / 音乐 / 三次元，条目库极全，社区氛围浓厚。',
+        tags: ['评分', '社区', '条目'], features: ['条目全', '社区强', '多领域'], proxy: false
+      },
+      {
+        name: 'MyAnimeList', url: 'https://myanimelist.net/', desc: '全球最大动漫 DB',
+        fullDesc: '全球最知名的动漫 / 漫画评分数据库，月活数千万，英文社区最活跃，榜单权威。',
+        tags: ['MAL', '英文', '评分'], features: ['英文 DB', '评分权威', '榜单'], proxy: true
+      },
+      {
+        name: 'AniList', url: 'https://anilist.co/', desc: '现代 ACG 平台',
+        fullDesc: '新一代 ACG 平台，UI 现代、统计丰富，跨端 iOS / Android / macOS / Windows 同步追番，适合数据控。',
+        tags: ['AniList', '现代', '统计'], features: ['现代 UI', '数据统计', '多端'], proxy: true
+      },
+      {
+        name: 'VNDB', url: 'https://vndb.org/', desc: '视觉小说 DB',
+        fullDesc: '全球最大的视觉小说（GalGame）数据库，6.3 万+ 作品、16 万+ 角色、14 万+ 发行版，标签系统业内标杆。',
+        tags: ['VN', 'GalGame', '标签'], features: ['VN 全', '标签细', '业界标杆'], proxy: true
+      },
+      {
+        name: 'AniDB', url: 'https://anidb.net/', desc: '动漫资料库',
+        fullDesc: '老牌动漫资料库，覆盖动画 / 番剧 / OVA / 剧场版等所有形式的 ACG 作品，文件信息（CRC / 来源）极详。',
+        tags: ['资料库', '老牌', 'CRC'], features: ['资料全', '文件信息', '老牌'], proxy: true
+      },
+      {
+        name: 'B站番剧索引', url: 'https://www.bilibili.com/anime/', desc: 'B站官方番剧',
+        fullDesc: 'B站官方番剧索引，权威番剧时间表 / 评分 / 追番数 / 播放量，正版番剧大本营，国创 / 日漫 / 欧美动画全收录。',
+        tags: ['B站', '官方', '正版'], features: ['正版', '时间表', '评分'], proxy: false
+      },
+    ]
+  },
+  {
+    id: 'imgai',
+    name: '图像 AI',
+    icon: '🖼️',
+    items: [
+      {
+        name: 'Waifu2x', url: 'https://waifu2x.net/', desc: '二次元超分鼻祖',
+        fullDesc: '二次元图像超分辨率算法鼻祖，原始项目已被多次重写，目前 waifu2x.net 提供 Web 在线版，免登录直接使用。',
+        tags: ['Waifu2x', 'Web', '在线'], features: ['Web 版', '免登录', '二次元'], proxy: false
+      },
+      {
+        name: 'Real-ESRGAN ncnn', url: 'https://github.com/xinntao/Real-ESRGAN-ncnn-vulkan', desc: 'Real-ESRGAN 桌面',
+        fullDesc: 'Real-ESRGAN 的 ncnn + Vulkan 实现桌面版，开箱即用（Win / Mac / Linux），无 Python 环境要求。',
+        tags: ['超分', '桌面', '三端'], features: ['三端', 'Vulkan', '无依赖'], proxy: false
+      },
+      {
+        name: 'Waifu2x-Extension-GUI', url: 'https://github.com/AaronFeng753/Waifu2x-Extension-GUI', desc: '超分全功能 GUI',
+        fullDesc: '集成 Waifu2x / SRMD / RealSR / Real-ESRGAN / Real-CUGAN 等多种算法的 Windows GUI，批量处理视频帧 / 图片。',
+        tags: ['超分', 'GUI', 'Windows'], features: ['多算法', '批量', '视频帧'], proxy: false
+      },
+      {
+        name: 'upscayl', url: 'https://github.com/upscayl/upscayl', desc: '开源桌面超分',
+        fullDesc: '开源桌面超分辨率客户端（Win / Mac / Linux），UI 现代，基于 Real-ESRGAN 模型，支持批量处理。',
+        tags: ['超分', '三端', '现代 UI'], features: ['三端', '现代 UI', '批量'], proxy: false
+      },
+      {
+        name: 'chaiNNer', url: 'https://github.com/chaiNNer-org/chaiNNer', desc: '节点式图像处理',
+        fullDesc: '节点式（Node-based）图像处理工具，可视化拼接超分 / 修复 / 上色等 AI 模型，适合进阶玩家。',
+        tags: ['节点', '可视化', '进阶'], features: ['节点', '可视化', '可拼装'], proxy: false
       },
     ]
   },
