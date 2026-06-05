@@ -1,4 +1,4 @@
-// Miru Index 数据：22 个细分分类，约 145+ 条资源
+// Miru Index 数据：26 个细分分类，约 170+ 条资源
 // 字段：name, url, desc, fullDesc, tags, features, proxy
 // proxy: true 表示需要科学上网
 
@@ -873,6 +873,149 @@ export const categories = [
         name: 'chaiNNer', url: 'https://github.com/chaiNNer-org/chaiNNer', desc: '节点式图像处理',
         fullDesc: '节点式（Node-based）图像处理工具，可视化拼接超分 / 修复 / 上色等 AI 模型，适合进阶玩家。',
         tags: ['节点', '可视化', '进阶'], features: ['节点', '可视化', '可拼装'], proxy: false
+      },
+    ]
+  },
+  {
+    id: 'draw',
+    name: '绘画 / 设计',
+    icon: '🎨',
+    items: [
+      {
+        name: 'Pixiv', url: 'https://www.pixiv.net/', desc: '日本最大插画平台',
+        fullDesc: '日本最大插画 / 漫画 / 同人志投稿平台，俗称 P 站，作品以 pid 编号索引，画师生态最丰富。',
+        tags: ['Pixiv', '插画', '同人'], features: ['pid 索引', '画师关注', '排行榜'], proxy: true
+      },
+      {
+        name: '半次元', url: 'https://bcy.net/', desc: '绘画 / Cos / 小说社区',
+        fullDesc: '国内知名的二次元综合社区，绘画 / Cos / 小说 / 视频四大板块，年轻画师 / Coser 入驻密集，作品氛围活跃。',
+        tags: ['绘画', 'Cos', '社区'], features: ['绘画社区', 'Cos 摄影', '小说'], proxy: false
+      },
+      {
+        name: '米画师', url: 'https://www.mihuashi.com/', desc: '约稿平台',
+        fullDesc: '专业约稿平台，万名过审画师，公开透明报价 + 全程交易担保，游戏 / 卡牌 / 场景 / 同人插画 各类需求一应俱全。',
+        tags: ['约稿', '画师', '担保'], features: ['画师多', '担保', '透明'], proxy: false
+      },
+      {
+        name: '站酷 ZCOOL', url: 'https://www.zcool.com.cn/', desc: '设计师社区',
+        fullDesc: '国内最老牌的设计师社区，覆盖插画 / UI / 平面 / 工业 / 摄影 / 动漫，原创作品 + 设计师招聘 / 接活生态完整。',
+        tags: ['设计', '社区', '招聘'], features: ['设计师', '原创', '招聘'], proxy: false
+      },
+      {
+        name: 'Lofter', url: 'https://www.lofter.com/', desc: '同人创作社区',
+        fullDesc: '网易旗下兴趣创作社区，二次元 / 同人 / 摄影 / 写作四大领域，标签 / 关注流体系成熟，LOFTER 全文搜索引擎收录良好。',
+        tags: ['同人', '网易', '社区'], features: ['同人', '标签', '创作'], proxy: false
+      },
+      {
+        name: 'ArtStation', url: 'https://www.artstation.com/', desc: '全球 CG 艺术',
+        fullDesc: '全球最知名的 CG / 概念设计 / 3D 艺术家作品集平台，业内招聘 / 自由职业订单生态成熟，画质顶级。',
+        tags: ['CG', '概念', '全球'], features: ['CG 强', '招聘', '全球'], proxy: true
+      },
+    ]
+  },
+  {
+    id: 'video',
+    name: '视频 / 弹幕',
+    icon: '📺',
+    items: [
+      {
+        name: '哔哩哔哩', url: 'https://www.bilibili.com/', desc: 'B 站',
+        fullDesc: '国内最大 ACG 视频弹幕社区，正版番剧 / 国创 / 游戏 / 鬼畜 / 科技 / 生活全覆盖，独家番剧数量行业第一。',
+        tags: ['B站', '弹幕', '番剧'], features: ['番剧', '弹幕', '国创'], proxy: false
+      },
+      {
+        name: 'AcFun', url: 'https://www.acfun.cn/', desc: 'A 站',
+        fullDesc: '国内首家弹幕视频网站（AcFun），主打 ACG 番剧 + 长视频 + 虚拟偶像社区，年轻用户群为主。',
+        tags: ['A站', '弹幕', '虚拟偶像'], features: ['弹幕鼻祖', '虚拟偶像', '番剧'], proxy: false
+      },
+      {
+        name: 'Niconico', url: 'https://www.nicovideo.jp/', desc: '弹幕始祖',
+        fullDesc: '日本弹幕视频网站鼻祖（niconico），弹幕文化的发源地，与日站番剧同步性最佳，画质/字幕独家资源多。',
+        tags: ['nico', '弹幕', '日本'], features: ['弹幕鼻祖', '日番同步', '独家'], proxy: true
+      },
+      {
+        name: 'YouTube', url: 'https://www.youtube.com/', desc: '全球视频',
+        fullDesc: '全球最大视频平台，番剧 / VTuber / MMD / 二次元解说 / 同人动画等所有 ACG 内容生态最丰富，需科学上网。',
+        tags: ['YT', '全球', '视频'], features: ['海量', 'VTuber', 'MMD'], proxy: true
+      },
+      {
+        name: 'Twitch', url: 'https://www.twitch.tv/', desc: '游戏直播',
+        fullDesc: '全球最大游戏直播平台，ACGN 圈 UP 主 / Vtuber 海外直播主要阵地，赛事 / 歌回 / 游戏实况全收录。',
+        tags: ['直播', 'Twitch', '游戏'], features: ['直播', 'Vtuber', '赛事'], proxy: true
+      },
+    ]
+  },
+  {
+    id: 'community',
+    name: 'ACG 社区',
+    icon: '💬',
+    items: [
+      {
+        name: '萌娘百科', url: 'https://zh.moegirl.org/', desc: '万物皆可萌',
+        fullDesc: '面向 ACG 的中文在线百科项目，条目覆盖动画 / 漫画 / 游戏 / 轻小说 / 角色 / 梗 / 编年史，维基式协作维护。',
+        tags: ['百科', '维基', 'ACGN'], features: ['百科', '条目全', '协作'], proxy: false
+      },
+      {
+        name: '百度贴吧', url: 'https://tieba.baidu.com/', desc: '老牌社区',
+        fullDesc: '国内最早 / 最大的兴趣社区，每个 ACG 作品基本都有独立吧，用户基数巨大，二次创作 / 讨论氛围浓厚。',
+        tags: ['贴吧', '社区', '兴趣'], features: ['吧文化', '用户多', '话题'], proxy: false
+      },
+      {
+        name: 'NGA 玩家社区', url: 'https://bbs.nga.cn/', desc: '游戏综合论坛',
+        fullDesc: '老牌游戏 / ACG 综合论坛，版块涵盖游戏（手游 / 端游 / 主机）/ 模玩手办 / 摄影 / 摄影 / 音乐，技术氛围浓。',
+        tags: ['NGA', '论坛', '游戏'], features: ['综合', '手办', '游戏'], proxy: false
+      },
+      {
+        name: '知乎', url: 'https://www.zhihu.com/', desc: '问答社区',
+        fullDesc: '国内最大问答社区，ACG 圈层话题（动画 / 漫画 / GalGame / 声优 / 同人）讨论深度高，评测 / 攻略质量好。',
+        tags: ['知乎', '问答', '深度'], features: ['问答', '深度文', '话题'], proxy: false
+      },
+      {
+        name: '微博', url: 'https://weibo.com/', desc: '资讯 / Cos',
+        fullDesc: '国内主流社交媒体，ACGN 官方账号 / Coser / 画师 / 制作组首选宣发阵地，热点事件最快的二次元资讯源。',
+        tags: ['微博', '社交', '资讯'], features: ['资讯快', 'Cos', '官方'], proxy: false
+      },
+      {
+        name: 'CnGal', url: 'https://www.cngal.org/', desc: '国 GalGame 资讯',
+        fullDesc: '中文 GalGame 综合性资讯站，作品条目 / 评测 / 资讯 / 编辑团队齐全，国内独立 Gal 圈最权威的资讯平台。',
+        tags: ['Gal', '中文', '国 Gal'], features: ['国 Gal', '条目', '资讯'], proxy: false
+      },
+    ]
+  },
+  {
+    id: 'agg',
+    name: '资源聚合',
+    icon: '🗂️',
+    items: [
+      {
+        name: '虫部落', url: 'https://search.chongbuluo.com/', desc: '聚合搜索',
+        fullDesc: '资源搜集控的瑞士军刀，聚合搜索 + 学术搜索 + 电子书搜索三件套，社区里大佬每天分享高质量资源。',
+        tags: ['搜索', '聚合', '社区'], features: ['聚合', '学术', '社区'], proxy: false
+      },
+      {
+        name: '鸠摩搜索', url: 'https://www.jiumodiary.com/', desc: '电子书聚合',
+        fullDesc: '电子书聚合搜索引擎，跨网盘 / 论坛 / Z-Library 等多个数据源，结果按相关度 / 时间排序，找书神器。',
+        tags: ['电子书', '搜索', '聚合'], features: ['多源', '全类型', '搜索强'], proxy: false
+      },
+      {
+        name: 'Koodo Reader', url: 'https://github.com/troyeguo/koodo-reader', desc: '开源电子书',
+        fullDesc: '开源跨平台电子书阅读器（Win / Mac / Linux / Web），支持 EPUB / PDF / MOBI / Kindle 等十余种格式，颜值高。',
+        tags: ['阅读', '开源', '多端'], features: ['多端', '多格式', 'Web'], proxy: false
+      },
+      {
+        name: '我的小书屋', url: 'https://m.wodebook.com/', desc: '电子书',
+        fullDesc: '电子书资源聚合站，资源覆盖网文 / 轻小说 / 古典 / 教材 / 期刊，按热度 / 时间排序，移动端友好。',
+        tags: ['电子书', '网文', '移动'], features: ['网文', '移动端', '聚合'], proxy: false
+      },
+      {
+        name: '阿里云盘资源', url: 'https://www.alipan.com/', desc: '网盘',
+        fullDesc: '阿里云盘是当前不限速、容量大的主流网盘之一，ACG 资源以分享形式传播活跃，可挂载到 WebDAV / Infuse 等。',
+        tags: ['网盘', '不限速', '阿里'], features: ['不限速', '容量大', 'WebDAV'], proxy: false
+      },
+      {
+        name: '夸克网盘', url: 'https://pan.quark.cn/', desc: '网盘 + 视频',
+        fullDesc: '夸克浏览器旗下网盘，ACG 资源 + 在线视频 + 学习资料生态齐备，免费扩容活动多。',
+        tags: ['网盘', '夸克', '视频'], features: ['网盘', '视频', '扩容'], proxy: false
       },
     ]
   },
