@@ -116,12 +116,8 @@ onBeforeUnmount(() => {
             0 0 0 1px rgba(217, 32, 32, 0.3);
         "
       >
-        <!-- 和纸纹理 -->
-        <div aria-hidden="true" class="absolute inset-0 pointer-events-none rounded-[4px]" style="
-          background-image: url(&quot;data:image/svg+xml;utf8,<svg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.3  0 0 0 0 0.2  0 0 0 0 0.1  0 0 0 0.18 0'/></filter><rect width='200' height='200' filter='url(%23n)'/></svg>&quot;);
-          mix-blend-mode: multiply;
-          opacity: 0.7;
-        "></div>
+        <!-- 和纸纹理 (CSS noise 替代 SVG filter, 避免 ERR_INVALID_URL) -->
+        <div aria-hidden="true" class="absolute inset-0 pointer-events-none rounded-[4px] washi"></div>
 
         <!-- 顶部朱红虚线边 -->
         <div aria-hidden="true" class="absolute top-0 left-0 right-0 h-[3px] z-10" style="
@@ -328,6 +324,15 @@ onBeforeUnmount(() => {
 </template>
 
 <style scoped>
+/* 和纸纹理: 纯 CSS 模拟纸张质感, 避免 SVG filter 在 Modal 重挂载时报错 */
+.washi {
+  background:
+    radial-gradient(circle at 20% 30%, rgba(168, 22, 26, 0.025) 0, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(168, 22, 26, 0.02) 0, transparent 50%),
+    radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0.03) 0, transparent 70%);
+  mix-blend-mode: multiply;
+  opacity: 0.85;
+}
 /* 关闭按钮 */
 .modal-close {
   background: rgba(184, 35, 31, 0.08);
