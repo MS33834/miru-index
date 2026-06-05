@@ -5,42 +5,61 @@
  * GitHub 加速镜像源
  */
 export const GH_MIRRORS = [
-  { id: 'ghproxy', name: 'GhProxy', url: 'https://gh-proxy.com/' },
-  { id: 'ghps', name: 'GhProxy.net', url: 'https://ghps.cc/' },
-  { id: 'mirror', name: 'GhProxy Mirror', url: 'https://mirror.ghproxy.com/' },
-  { id: 'jsdelivr', name: 'jsDelivr CDN', url: 'https://cdn.jsdelivr.net/' },
-  { id: 'fastgit', name: 'FastGit', url: 'https://raw.fastgit.org/' },
+  { id: 'ghproxy',  name: 'GhProxy',       fmt: 'prefix' },
+  { id: 'ghps',     name: 'GhProxy.net',   fmt: 'prefix' },
+  { id: 'mirror',   name: 'GhProxy Mirror', fmt: 'prefix' },
+  { id: 'jsdelivr', name: 'jsDelivr CDN',  fmt: 'repo'   },
+  { id: 'fastgit',  name: 'FastGit',       fmt: 'prefix' },
 ]
 
+const GH_MIRROR_BASE = {
+  ghproxy: 'https://gh-proxy.com/',
+  ghps:    'https://ghps.cc/',
+  mirror:  'https://mirror.ghproxy.com/',
+  jsdelivr:'https://cdn.jsdelivr.net/gh/',
+  fastgit: 'https://raw.fastgit.org/',
+}
+
 /**
- * 给 GitHub URL 加镜像前缀
- *  /xx/yy -> https://gh-proxy.com/https://raw.githubusercontent.com/xx/yy
+ * 判断 URL 是否为 GitHub 仓库主页（无 /blob/ /tree/ /releases/ /raw/ 等路径）
  */
-export function ghMirror(url, mirror = 'ghproxy') {
+function isRepoHome(url) {
+  // 形如 https://github.com/owner/repo 或 https://github.com/owner/repo/
+  return /^https:\/\/github\.com\/[^/]+\/[^/]+\/?(\?.*)?$/.test(url)
+}
+
+/**
+ * 把 GitHub URL 转为镜像 URL
+ *  - 仓库主页（isRepoHome）→ 仓库页镜像（jsDelivr 风格）
+ *  - 其他（blob / tree / raw / releases）→ raw 资源镜像（prefix 风格）
+ */
+export function ghMirror(url, mirrorId = 'ghproxy') {
   if (!url || !url.includes('github.com')) return url
-  const m = GH_MIRRORS.find(x => x.id === mirror) || GH_MIRRORS[0]
-  // 把 https://github.com/owner/repo 替换为镜像 raw URL
-  if (url.includes('github.com/') && !url.includes('/blob/') && !url.includes('/tree/') && !url.includes('/releases') && !url.includes('/raw/')) {
-    // 仓库主页: 走 jsdelivr 镜像仓库页
-    const jm = GH_MIRRORS.find(x => x.id === 'jsdelivr')
-    const path = url.replace('https://github.com/', '')
-    return `https://cdn.jsdelivr.net/gh/${path.replace(/\/$/, '')}`
+  const base = GH_MIRROR_BASE[mirrorId] || GH_MIRROR_BASE.ghproxy
+
+  if (isRepoHome(url)) {
+    // https://github.com/owner/repo  →  base + owner/repo
+    const path = url.replace('https://github.com/', '').replace(/\/+$/, '')
+    return base + path
   }
-  // raw 资源
-  const rawUrl = url
+
+  // raw 资源：把 https://github.com/owner/repo/blob/branch/path → raw.githubusercontent.com
+  let rawUrl = url
     .replace('https://github.com/', 'https://raw.githubusercontent.com/')
     .replace('/blob/', '/')
-  return m.url + rawUrl
+
+  // prefix 镜像直接拼接
+  return base + rawUrl
 }
 
 /**
  * 健康状态 -> 颜色 + 中文标签 + 图标
  */
 export const HEALTH_MAP = {
-  ok:       { color: '#3a8a3a', bg: 'rgba(58, 138, 58, 0.12)',  label: '在线',      icon: '●' },
-  mirror:   { color: '#c9a55c', bg: 'rgba(201, 165, 92, 0.15)',  label: '需镜像',    icon: '◇' },
-  crawl:    { color: '#a4853e', bg: 'rgba(164, 133, 62, 0.15)',  label: '反爬',      icon: '◐' },
-  unstable: { color: '#a8161a', bg: 'rgba(168, 22, 26, 0.12)',   label: '不稳定',    icon: '○' },
+  ok:       { color: '#3a8a3a', bg: 'rgba(58, 138, 58, 0.12)',  label: '在线',     icon: '●' },
+  mirror:   { color: '#c9a55c', bg: 'rgba(201, 165, 92, 0.15)', label: '需镜像',   icon: '◇' },
+  crawl:    { color: '#a4853e', bg: 'rgba(164, 133, 62, 0.15)', label: '反爬',     icon: '◐' },
+  unstable: { color: '#a8161a', bg: 'rgba(168, 22, 26, 0.12)',  label: '不稳定',   icon: '○' },
 }
 
 export function healthOf(item) {

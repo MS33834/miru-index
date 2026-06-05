@@ -134,10 +134,7 @@ onBeforeUnmount(() => {
           <button
             @click="emit('close')"
             aria-label="关闭"
-            class="absolute top-3 right-3 w-10 h-10 rounded-full flex items-center justify-center transition z-20"
-            style="background: rgba(184, 35, 31, 0.08); border: 1px solid rgba(184, 35, 31, 0.3); color: #a8161a;"
-            onmouseover="this.style.background='rgba(184,35,31,0.18)'"
-            onmouseout="this.style.background='rgba(184,35,31,0.08)'"
+            class="modal-close absolute top-3 right-3 w-10 h-10 rounded-full flex items-center justify-center transition z-20"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
               <line x1="6" y1="6" x2="18" y2="18" />
@@ -243,10 +240,7 @@ onBeforeUnmount(() => {
               <div v-if="isGitHub" class="mt-4 rounded-sm overflow-hidden" style="border: 1px solid rgba(201, 165, 92, 0.3); background: rgba(201, 165, 92, 0.05);">
                 <button
                   @click="mirrorOpen = !mirrorOpen"
-                  class="w-full flex items-center justify-between gap-2 px-4 py-2.5 font-serif-cn text-sm transition"
-                  style="color: #a4853e;"
-                  onmouseover="this.style.background='rgba(201, 165, 92, 0.1)'"
-                  onmouseout="this.style.background='transparent'"
+                  class="mirror-toggle w-full flex items-center justify-between gap-2 px-4 py-2.5 font-serif-cn text-sm transition"
                 >
                   <span class="flex items-center gap-2">
                     <span class="font-mono text-[10px] tracking-[0.2em] text-[#a8161a]">▎镜 · MIRROR</span>
@@ -260,14 +254,8 @@ onBeforeUnmount(() => {
                     v-for="m in GH_MIRRORS"
                     :key="m.id"
                     @click="selectMirror(m)"
-                    class="px-4 py-2 text-xs font-mono cursor-pointer transition flex items-center gap-2"
-                    :style="{
-                      background: selectedMirror.id === m.id ? 'rgba(201, 165, 92, 0.18)' : 'transparent',
-                      color: selectedMirror.id === m.id ? '#a8161a' : '#5a4a3a',
-                    }"
-                    onmouseover="if(this.dataset.sel!=='1')this.style.background='rgba(201,165,92,0.08)'"
-                    onmouseout="if(this.dataset.sel!=='1')this.style.background='transparent'"
-                    :data-sel="selectedMirror.id === m.id ? '1' : '0'"
+                    class="mirror-option px-4 py-2 text-xs font-mono cursor-pointer transition flex items-center gap-2"
+                    :class="{ 'is-active': selectedMirror.id === m.id }"
                   >
                     <span :class="selectedMirror.id === m.id ? 'text-[#a8161a]' : 'opacity-30'">●</span>
                     <span class="flex-1">{{ m.name }}</span>
@@ -305,16 +293,7 @@ onBeforeUnmount(() => {
             <button
               v-if="isGitHub"
               @click="openOriginal"
-              class="px-5 py-3.5 font-serif-cn font-bold text-sm transition flex items-center justify-center gap-2"
-              style="
-                background: transparent;
-                color: #5a4a3a;
-                border: 1px solid #5a4a3a55;
-                border-radius: 2px;
-                letter-spacing: 0.05em;
-              "
-              onmouseover="this.style.background='rgba(0,0,0,0.05)';this.style.color='#1a1410'"
-              onmouseout="this.style.background='transparent';this.style.color='#5a4a3a'"
+              class="btn-mute px-5 py-3.5 font-serif-cn font-bold text-sm transition flex items-center justify-center gap-2"
               title="打开 GitHub 原始链接（需梯子）"
             >
               <span class="text-[10px]">原</span>
@@ -322,16 +301,7 @@ onBeforeUnmount(() => {
             <button
               v-if="isGitHub"
               @click="copyMirror"
-              class="px-5 py-3.5 font-serif-cn font-bold text-sm transition flex items-center justify-center gap-2"
-              style="
-                background: transparent;
-                color: #a4853e;
-                border: 1px solid #a4853e55;
-                border-radius: 2px;
-                letter-spacing: 0.05em;
-              "
-              onmouseover="this.style.background='rgba(201, 165, 92, 0.1)';this.style.color='#1a1410'"
-              onmouseout="this.style.background='transparent';this.style.color='#a4853e'"
+              class="btn-gold px-5 py-3.5 font-serif-cn font-bold text-sm transition flex items-center justify-center gap-2"
               :title="`复制 ${selectedMirror.name} 镜像 URL`"
             >
               <span v-if="!copiedMirror">抄 · 镜</span>
@@ -339,26 +309,14 @@ onBeforeUnmount(() => {
             </button>
             <button
               @click="copyUrl"
-              class="px-6 py-3.5 font-serif-cn font-bold text-base transition flex items-center justify-center gap-2"
-              style="
-                background: transparent;
-                color: #1a1410;
-                border: 1px solid #1a1410;
-                border-radius: 2px;
-                letter-spacing: 0.1em;
-              "
-              onmouseover="this.style.background='rgba(0,0,0,0.05)'"
-              onmouseout="this.style.background='transparent'"
+              class="btn-dark px-6 py-3.5 font-serif-cn font-bold text-base transition flex items-center justify-center gap-2"
             >
               <span v-if="!copied">抄 · 录</span>
               <span v-else class="text-[#a8161a]">已抄 ✓</span>
             </button>
             <button
               @click="emit('close')"
-              class="px-6 py-3.5 font-kai-cn text-base transition"
-              style="background: transparent; color: #5a4a3a; letter-spacing: 0.1em;"
-              onmouseover="this.style.color='#1a1410'"
-              onmouseout="this.style.color='#5a4a3a'"
+              class="btn-text px-6 py-3.5 font-kai-cn text-base transition"
             >
               闭
             </button>
@@ -368,3 +326,85 @@ onBeforeUnmount(() => {
     </div>
   </Teleport>
 </template>
+
+<style scoped>
+/* 关闭按钮 */
+.modal-close {
+  background: rgba(184, 35, 31, 0.08);
+  border: 1px solid rgba(184, 35, 31, 0.3);
+  color: #a8161a;
+}
+.modal-close:hover {
+  background: rgba(184, 35, 31, 0.18);
+}
+
+/* 镜像下拉按钮 */
+.mirror-toggle {
+  color: #a4853e;
+  background: transparent;
+}
+.mirror-toggle:hover {
+  background: rgba(201, 165, 92, 0.1);
+}
+
+/* 镜像选项 */
+.mirror-option {
+  background: transparent;
+  color: #5a4a3a;
+}
+.mirror-option:not(.is-active):hover {
+  background: rgba(201, 165, 92, 0.08);
+}
+.mirror-option.is-active {
+  background: rgba(201, 165, 92, 0.18);
+  color: #a8161a;
+}
+
+/* 按钮：原 */
+.btn-mute {
+  background: transparent;
+  color: #5a4a3a;
+  border: 1px solid rgba(90, 74, 58, 0.33);
+  border-radius: 2px;
+  letter-spacing: 0.05em;
+}
+.btn-mute:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: #1a1410;
+}
+
+/* 按钮：抄镜 */
+.btn-gold {
+  background: transparent;
+  color: #a4853e;
+  border: 1px solid rgba(164, 133, 62, 0.33);
+  border-radius: 2px;
+  letter-spacing: 0.05em;
+}
+.btn-gold:hover {
+  background: rgba(201, 165, 92, 0.1);
+  color: #1a1410;
+}
+
+/* 按钮：抄录 */
+.btn-dark {
+  background: transparent;
+  color: #1a1410;
+  border: 1px solid #1a1410;
+  border-radius: 2px;
+  letter-spacing: 0.1em;
+}
+.btn-dark:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+/* 按钮：闭 */
+.btn-text {
+  background: transparent;
+  color: #5a4a3a;
+  letter-spacing: 0.1em;
+}
+.btn-text:hover {
+  color: #1a1410;
+}
+</style>
