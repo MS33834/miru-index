@@ -1,5 +1,6 @@
 <script setup>
-import { ref, onMounted, onBeforeUnmount, nextTick } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
+import { GH_MIRRORS, ghMirror, healthOf } from '../utils/mirror.js'
 
 const props = defineProps({
   item: { type: Object, required: true },
@@ -10,12 +11,25 @@ const emit = defineEmits(['close'])
 const dialogRef = ref(null)
 const enterBtnRef = ref(null)
 const copied = ref(false)
+const copiedMirror = ref(false)
+const mirrorOpen = ref(false)
+const selectedMirror = ref(GH_MIRRORS[0])
+
+const health = computed(() => healthOf(props.item))
+const isGitHub = computed(() => props.item.url?.includes('github.com'))
+const mirrorUrl = computed(() => {
+  if (!isGitHub.value) return null
+  return ghMirror(props.item.url, selectedMirror.value.id)
+})
 
 function onBackdropClick(e) {
   if (e.target === e.currentTarget) emit('close')
 }
 function onKeydown(e) {
-  if (e.key === 'Escape') emit('close')
+  if (e.key === 'Escape') {
+    if (mirrorOpen.value) { mirrorOpen.value = false; return }
+    emit('close')
+  }
   if (e.key === 'Tab') trapFocus(e)
 }
 function trapFocus(e) {
@@ -34,30 +48,40 @@ function trapFocus(e) {
 }
 
 async function copyUrl() {
+  await doCopy(props.item.url, copied, '已抄录 ✓')
+}
+async function copyMirror() {
+  await doCopy(mirrorUrl.value, copiedMirror, '镜像已抄录 ✓')
+}
+async function doCopy(text, flagRef, msg) {
   try {
-    await navigator.clipboard.writeText(props.item.url)
-    copied.value = true
-    setTimeout(() => (copied.value = false), 1500)
+    await navigator.clipboard.writeText(text)
+    flagRef.value = true
+    setTimeout(() => (flagRef.value = false), 1500)
   } catch {
     const ta = document.createElement('textarea')
-    ta.value = props.item.url
+    ta.value = text
     document.body.appendChild(ta)
     ta.select()
-    try { document.execCommand('copy'); copied.value = true; setTimeout(() => (copied.value = false), 1500) } catch {}
+    try { document.execCommand('copy'); flagRef.value = true; setTimeout(() => (flagRef.value = false), 1500) } catch {}
     document.body.removeChild(ta)
   }
 }
 
 function openInNewTab() {
-  // 显式 window.open 比 <a target="_blank"> 更可靠：
-  //   1. 不依赖 click 事件冒泡后的浏览器默认行为
-  //   2. 避免 CSP / 弹窗拦截器 / autofocus 触发的安全策略
-  //   3. 可拿到 window 引用，便于检测是否被拦截
+  const target = isGitHub.value ? mirrorUrl.value : props.item.url
+  const w = window.open(target, '_blank', 'noopener,noreferrer')
+  if (!w) window.location.href = target
+}
+
+function openOriginal() {
   const w = window.open(props.item.url, '_blank', 'noopener,noreferrer')
-  if (!w) {
-    // 弹窗被拦截：兜底为同窗口跳转
-    window.location.href = props.item.url
-  }
+  if (!w) window.location.href = props.item.url
+}
+
+function selectMirror(m) {
+  selectedMirror.value = m
+  mirrorOpen.value = false
 }
 
 onMounted(() => {
@@ -124,9 +148,22 @@ onBeforeUnmount(() => {
           <!-- 头部：卷首 -->
           <header class="px-6 sm:px-10 pt-10 sm:pt-12 pb-5 border-b border-[#1a1410]/10">
             <!-- 卷首 标识 -->
-            <div class="flex items-center gap-3 mb-5">
+            <div class="flex items-center gap-2 mb-5 flex-wrap">
               <div class="hanko text-xs px-2.5 py-1 stamp-anim" v-if="category">
                 <span class="mr-1">{{ category.icon }}</span>{{ category.name }}
+              </div>
+              <!-- 健康状态徽章 -->
+              <div
+                class="font-serif-cn text-xs px-2.5 py-1 rounded-sm inline-flex items-center gap-1.5"
+                :style="{
+                  background: health.bg,
+                  color: health.color,
+                  border: '1px solid ' + health.color + '66',
+                }"
+                :title="`健康状态: ${health.label}`"
+              >
+                <span :style="{ color: health.color, fontSize: '10px' }">{{ health.icon }}</span>
+                <span>{{ health.label }}</span>
               </div>
               <div
                 v-if="item.proxy"
@@ -191,15 +228,56 @@ onBeforeUnmount(() => {
               </ul>
             </section>
 
-            <!-- URL -->
+            <!-- URL + 镜像（GitHub 时显示） -->
             <section>
               <div class="flex items-center gap-2 mb-3">
                 <div class="font-mono text-[10px] tracking-[0.3em] text-[#a8161a]">▎址 · URL</div>
                 <div class="flex-1 h-px" style="background: linear-gradient(90deg, rgba(168, 22, 26, 0.3), transparent);"></div>
               </div>
+
               <code class="block bg-[#0a0a0a] border border-[#1a1410] rounded-sm px-4 py-3 text-[#c9a55c] text-xs sm:text-sm break-all font-mono">
                 {{ item.url }}
               </code>
+
+              <!-- GitHub 镜像选择器 -->
+              <div v-if="isGitHub" class="mt-4 rounded-sm overflow-hidden" style="border: 1px solid rgba(201, 165, 92, 0.3); background: rgba(201, 165, 92, 0.05);">
+                <button
+                  @click="mirrorOpen = !mirrorOpen"
+                  class="w-full flex items-center justify-between gap-2 px-4 py-2.5 font-serif-cn text-sm transition"
+                  style="color: #a4853e;"
+                  onmouseover="this.style.background='rgba(201, 165, 92, 0.1)'"
+                  onmouseout="this.style.background='transparent'"
+                >
+                  <span class="flex items-center gap-2">
+                    <span class="font-mono text-[10px] tracking-[0.2em] text-[#a8161a]">▎镜 · MIRROR</span>
+                    <span>{{ selectedMirror.name }}</span>
+                  </span>
+                  <span class="text-[10px] transition" :class="{ 'rotate-180': mirrorOpen }">▾</span>
+                </button>
+
+                <div v-if="mirrorOpen" class="border-t" style="border-color: rgba(201, 165, 92, 0.2);">
+                  <div
+                    v-for="m in GH_MIRRORS"
+                    :key="m.id"
+                    @click="selectMirror(m)"
+                    class="px-4 py-2 text-xs font-mono cursor-pointer transition flex items-center gap-2"
+                    :style="{
+                      background: selectedMirror.id === m.id ? 'rgba(201, 165, 92, 0.18)' : 'transparent',
+                      color: selectedMirror.id === m.id ? '#a8161a' : '#5a4a3a',
+                    }"
+                    onmouseover="if(this.dataset.sel!=='1')this.style.background='rgba(201,165,92,0.08)'"
+                    onmouseout="if(this.dataset.sel!=='1')this.style.background='transparent'"
+                    :data-sel="selectedMirror.id === m.id ? '1' : '0'"
+                  >
+                    <span :class="selectedMirror.id === m.id ? 'text-[#a8161a]' : 'opacity-30'">●</span>
+                    <span class="flex-1">{{ m.name }}</span>
+                    <span class="opacity-50 text-[10px]">{{ m.id }}</span>
+                  </div>
+                  <code class="block px-4 py-2 text-[10px] sm:text-[11px] break-all font-mono" style="background: rgba(0,0,0,0.05); color: #5a4a3a; border-top: 1px dashed rgba(201, 165, 92, 0.3);">
+                    {{ mirrorUrl }}
+                  </code>
+                </div>
+              </div>
             </section>
           </div>
 
@@ -222,7 +300,42 @@ onBeforeUnmount(() => {
             >
               <span>入</span>
               <span class="text-sm opacity-80">→</span>
-              <span>覌</span>
+              <span>{{ isGitHub ? '覌镜像' : '覌' }}</span>
+            </button>
+            <button
+              v-if="isGitHub"
+              @click="openOriginal"
+              class="px-5 py-3.5 font-serif-cn font-bold text-sm transition flex items-center justify-center gap-2"
+              style="
+                background: transparent;
+                color: #5a4a3a;
+                border: 1px solid #5a4a3a55;
+                border-radius: 2px;
+                letter-spacing: 0.05em;
+              "
+              onmouseover="this.style.background='rgba(0,0,0,0.05)';this.style.color='#1a1410'"
+              onmouseout="this.style.background='transparent';this.style.color='#5a4a3a'"
+              title="打开 GitHub 原始链接（需梯子）"
+            >
+              <span class="text-[10px]">原</span>
+            </button>
+            <button
+              v-if="isGitHub"
+              @click="copyMirror"
+              class="px-5 py-3.5 font-serif-cn font-bold text-sm transition flex items-center justify-center gap-2"
+              style="
+                background: transparent;
+                color: #a4853e;
+                border: 1px solid #a4853e55;
+                border-radius: 2px;
+                letter-spacing: 0.05em;
+              "
+              onmouseover="this.style.background='rgba(201, 165, 92, 0.1)';this.style.color='#1a1410'"
+              onmouseout="this.style.background='transparent';this.style.color='#a4853e'"
+              :title="`复制 ${selectedMirror.name} 镜像 URL`"
+            >
+              <span v-if="!copiedMirror">抄 · 镜</span>
+              <span v-else class="text-[#a8161a]">已抄 ✓</span>
             </button>
             <button
               @click="copyUrl"
@@ -237,8 +350,8 @@ onBeforeUnmount(() => {
               onmouseover="this.style.background='rgba(0,0,0,0.05)'"
               onmouseout="this.style.background='transparent'"
             >
-              <span v-if="!copied">抄 · 录 URL</span>
-              <span v-else class="text-[#a8161a]">已抄录 ✓</span>
+              <span v-if="!copied">抄 · 录</span>
+              <span v-else class="text-[#a8161a]">已抄 ✓</span>
             </button>
             <button
               @click="emit('close')"

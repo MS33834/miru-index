@@ -3,6 +3,9 @@ import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import { categories } from './data/nav.js'
 import SiteModal from './components/SiteModal.vue'
 import SidebarNav from './components/SidebarNav.vue'
+import { healthOf } from './utils/mirror.js'
+
+const healthColor = (h) => healthOf({ health: h }).color
 
 const searchQuery = ref('')
 const activeCategory = ref('all')
@@ -283,7 +286,7 @@ onMounted(() => {
                         :key="item.name + (item.url || '')"
                         @click="openModal(item, cat)"
                         @keydown="onCardKeydown($event, item, cat)"
-                        class="card-paper text-left p-3.5 sm:p-4 card-rise focus:outline-none focus:ring-2 focus:ring-[#d92020] focus:ring-offset-2 focus:ring-offset-[#0a0a0a]"
+                        class="card-paper text-left p-3.5 sm:p-4 card-rise focus:outline-none focus:ring-2 focus:ring-[#d92020] focus:ring-offset-2 focus:ring-offset-[#0a0a0a] relative"
                         :style="{ animationDelay: (0.04 * idx) + 's' }"
                         :aria-label="`${item.name} — ${item.desc || ''}`"
                       >
@@ -291,7 +294,15 @@ onMounted(() => {
                           <h4 class="font-serif-cn text-base sm:text-lg font-bold text-[#1a1410] leading-tight line-clamp-1 flex-1">
                             {{ item.name }}
                           </h4>
-                          <div class="hanko-circle w-7 h-7 text-[10px] shrink-0 stamp-anim" :style="{ animationDelay: (0.05 * idx) + 's' }">藏</div>
+                          <div class="flex items-center gap-1.5 shrink-0">
+                            <span
+                              v-if="item.health && item.health !== 'ok'"
+                              :title="`健康: ${healthOf(item).label}`"
+                              class="w-2 h-2 rounded-full"
+                              :style="{ background: healthOf(item).color, boxShadow: `0 0 6px ${healthOf(item).color}88` }"
+                            ></span>
+                            <div class="hanko-circle w-7 h-7 text-[10px] stamp-anim" :style="{ animationDelay: (0.05 * idx) + 's' }">藏</div>
+                          </div>
                         </div>
                         <p v-if="item.desc" class="font-kai-cn text-[#3a2e22] text-[12.5px] sm:text-[13px] leading-relaxed line-clamp-2 mb-2">
                           {{ item.desc }}
@@ -358,7 +369,7 @@ onMounted(() => {
               :key="item.name + (item.url || '')"
               @click="openModal(item, group)"
               @keydown="onCardKeydown($event, item, group)"
-              class="card-paper text-left p-4 sm:p-5 card-rise focus:outline-none focus:ring-2 focus:ring-[#d92020] focus:ring-offset-2 focus:ring-offset-[#0a0a0a]"
+              class="card-paper text-left p-4 sm:p-5 card-rise focus:outline-none focus:ring-2 focus:ring-[#d92020] focus:ring-offset-2 focus:ring-offset-[#0a0a0a] relative"
               :style="{ animationDelay: (0.04 * idx) + 's' }"
               :aria-label="`${item.name} — ${item.desc || ''}`"
             >
@@ -366,7 +377,15 @@ onMounted(() => {
                 <h3 class="font-serif-cn text-lg sm:text-xl font-bold text-[#1a1410] leading-tight line-clamp-1 flex-1">
                   {{ item.name }}
                 </h3>
-                <div class="hanko-circle w-9 h-9 text-xs shrink-0 stamp-anim" :style="{ animationDelay: (0.05 * idx) + 's' }">藏</div>
+                <div class="flex items-center gap-1.5 shrink-0">
+                  <span
+                    v-if="item.health && item.health !== 'ok'"
+                    :title="`健康: ${healthOf(item).label}`"
+                    class="w-2.5 h-2.5 rounded-full"
+                    :style="{ background: healthOf(item).color, boxShadow: `0 0 6px ${healthOf(item).color}88` }"
+                  ></span>
+                  <div class="hanko-circle w-9 h-9 text-xs stamp-anim" :style="{ animationDelay: (0.05 * idx) + 's' }">藏</div>
+                </div>
               </div>
               <p v-if="item.desc" class="font-kai-cn text-[#3a2e22] text-[13px] sm:text-sm leading-relaxed line-clamp-2 mb-3">
                 {{ item.desc }}
