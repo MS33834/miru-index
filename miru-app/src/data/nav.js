@@ -28,6 +28,16 @@ export const categories = [
         fullDesc: 'Windows 平台 V2Ray / Xray 图形客户端老牌项目，支持订阅链接批量导入、路由规则分流、流量统计，ACGN 圈几乎人手一份。',
         tags: ['V2Ray', 'Windows', '开源'], features: ['订阅导入', '路由分流', '流量统计'], proxy: false
       },
+      {
+        name: 'v2rayNG', url: 'https://github.com/2dust/v2rayNG', desc: 'Android 代理',
+        fullDesc: 'Android 平台 V2Ray / Xray 图形客户端项目，与 v2rayN 同源（2dust），手机端最常用的代理 App，支持订阅批量导入和路由分流。',
+        tags: ['V2Ray', 'Android', '开源'], features: ['订阅导入', '路由分流', '流量统计'], proxy: false
+      },
+      {
+        name: 'Clash Verge Rev', url: 'https://github.com/clash-verge-rev/clash-verge-rev', desc: 'Clash 桌面',
+        fullDesc: 'Clash for Windows 停更后社区接手的继任者（clash-verge-rev/clash-verge-rev），基于 Tauri 框架，体积小、内存低、启动快，原生支持 Mihomo 内核与 VLESS / Hysteria2 / Reality 等新协议。',
+        tags: ['Clash', 'Tauri', '开源'], features: ['Tauri 轻量', 'Mihomo 内核', '新协议'], proxy: false
+      },
     ]
   },
   {
@@ -49,6 +59,16 @@ export const categories = [
         name: 'Motrix', url: 'https://motrix.app/', desc: '全平台开源',
         fullDesc: '基于 aria2 的开源全平台下载管理器，界面清新，支持 HTTP / FTP / BT / 磁力，可同时下载 10 个任务，免费无广告。',
         tags: ['开源', '全平台', 'aria2'], features: ['BT / 磁力', '多协议', '无广告'], proxy: false
+      },
+      {
+        name: 'NDM', url: 'https://www.neatdownloadmanager.com/', desc: 'IDM 替代品',
+        fullDesc: 'Neat Download Manager，Windows 平台 IDM 风格的轻量级多线程下载加速器，浏览器扩展集成度高，嗅探能力强，免费。',
+        tags: ['Windows', '多线程', '嗅探'], features: ['IDM 风格', '浏览器扩展', '免费'], proxy: false
+      },
+      {
+        name: 'FreeDM', url: 'https://www.freedownloadmanager.org/', desc: '老牌免费',
+        fullDesc: '老牌免费多线程下载管理器，BitTorrent 支持，YouTube / 视频站嗅探下载，跨平台，是 IDM 的免费替代方案之一。',
+        tags: ['跨平台', 'BT', '免费'], features: ['BT 支持', '视频嗅探', '免费'], proxy: false
       },
     ]
   },
@@ -76,6 +96,16 @@ export const categories = [
         name: '7-Zip', url: 'https://7-zip.org/', desc: '开源免费',
         fullDesc: 'Windows 平台最经典的开源解压软件，支持 7z / zip / tar / gz / bz2 / xz 等几乎所有格式，7z 格式压缩比业界第一。',
         tags: ['Windows', '开源', '7z'], features: ['高压缩比', '开源免费', '命令行版'], proxy: false
+      },
+      {
+        name: 'Bandizip', url: 'https://www.bandisoft.com/bandizip/', desc: '优雅全能',
+        fullDesc: '韩国 Bandisoft 出品的解压工具（Windows / Mac），UI 优雅，支持 30+ 压缩格式，含 ZIPX / Zstandard / LZMA，内置压缩包预览。',
+        tags: ['Windows', 'Mac', '优雅'], features: ['30+ 格式', '压缩包预览', '高速'], proxy: false
+      },
+      {
+        name: 'PeaZip', url: 'https://peazip.github.io/', desc: '开源跨平台',
+        fullDesc: '开源跨平台解压工具（Windows / Linux），支持 200+ 格式，开源免费，无广告，可作为商业解压软件的开源替代。',
+        tags: ['开源', '跨平台', '200+ 格式'], features: ['200+ 格式', '开源', '无广告'], proxy: false
       },
     ]
   },
@@ -119,6 +149,16 @@ export const categories = [
         fullDesc: 'Telegram 上的多源聚合搜图机器人，一次上传同时调用 SauceNAO / ascii2d / IqDB / Yandex 等十余个引擎，结果按相似度排序。',
         tags: ['Telegram', '聚合', 'Bot'], features: ['多引擎聚合', '一键调用', '相似度排序'], proxy: false
       },
+      {
+        name: 'trace.moe', url: 'https://trace.moe/', desc: '动漫截图搜番',
+        fullDesc: '基于深度学习的动漫截图反向搜番引擎，给一张动画截图就能精准定位是哪部番剧的第几集（误差秒级），搜番党终极利器。',
+        tags: ['动漫', '截图', 'AI'], features: ['秒级定位', '番剧匹配', 'AI 识别'], proxy: false
+      },
+      {
+        name: '3D-IQDB', url: 'https://3d.iqdb.org/', desc: '3D 搜图',
+        fullDesc: 'Danbooru 系引擎的扩展，支持 3D 渲染图反向搜索，对 MMD / SFM / VR 作品识别率较高。',
+        tags: ['3D', 'MMD', 'SFM'], features: ['3D 识别', 'MMD 专精', '扩展'], proxy: true
+      },
     ]
   },
   {
@@ -155,6 +195,21 @@ export const categories = [
         name: 'kohya_ss GUI', url: 'https://github.com/bmaltais/kohya_ss', desc: 'SD 训练 GUI',
         fullDesc: 'Kohya 的 Stable Diffusion 训练 WebUI 包装，支持 LoRA / DreamBooth / Textual Inversion 训练，是训练二次元模型的事实标准。',
         tags: ['SD', 'LoRA', '训练'], features: ['LoRA', 'DreamBooth', 'WebUI'], proxy: false
+      },
+      {
+        name: 'SD WebUI', url: 'https://github.com/AUTOMATIC1111/stable-diffusion-webui', desc: 'SD 开源鼻祖',
+        fullDesc: 'AUTOMATIC1111 的 Stable Diffusion WebUI，SD 开源生态的鼻祖和事实标准，支持文生图 / 图生图 / 后期处理 / 扩展插件，是二次元 AI 绘画的标配。',
+        tags: ['SD', 'WebUI', '扩展'], features: ['插件生态', '文生图', '图生图'], proxy: false
+      },
+      {
+        name: 'ComfyUI', url: 'https://github.com/comfyanonymous/ComfyUI', desc: '节点式 SD',
+        fullDesc: 'ComfyUI 是基于节点流程图的 Stable Diffusion 图形界面（GUI），可任意拼接模型 / 采样器 / ControlNet 等节点，效率高 / 复现强，是进阶玩家首选。',
+        tags: ['SD', '节点', '进阶'], features: ['节点拼接', '高效率', '可复现'], proxy: false
+      },
+      {
+        name: 'LobeChat', url: 'https://github.com/lobehub/lobe-chat', desc: '开源 ChatGPT',
+        fullDesc: '开源 ChatGPT / LLM 对话前端（Web / Desktop），支持多模型（OpenAI / Claude / Gemini / Ollama），UI 现代，可本地部署，对中文优化好。',
+        tags: ['AI', 'Chat', '多模型'], features: ['多模型', '本地', '现代 UI'], proxy: false
       },
     ]
   },
@@ -225,6 +280,16 @@ export const categories = [
         fullDesc: 'ACG 资源 + 论坛形式的综合站，GalGame / 漫画 / 番剧 / 音乐都有专属板块，社交属性强。',
         tags: ['ACG', '论坛', '综合'], features: ['社区强', '多板块', '社交'], proxy: false
       },
+      {
+        name: 'VNDB', url: 'https://vndb.org/', desc: 'GalGame 资料库',
+        fullDesc: 'Visual Novel Database (VNDB)，全球最权威的 GalGame / Visual Novel 元数据库，2 万+ 作品，支持评分 / 标签 / 角色筛选，中文友好。',
+        tags: ['VNDB', '数据库', '权威'], features: ['2 万+ 作品', '元数据全', '中文友好'], proxy: true
+      },
+      {
+        name: '萌新社', url: 'https://www.moe48.com/', desc: 'GalGame 资讯',
+        fullDesc: '萌新社（moe48），GalGame / 二次元综合资讯站，发布 GalGame 推荐 / 资讯 / 攻略 / 资源整合，是国内 GalGame 圈新晋聚合。',
+        tags: ['GalGame', '资讯', '推荐'], features: ['GalGame 资讯', '攻略', '推荐'], proxy: false
+      },
     ]
   },
   {
@@ -294,6 +359,11 @@ export const categories = [
         fullDesc: '日漫 / 同人 / 画廊类站点，资源以图集形式发布，画质普遍高，适合二次元高清党。',
         tags: ['日漫', '同人', '高画质'], features: ['图集形式', '高画质', '日漫全'], proxy: true
       },
+      {
+        name: 'MangaDex', url: 'https://mangadex.org/', desc: '海外漫画站',
+        fullDesc: 'MangaDex 是全球最大的合法英 / 日 / 西班牙语漫画阅读站，30 万+ 作品，作者直接发布，按作品 / 章节 / 标签组织，需科学上网。',
+        tags: ['MangaDex', '海外', '合法'], features: ['30 万+', '作者发布', '多语言'], proxy: true
+      },
     ]
   },
   {
@@ -325,6 +395,11 @@ export const categories = [
         name: 'Booth', url: 'https://booth.pm/', desc: 'pixiv 旗下商店',
         fullDesc: 'Pixiv 旗下的 C2C 数字商店，画师 / 社团可自由上架素材、笔刷、MMD 模型、音声等数字商品。',
         tags: ['pixiv', '数字', '素材'], features: ['C2C', '素材丰富', '画师直营'], proxy: true
+      },
+      {
+        name: 'DeviantArt', url: 'https://www.deviantart.com/', desc: '海外插画社区',
+        fullDesc: '全球最大的插画 / 数字艺术社区（DA），老牌 20+ 年历史，作品按分类（传统 / 数码 / 摄影）组织，需科学上网。',
+        tags: ['DA', '海外', '老牌'], features: ['20+ 年', '分类齐', '收藏'], proxy: true
       },
     ]
   },
@@ -410,6 +485,21 @@ export const categories = [
         fullDesc: '基于 React Native 的 Bangumi 第三方客户端（iOS / Android / WSA），UI 现代化，与 bgm.tv 账号体系完全打通。',
         tags: ['React Native', 'Bangumi', 'iOS'], features: ['原生体验', '追番同步', '多端'], proxy: false
       },
+      {
+        name: 'Kotatsu', url: 'https://github.com/KotatsuApp/kotatsu', desc: 'Android 漫画',
+        fullDesc: '开源 Android 漫画阅读器（Kotatsu），内置 MangaDex / MangaPark / ComicWalker 等 100+ 漫画源，支持本地漫画库与 OPDS，UI 现代化。',
+        tags: ['Android', '开源', '100+ 源'], features: ['100+ 源', '本地库', 'OPDS'], proxy: false
+      },
+      {
+        name: 'Animetail', url: 'https://github.com/Animetailapp/Animetail', desc: '番剧 + 漫画',
+        fullDesc: 'Animetail 是 Aniyomi 团队的新一代番剧 + 漫画二合一客户端（Android），界面更现代，分区更清晰，与 Mihon 扩展源互通。',
+        tags: ['Android', '二合一', 'Mihon'], features: ['二合一', 'Mihon 互通', '现代 UI'], proxy: false
+      },
+      {
+        name: 'Dantotsu', url: 'https://github.com/rebelonion/Dantotsu', desc: 'iOS 风格番剧',
+        fullDesc: 'Dantotsu 是 Aniyomi 团队的 iOS 风格改版番剧 + 漫画 App（Android），UI 仿 iOS Material You 范式，集成了 AniList / MyAnimeList / Kitsu 多个追番源。',
+        tags: ['Android', 'iOS 风', 'AniList'], features: ['iOS 风', '多追番源', 'Material You'], proxy: false
+      },
     ]
   },
   {
@@ -442,6 +532,16 @@ export const categories = [
         fullDesc: '在线番剧 / 漫画综合站，UI 仿哔咔风格，资源以网盘 + 在线双模式分发。',
         tags: ['在线', '网盘', '漫画'], features: ['双模式', 'UI 仿哔咔', '漫画+番剧'], proxy: true
       },
+      {
+        name: 'AGE 动漫', url: 'https://www.agemys.org/', desc: '在线番剧',
+        fullDesc: 'AGE 动漫网，老牌在线番剧站，资源以季度归档，按字母索引齐全，无广告设计简洁，是新番党补番常用站。',
+        tags: ['在线', '新番', '补番'], features: ['新番', '补番', '按季归档'], proxy: false
+      },
+      {
+        name: '琪琪影院', url: 'https://www.qiqi.tv/', desc: '在线番剧',
+        fullDesc: '琪琪影院（qiqi.tv），在线番剧 + 漫画 + 网盘分发，资源更新快，多线路备选，ACGN 综合站。',
+        tags: ['在线', '网盘', '综合'], features: ['多线路', '网盘', '综合'], proxy: false
+      },
     ]
   },
   {
@@ -468,6 +568,11 @@ export const categories = [
         name: '蜜柑计划', url: 'https://mikanani.me/', desc: '新番磁力索引',
         fullDesc: '国内新番磁力索引站，自动从各字幕组抓取新番发布，UI 简洁，磁力 + 迅雷链双发。',
         tags: ['新番', '磁力', '索引'], features: ['自动抓取', 'UI 简洁', '速更'], proxy: false
+      },
+      {
+        name: '动漫 BT 联盟', url: 'https://www.dmbtl.org/', desc: '国内动漫磁力',
+        fullDesc: '动漫 BT 联盟（dmbtl.org），国内动漫 BT 资源聚合索引站，按作品 / 年份整理，磁力链接，老牌动漫磁力索引。',
+        tags: ['BT', '磁力', '老牌'], features: ['磁力', '按年', '老牌'], proxy: true
       },
     ]
   },
@@ -686,6 +791,21 @@ export const categories = [
         fullDesc: '零代码可视化爬虫工具，图形化选择元素 + 流程编排，可批量抓取番剧 / 漫画 / 小说章节。',
         tags: ['爬虫', '零代码', 'GUI'], features: ['可视化', '零代码', '批量'], proxy: false
       },
+      {
+        name: 'Fooocus', url: 'https://github.com/lllyasviel/Fooocus', desc: 'SD 极简前端',
+        fullDesc: 'Fooocus 是 Stable Diffusion XL 的极简 GUI 前端，专注"开箱即用"出图，自动优化提示词、构图、风格，无需参数调节，适合快速出图。',
+        tags: ['SDXL', '极简', 'GUI'], features: ['SDXL', '极简', '开箱即用'], proxy: false
+      },
+      {
+        name: 'SD WebUI Forge', url: 'https://github.com/lllyasviel/stable-diffusion-webui-forge', desc: 'SD 性能增强',
+        fullDesc: 'A1111 WebUI 的社区分叉（lllyasviel 主导），针对低显存 GPU 重写主分支计算图，推理速度可提升 30-50%，兼容原 A1111 全部生态。',
+        tags: ['SD', '性能', 'A1111'], features: ['低显存', '速度+', '生态兼容'], proxy: false
+      },
+      {
+        name: 'ani-rss', url: 'https://github.com/wushuo894/ani-rss', desc: '自动追番',
+        fullDesc: 'ani-rss 自动追番 RSS 工具（Java），可对接 qBittorrent / Transmission 自动下载新番，按规则自动整理 / 重命名 / 入 Plex / Jellyfin 媒体库。',
+        tags: ['RSS', '自动', 'qBittorrent'], features: ['自动追番', '媒体库', 'RSS'], proxy: false
+      },
     ]
   },
   {
@@ -717,6 +837,11 @@ export const categories = [
         name: 'MyFreeMP3', url: 'https://tool.liumingye.cn/music/', desc: '在线试听 / 下载',
         fullDesc: '聚合多音乐平台资源的免费试听 / 下载站，ACG 资源丰富，UI 简洁，支持歌词 / 封面下载。',
         tags: ['音乐', '免费', '聚合'], features: ['多源聚合', '免费', '歌词'], proxy: false
+      },
+      {
+        name: '网易云音乐', url: 'https://music.163.com/', desc: '音乐流媒体',
+        fullDesc: '网易云音乐，主流音乐流媒体平台，ACG 资源极丰富，独家版权、评论区文化（云村）深入二次元圈。',
+        tags: ['网易云', '流媒体', '社区'], features: ['ACG 资源', '评论区', '独家版权'], proxy: false
       },
     ]
   },
@@ -787,6 +912,11 @@ export const categories = [
         fullDesc: 'B站官方番剧索引，权威番剧时间表 / 评分 / 追番数 / 播放量，正版番剧大本营，国创 / 日漫 / 欧美动画全收录。',
         tags: ['B站', '官方', '正版'], features: ['正版', '时间表', '评分'], proxy: false
       },
+      {
+        name: 'Anikore', url: 'https://anikore.jp/', desc: '日本动漫评分',
+        fullDesc: 'Anikore（あにこれ），日本老牌动漫评分 / 评论平台，评分维度（剧情 / 作画 / 音乐 / 配音）极细，是日本 ACG 评分参考之一。',
+        tags: ['日本', '评分', '维度细'], features: ['日站', '维度细', '评论'], proxy: true
+      },
     ]
   },
   {
@@ -819,6 +949,11 @@ export const categories = [
         fullDesc: '节点式（Node-based）图像处理工具，可视化拼接超分 / 修复 / 上色等 AI 模型，适合进阶玩家。',
         tags: ['节点', '可视化', '进阶'], features: ['节点', '可视化', '可拼装'], proxy: false
       },
+      {
+        name: 'Bigjpg', url: 'https://bigjpg.com/', desc: '在线 AI 放大',
+        fullDesc: 'Bigjpg 在线 AI 图像放大服务，基于 Waifu2x / Real-ESRGAN 等模型，对二次元插画 / 漫画的放大效果行业领先，支持免费 + 付费。',
+        tags: ['在线', '放大', '二次元'], features: ['在线', '二次元', '多模型'], proxy: false
+      },
     ]
   },
   {
@@ -850,6 +985,11 @@ export const categories = [
         name: 'ArtStation', url: 'https://www.artstation.com/', desc: '全球 CG 艺术',
         fullDesc: '全球最知名的 CG / 概念设计 / 3D 艺术家作品集平台，业内招聘 / 自由职业订单生态成熟，画质顶级。',
         tags: ['CG', '概念', '全球'], features: ['CG 强', '招聘', '全球'], proxy: true
+      },
+      {
+        name: 'Krita', url: 'https://krita.org/zh/', desc: '开源绘画软件',
+        fullDesc: 'Krita 是 KDE 开源的免费数字绘画软件，Windows / macOS / Linux 全平台，专为概念画 / 漫画 / 插画设计，笔刷丰富、UI 专业。',
+        tags: ['开源', '绘画', '漫画'], features: ['开源', '笔刷全', '三端'], proxy: false
       },
     ]
   },
@@ -920,6 +1060,11 @@ export const categories = [
         fullDesc: '中文 GalGame 综合性资讯站，作品条目 / 评测 / 资讯 / 编辑团队齐全，国内独立 Gal 圈最权威的资讯平台。',
         tags: ['Gal', '中文', '国 Gal'], features: ['国 Gal', '条目', '资讯'], proxy: false
       },
+      {
+        name: 'Stage1st', url: 'https://www.saraba1st.com/', desc: 'S1 论坛',
+        fullDesc: 'Stage1st（S1）老牌综合论坛，ACG / 游戏 / 数码 / 影视分区齐全，二次元浓度高，长文讨论氛围浓厚。',
+        tags: ['S1', '论坛', '综合'], features: ['ACG 浓度高', '长文', '多板块'], proxy: false
+      },
     ]
   },
   {
@@ -956,6 +1101,144 @@ export const categories = [
         name: '夸克网盘', url: 'https://pan.quark.cn/', desc: '网盘 + 视频',
         fullDesc: '夸克浏览器旗下网盘，ACG 资源 + 在线视频 + 学习资料生态齐备，免费扩容活动多。',
         tags: ['网盘', '夸克', '视频'], features: ['网盘', '视频', '扩容'], proxy: false
+      },
+      {
+        name: 'KPlayer', url: 'https://github.com/bytelang/kplayer-go', desc: '直播推流',
+        fullDesc: 'KPlayer 是 ByteLang 开发的 Linux 媒体资源推流工具，B 站 / 斗鱼 / 虎牙等直播平台 24h 无人直播利器，配置简洁 / 缓存优化 / 插件扩展。',
+        tags: ['推流', '直播', '开源'], features: ['24h 直播', '多平台', '缓存'], proxy: false
+      },
+    ]
+  },
+  {
+    id: 'font',
+    name: '字体',
+    icon: '✒️',
+    items: [
+      {
+        name: '霞鹜文楷', url: 'https://github.com/lxgw/LxgwWenKai', desc: '开源中文字楷',
+        fullDesc: 'LXGW 霞鹜文楷（屏幕阅读版），开源免费中文字体（霞鹜文楷 TC / SC），基于 FONTWORKS 的 Klee One 衍生，适配屏幕显示，ACG 圈御用字体。',
+        tags: ['开源', '中文', '楷体'], features: ['开源免费', '屏幕优化', '多字重'], proxy: false
+      },
+      {
+        name: '阿里巴巴普惠体', url: 'https://fonts.alibabagroup.com/', desc: '阿里开源',
+        fullDesc: '阿里巴巴普惠体 3.0（永久免费商用），阿里官方出品的开源中文字体，覆盖 15 种字重，是国内企业开源中文字体的标杆。',
+        tags: ['中文', '商用', '阿里'], features: ['免费商用', '多字重', '全字符'], proxy: false
+      },
+      {
+        name: 'Fontke 字体库', url: 'https://www.fontke.com/', desc: '字体聚合下载',
+        fullDesc: '中国最大的字体聚合下载站，1 万+ 字体（中英日韩），预览 + 下载 + 字体识别一体化，是设计师找字体的常备网站。',
+        tags: ['聚合', '下载', '预览'], features: ['1 万+ 字体', '在线预览', '字体识别'], proxy: false
+      },
+      {
+        name: 'DaFont', url: 'https://www.dafont.com/', desc: '英文字体站',
+        fullDesc: '全球最大的英文字体免费下载站，1 万+ 字体按风格分类（哥特 / 手写 / 像素 / 复古等），预览 + 收藏 + 打包下载。',
+        tags: ['英文', '免费', '1 万+'], features: ['1 万+ 字体', '分类', '收藏'], proxy: false
+      },
+      {
+        name: 'Google Fonts', url: 'https://fonts.google.com/', desc: 'Google 字体',
+        fullDesc: 'Google 字体库（1 千+ 字体），开源免费 / 商用，配 CDN 引用，是 Web 开发者首选的字体来源。需科学上网访问。',
+        tags: ['英文', 'Web', 'CDN'], features: ['CDN', '开源', 'Web 友好'], proxy: true
+      },
+      {
+        name: '猫啃网', url: 'https://www.maoken.com/', desc: '免费中文字体',
+        fullDesc: '猫啃网（maoken.com）专注收录可免费商用的中文字体，按黑体 / 宋体 / 楷体 / 手书分类齐全，是设计师和开发者找免费中文字体的好去处。',
+        tags: ['中文', '免费商用', '聚合'], features: ['免费商用', '中文', '分类齐'], proxy: false
+      },
+    ]
+  },
+  {
+    id: 'wallpaper',
+    name: '壁纸',
+    icon: '🖼️',
+    items: [
+      {
+        name: 'Wallhaven', url: 'https://wallhaven.cc/', desc: '全球壁纸',
+        fullDesc: '全球最知名的二次元 / 高清壁纸站，60 万+ 张 4K+ 壁纸，按 SFW / Sketchy / NSFW 分级，标签 + 收藏 + 随机功能齐全。',
+        tags: ['二次元', '4K', '全球'], features: ['60 万+ 张', '4K+', '标签系统'], proxy: true
+      },
+      {
+        name: 'Konachan 壁纸', url: 'https://konachan.net/post', desc: '二次元壁纸',
+        fullDesc: 'Konachan 的壁纸专区，基于 Danbooru 引擎，5 万+ 张二次元高画质壁纸，按标签 / 评分 / 分辨率筛选，pool 收藏功能强大。',
+        tags: ['二次元', 'Danbooru', '高画质'], features: ['5 万+ 张', 'pool', '高画质'], proxy: true
+      },
+      {
+        name: 'Wallpaper Abyss', url: 'https://wall.alphacoders.com/', desc: 'Alpha Coders 壁纸',
+        fullDesc: 'Alpha Coders 旗下壁纸站（Wallpaper Abyss），100 万+ 张多分类壁纸，PC / 移动 / iPad 多尺寸适配，动漫 / 风景 / 抽象全覆盖。',
+        tags: ['动漫', '100 万+', '多尺寸'], features: ['100 万+ 张', '多尺寸', '分类齐'], proxy: true
+      },
+      {
+        name: 'Zerochan', url: 'https://www.zerochan.net/', desc: '动漫头像',
+        fullDesc: '动漫头像 / 角色图专门站，10 万+ 张二次元角色图，按动漫 / 角色 / 标签组织，常用于社交头像和壁纸。',
+        tags: ['动漫', '头像', '角色'], features: ['10 万+ 张', '角色标签', '头像友好'], proxy: true
+      },
+      {
+        name: 'Wallpaper Engine 工坊', url: 'https://steamcommunity.com/app/431960/workshop/', desc: '动态壁纸工坊',
+        fullDesc: 'Wallpaper Engine 的 Steam 创意工坊，200 万+ 用户制作的动态 / 互动壁纸，含二次元 / 风景 / 抽象等分类，订阅即可使用。',
+        tags: ['动态', 'Steam', '工坊'], features: ['200 万+ 壁纸', '动态', '可互动'], proxy: true
+      },
+    ]
+  },
+  {
+    id: 'sticker',
+    name: '表情包',
+    icon: '😄',
+    items: [
+      {
+        name: '斗图啦', url: 'https://www.doutula.com/', desc: '斗图表情',
+        fullDesc: '国内最大的斗图表情包聚合站（斗图啦），几万套在线斗图表情，按热门 / 最新 / 关键字搜索，是微信 / QQ 群斗图党的必备。',
+        tags: ['斗图', '微信', 'QQ'], features: ['几万套', '在线搜索', '一键保存'], proxy: false
+      },
+      {
+        name: '发表情', url: 'https://www.fabiaoqing.com/', desc: '表情包大全',
+        fullDesc: '发表情 fabiaoqing.com，5 万+ 张表情包在线制作 + 下载，分类齐全（沙雕 / 熊猫头 / 二次元 / 萌宠），支持自定义加字。',
+        tags: ['表情', '制作', '加字'], features: ['5 万+', '自定义加字', '分类齐'], proxy: false
+      },
+      {
+        name: 'Iconify', url: 'https://iconify.design/', desc: '图标大全',
+        fullDesc: 'Iconify 聚合 200+ 套图标集（150 万+ 图标），开源免费，支持 React / Vue / SVG / Web Font 多种引用方式，是开发者首选图标库。',
+        tags: ['图标', '开源', '多框架'], features: ['150 万+', '200+ 集', '多框架'], proxy: false
+      },
+      {
+        name: 'Emoji 百科', url: 'https://emojipedia.org/', desc: 'Emoji 全集',
+        fullDesc: 'Emoji 百科（Emojipedia），全球最全的 Emoji 检索站，3 千+ 表情符号，按版本 / 平台 / 主题分类，是 Emoji 含义查询的权威站。',
+        tags: ['Emoji', '百科', '全平台'], features: ['3 千+', '版本对比', '含义查询'], proxy: true
+      },
+      {
+        name: 'Sticker 表情', url: 'https://stickers.com/', desc: 'iMessage 贴纸',
+        fullDesc: 'Stickers.com 提供 iMessage 贴纸包下载，覆盖 1 万+ 套免费贴纸（动漫 / 萌宠 / 节日），一键安装到 iMessage 使用。',
+        tags: ['iMessage', '贴纸', '苹果'], features: ['1 万+ 套', '免费', '一键装'], proxy: false
+      },
+    ]
+  },
+  {
+    id: 'imghost',
+    name: '图床',
+    icon: '☁️',
+    items: [
+      {
+        name: 'SM.MS', url: 'https://sm.ms/', desc: '老牌免费图床',
+        fullDesc: 'SM.MS 老牌免费图床，单张 5MB / 单次 10 张，支持 API + 历史管理 + 全球 CDN，国内访问速度尚可，开发者首选。',
+        tags: ['免费', 'API', 'CDN'], features: ['5MB / 张', 'API', '历史管理'], proxy: false
+      },
+      {
+        name: '路过图床', url: 'https://imgchr.com/', desc: '国内高速图床',
+        fullDesc: '路过图床（imgchr.com），国内老牌免登录图床，5MB / 张，CDN 加速，全球节点分发，ACGN 圈论坛 / 博客常用。',
+        tags: ['国内', '免登录', 'CDN'], features: ['5MB / 张', 'CDN', '免登录'], proxy: false
+      },
+      {
+        name: '聚合图床', url: 'https://www.superbed.cn/', desc: '多源聚合',
+        fullDesc: '聚合图床（superbed.cn）一次上传同时分发到 5+ 图床（SM.MS / imgur / 微博等），自动测速选最优，原创博主防失联必备。',
+        tags: ['聚合', '多源', '自动'], features: ['5+ 图床', '自动测速', '防失联'], proxy: false
+      },
+      {
+        name: 'Imgur', url: 'https://imgur.com/', desc: '全球最大图床',
+        fullDesc: 'Imgur 全球最大图床之一，匿名上传无需注册，20MB / 张 / 视频 200MB，API 完善，需科学上网访问。',
+        tags: ['全球', '20MB', 'API'], features: ['20MB / 张', '匿名', 'API'], proxy: true
+      },
+      {
+        name: 'Postimages', url: 'https://postimages.org/', desc: '免注册图床',
+        fullDesc: 'Postimages 免注册图床，匿名上传，8MB / 张，支持 PNG / JPG / GIF / BMP，永久直链，ACGN 论坛常用。',
+        tags: ['免注册', '8MB', '永久'], features: ['8MB / 张', '免注册', '永久直链'], proxy: false
       },
     ]
   },

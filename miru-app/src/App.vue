@@ -16,13 +16,13 @@ const CHINESE_NUMS = ['零', '壹', '贰', '叁', '肆', '伍', '陆', '柒', '�
 
 // 把 26 个分类按主题分成 6 卷
 const VOLUMES = [
-  { id: 'v1', name: '卷壹', title: '網絡工具', sub: 'Network · Tools', catIds: ['proxy', 'downloader', 'unzip', 'imgsearch'] },
-  { id: 'v2', name: '卷贰', title: 'AI 工坊', sub: 'AI · Workshop', catIds: ['aitools', 'imgai'] },
-  { id: 'v3', name: '卷叁', title: 'ACG 主场', sub: 'ACGN · Main', catIds: ['manga', 'mangaapp', 'anime', 'animeapp', 'galgame', 'lightnovel', 'library'] },
+  { id: 'v1', name: '卷壹', title: '網絡工具', sub: 'Network · Tools', catIds: ['proxy', 'downloader', 'archive', 'imagesearch'] },
+  { id: 'v2', name: '卷贰', title: 'AI 工坊', sub: 'AI · Workshop', catIds: ['ai', 'imgai'] },
+  { id: 'v3', name: '卷叁', title: 'ACG 主场', sub: 'ACGN · Main', catIds: ['manga', 'manga_app', 'anime_site', 'anime_app', 'galgame_res', 'novel', 'library'] },
   { id: 'v4', name: '卷肆', title: '社区 · 资讯', sub: 'Community · News', catIds: ['news', 'community', 'galgame_news'] },
-  { id: 'v5', name: '卷伍', title: '视听娱乐', sub: 'Audio · Visual', catIds: ['music', 'draw', 'video'] },
+  { id: 'v5', name: '卷伍', title: '视听娱乐', sub: 'Audio · Visual', catIds: ['music', 'draw', 'video', 'sticker'] },
   { id: 'v6', name: '卷陆', title: '周边 · 聚合', sub: 'Figure · Aggregator', catIds: ['figure', 'agg', 'github'] },
-  { id: 'v7', name: '附录', title: '工具 · 导航', sub: 'Utils · Index', catIds: ['nav', 'tools'] },
+  { id: 'v7', name: '卷柒', title: '资源 · 工具', sub: 'Resources · Tools', catIds: ['font', 'wallpaper', 'imghost', 'illust', 'subgroup', 'game', 'nav'] },
 ]
 
 const allItems = computed(() =>
