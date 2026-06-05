@@ -4,7 +4,7 @@
 >
 > 👉 想要**实用网站导航**（梯子 / 下载器 / 解压 / 搜图 / GalGame / 番剧 / 游戏 / 书籍）？请查看 [SITES.md](SITES.md)。
 >
-> 🌐 **新！GitHub Pages 前端网站**：仓库自带一个 `docs/` 站点（**漫藏 · MIRU INDEX**），带搜索 / 分类 / 标签 / 印章红 + 水墨黑设计。直接 `git push` 后到 `Settings → Pages → Branch: main, Folder: /docs` 启用。详见 [docs/README.md](docs/README.md)。
+> 🌐 **新！GitHub Pages 前端网站**：仓库自带一个 `docs/` 站点（**漫藏 · MIRU INDEX**），带搜索 / 分类 / 标签 / 印章红 + 水墨黑设计。直接 `git push` 后到 `Settings → Pages → Branch: main, Folder: /docs` 启用，访问 `https://badhope.github.io/miru-index/` 即可。
 >
 > ⚠️ 本仓库仅做开源项目导航与索引，**不托管、不分发任何受版权保护的内容**。所有内容均来自 GitHub 开源社区，请使用者遵守各项目对应的开源协议以及相关网站的使用条款。
 
