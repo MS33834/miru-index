@@ -1,9 +1,12 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { categories } from './data/nav.js'
 import SiteModal from './components/SiteModal.vue'
 import SidebarNav from './components/SidebarNav.vue'
-import { healthOf } from './utils/mirror.js'
+import SiteCard from './components/SiteCard.vue'
+import { isOffline } from './main.js'
+import { APP_CONFIG } from './config/constants.js'
+import { useScrollPosition } from './composables/useScrollPosition.js'
 
 const searchQuery = ref('')
 const activeCategory = ref('all')
@@ -13,19 +16,11 @@ const drawerOpen = ref(false)
 const sidebarCollapsed = ref(false)
 const loaded = ref(false)
 
-// 卷册序号: 7 卷 + 单分类页备用
-const CHINESE_NUMS = ['零', '壹', '贰', '叁', '肆', '伍', '陆', '柒', '捌']
+// 从配置导入
+const { VOLUMES, CHINESE_NUMS, UI } = APP_CONFIG
 
-// 把 26 个分类按主题分成 7 卷
-const VOLUMES = [
-  { id: 'v1', name: '卷壹', title: '網絡工具', sub: 'Network · Tools', catIds: ['proxy', 'downloader', 'archive', 'imagesearch'] },
-  { id: 'v2', name: '卷贰', title: 'AI 工坊', sub: 'AI · Workshop', catIds: ['ai', 'imgai'] },
-  { id: 'v3', name: '卷叁', title: 'ACG 主场', sub: 'ACGN · Main', catIds: ['manga', 'manga_app', 'anime_site', 'anime_app', 'galgame_res', 'novel', 'library'] },
-  { id: 'v4', name: '卷肆', title: '社区 · 资讯', sub: 'Community · News', catIds: ['news', 'community', 'galgame_news'] },
-  { id: 'v5', name: '卷伍', title: '视听娱乐', sub: 'Audio · Visual', catIds: ['music', 'draw', 'video', 'sticker'] },
-  { id: 'v6', name: '卷陆', title: '周边 · 聚合', sub: 'Figure · Aggregator', catIds: ['figure', 'agg', 'github'] },
-  { id: 'v7', name: '卷柒', title: '资源 · 工具', sub: 'Resources · Tools', catIds: ['font', 'wallpaper', 'imghost', 'illust', 'subgroup', 'game', 'nav'] },
-]
+// 使用滚动位置 composable
+const { showBackToTop } = useScrollPosition({ threshold: UI.BACK_TO_TOP_THRESHOLD })
 
 const allItems = computed(() =>
   categories.flatMap(c => c.items.map(i => ({ ...i, _category: c })))
@@ -88,12 +83,6 @@ function closeModal() {
   modalItem.value = null
   modalCategory.value = null
 }
-function onCardKeydown(e, item, category) {
-  if (e.key === 'Enter' || e.key === ' ') {
-    e.preventDefault()
-    openModal(item, category)
-  }
-}
 function selectCategory(id) {
   activeCategory.value = id
   drawerOpen.value = false
@@ -106,13 +95,52 @@ function onSearch(q) {
   searchQuery.value = q
 }
 
+// 返回顶部
+function scrollToTop() {
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+}
+
+// 键盘快捷键
+function handleKeydown(e) {
+  // Ctrl/Cmd + K 聚焦搜索
+  if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+    e.preventDefault()
+    const searchInput = document.querySelector('.scroll-input')
+    if (searchInput) searchInput.focus()
+  }
+  // Escape 关闭模态框
+  if (e.key === 'Escape' && modalItem.value) {
+    closeModal()
+  }
+}
+
 onMounted(() => {
   setTimeout(() => (loaded.value = true), 80)
+  window.addEventListener('keydown', handleKeydown)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', handleKeydown)
+})
+
+// 动态更新页面标题
+watch([activeCategory, searchQuery], () => {
+  if (searchQuery.value) {
+    document.title = `搜索: ${searchQuery.value} - 漫藏阁`
+  } else if (activeCategory.value !== 'all') {
+    const cat = categories.find(c => c.id === activeCategory.value)
+    document.title = `${cat?.name || ''} - 漫藏阁`
+  } else {
+    document.title = '漫藏阁 - ACGN 资源导航'
+  }
 })
 </script>
 
 <template>
   <div class="layout">
+    <!-- =================== Skip Navigation 链接 =================== -->
+    <a href="#main-content" class="skip-nav">跳转到主要内容</a>
+
     <!-- =================== 桌面端侧边栏 =================== -->
     <div class="hidden lg:block sidebar-shell" :class="{ 'is-collapsed': sidebarCollapsed }">
       <SidebarNav
@@ -167,7 +195,7 @@ onMounted(() => {
     </Teleport>
 
     <!-- =================== 主区 =================== -->
-    <main class="main">
+    <main id="main-content" class="main">
       <!-- Hero（首次进入且无搜索） -->
       <section v-if="loaded && !searchQuery && activeCategory === 'all'" class="hero">
         <div class="hero__inner">
@@ -277,52 +305,16 @@ onMounted(() => {
                 <button @click="selectCategory(cat.id)" class="subgroup__more">全卷 →</button>
               </div>
               <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
-                <button
+                <SiteCard
                   v-for="(item, idx) in cat.items"
                   :key="item.name + (item.url || '')"
-                  @click="openModal(item, cat)"
-                  @keydown="onCardKeydown($event, item, cat)"
-                  class="card-paper text-left p-3.5 sm:p-4 card-rise focus:outline-none focus:ring-2 focus:ring-[#d92020] focus:ring-offset-2 focus:ring-offset-[#0a0a0a] relative"
-                  :style="{ animationDelay: (Math.min(idx, 24) * 0.04) + 's' }"
-                  :aria-label="`${item.name} — ${item.desc || ''}`"
-                >
-                  <div class="flex items-start justify-between gap-2 mb-2">
-                    <h4 class="font-serif-cn text-base sm:text-lg font-bold text-[#1a1410] leading-tight line-clamp-1 flex-1">
-                      {{ item.name }}
-                    </h4>
-                    <div class="flex items-center gap-1.5 shrink-0">
-                      <span
-                        v-if="item.health && item.health !== 'ok'"
-                        :title="`健康: ${healthOf(item).label}`"
-                        class="w-2 h-2 rounded-full"
-                        :style="{ background: healthOf(item).color, boxShadow: `0 0 6px ${healthOf(item).color}88` }"
-                      ></span>
-                      <div class="hanko-circle w-7 h-7 text-[10px] stamp-anim" :style="{ animationDelay: (Math.min(idx, 18) * 0.05) + 's' }">藏</div>
-                    </div>
-                  </div>
-                  <p v-if="item.desc" class="font-kai-cn text-[#3a2e22] text-[12.5px] sm:text-[13px] leading-relaxed line-clamp-2 mb-2">
-                    {{ item.desc }}
-                  </p>
-                  <div v-if="item.tags?.length" class="flex flex-wrap gap-1 mb-2">
-                    <span
-                      v-for="t in item.tags.slice(0, 2)"
-                      :key="t"
-                      class="tag-stamp"
-                      style="background: rgba(168, 22, 26, 0.08); border-color: rgba(168, 22, 26, 0.3); color: #a8161a; font-size: 0.65rem; padding: 0.1rem 0.4rem;"
-                    >#{{ t }}</span>
-                    <span
-                      v-if="item.tags.length > 2"
-                      class="tag-stamp"
-                      style="background: rgba(201, 165, 92, 0.1); border-color: rgba(201, 165, 92, 0.3); color: #a4853e; font-size: 0.65rem; padding: 0.1rem 0.4rem;"
-                    >+{{ item.tags.length - 2 }}</span>
-                  </div>
-                  <div class="flex items-center justify-between pt-1.5 border-t border-[#1a1410]/10">
-                    <div class="font-mono text-[9px] text-[#5a4a3a] tracking-wider line-clamp-1 flex-1">
-                      {{ item.proxy ? '◯ 需梯子' : '◯ 直连' }}
-                    </div>
-                    <div class="text-[#a8161a] text-[11px] font-serif-cn tracking-wider">覌 →</div>
-                  </div>
-                </button>
+                  :item="item"
+                  :category="cat"
+                  :index="idx"
+                  :compact="true"
+                  :search-query="searchQuery"
+                  @open="openModal"
+                />
               </div>
             </div>
           </div>
@@ -356,54 +348,17 @@ onMounted(() => {
             </div>
           </header>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
-            <button
-              v-for="(item, idx) in group.items"
-              :key="item.name + (item.url || '')"
-              @click="openModal(item, group)"
-              @keydown="onCardKeydown($event, item, group)"
-              class="card-paper text-left p-4 sm:p-5 card-rise focus:outline-none focus:ring-2 focus:ring-[#d92020] focus:ring-offset-2 focus:ring-offset-[#0a0a0a] relative"
-              :style="{ animationDelay: (Math.min(idx, 24) * 0.04) + 's' }"
-              :aria-label="`${item.name} — ${item.desc || ''}`"
-            >
-              <div class="flex items-start justify-between gap-2 mb-3">
-                <h3 class="font-serif-cn text-lg sm:text-xl font-bold text-[#1a1410] leading-tight line-clamp-1 flex-1">
-                  {{ item.name }}
-                </h3>
-                <div class="flex items-center gap-1.5 shrink-0">
-                  <span
-                    v-if="item.health && item.health !== 'ok'"
-                    :title="`健康: ${healthOf(item).label}`"
-                    class="w-2.5 h-2.5 rounded-full"
-                    :style="{ background: healthOf(item).color, boxShadow: `0 0 6px ${healthOf(item).color}88` }"
-                  ></span>
-                  <div class="hanko-circle w-9 h-9 text-xs stamp-anim" :style="{ animationDelay: (Math.min(idx, 18) * 0.05) + 's' }">藏</div>
-                </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
+                <SiteCard
+                  v-for="(item, idx) in group.items"
+                  :key="item.name + (item.url || '')"
+                  :item="item"
+                  :category="group"
+                  :index="idx"
+                  :search-query="searchQuery"
+                  @open="openModal"
+                />
               </div>
-              <p v-if="item.desc" class="font-kai-cn text-[#3a2e22] text-[13px] sm:text-sm leading-relaxed line-clamp-2 mb-3">
-                {{ item.desc }}
-              </p>
-              <div v-if="item.tags?.length" class="flex flex-wrap gap-1.5 mb-3">
-                <span
-                  v-for="t in item.tags.slice(0, 3)"
-                  :key="t"
-                  class="tag-stamp"
-                  style="background: rgba(168, 22, 26, 0.08); border-color: rgba(168, 22, 26, 0.3); color: #a8161a;"
-                >#{{ t }}</span>
-                <span
-                  v-if="item.tags.length > 3"
-                  class="tag-stamp"
-                  style="background: rgba(201, 165, 92, 0.1); border-color: rgba(201, 165, 92, 0.3); color: #a4853e;"
-                >+{{ item.tags.length - 3 }}</span>
-              </div>
-              <div class="flex items-center justify-between pt-2 border-t border-[#1a1410]/10">
-                <div class="font-mono text-[10px] text-[#5a4a3a] tracking-wider line-clamp-1 flex-1">
-                  {{ item.proxy ? '◯ 需梯子' : '◯ 直连' }}
-                </div>
-                <div class="text-[#a8161a] text-xs font-serif-cn tracking-wider">覌 →</div>
-              </div>
-            </button>
-          </div>
         </article>
       </div>
 
@@ -438,6 +393,36 @@ onMounted(() => {
       :category="modalCategory"
       @close="closeModal"
     />
+
+    <!-- =================== 返回顶部按钮 =================== -->
+    <Transition name="fade">
+      <button
+        v-if="showBackToTop"
+        @click="scrollToTop"
+        class="back-to-top"
+        aria-label="返回顶部"
+      >
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <polyline points="18 15 12 9 6 15" />
+        </svg>
+      </button>
+    </Transition>
+
+    <!-- =================== 离线状态提示 =================== -->
+    <Transition name="fade">
+      <div v-if="isOffline" class="offline-banner">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="1" y1="1" x2="23" y2="23"></line>
+          <path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"></path>
+          <path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"></path>
+          <path d="M10.71 5.05A16 16 0 0 1 22.58 9"></path>
+          <path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"></path>
+          <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
+          <line x1="12" y1="20" x2="12.01" y2="20"></line>
+        </svg>
+        <span>离线模式 - 部分功能可能受限</span>
+      </div>
+    </Transition>
   </div>
 </template>
 
@@ -608,4 +593,66 @@ onMounted(() => {
 }
 @media (min-width: 1024px) { .site-footer { padding: 3rem 2rem; } }
 .site-footer__inner { max-width: 800px; margin: 0 auto; }
+
+/* ============== 返回顶部按钮 ============== */
+.back-to-top {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--seal);
+  color: var(--washi);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(217, 32, 32, 0.3);
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  z-index: 40;
+}
+.back-to-top:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 20px rgba(217, 32, 32, 0.4);
+  background: var(--seal-deep);
+}
+.back-to-top:active {
+  transform: translateY(-2px);
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+/* ============== 离线状态提示 ============== */
+.offline-banner {
+  position: fixed;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  background: rgba(26, 20, 16, 0.95);
+  color: var(--washi);
+  border: 1px solid rgba(217, 32, 32, 0.3);
+  border-radius: 4px;
+  font-family: var(--kai);
+  font-size: 0.875rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  z-index: 50;
+  backdrop-filter: blur(8px);
+}
+.offline-banner svg {
+  color: var(--seal);
+  flex-shrink: 0;
+}
 </style>

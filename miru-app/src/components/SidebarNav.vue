@@ -1,6 +1,7 @@
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { categories } from '../data/nav.js'
+import { useDebounce } from '../composables/useDebounce.js'
 
 const props = defineProps({
   activeCategory: { type: String, required: true },
@@ -11,6 +12,25 @@ const emit = defineEmits(['select', 'search', 'toggle'])
 
 const expanded = ref(new Set(['all']))  // 默认展开"全部"
 const allCount = computed(() => categories.reduce((a, c) => a + c.items.length, 0))
+
+// 使用防抖 composable
+const { debouncedValue, setDebouncedValue } = useDebounce(300)
+const localSearchQuery = ref(props.searchQuery)
+
+function handleSearchInput(e) {
+  const value = e.target.value
+  localSearchQuery.value = value
+  setDebouncedValue(value)
+}
+
+// 监听防抖后的值并触发搜索
+watch(debouncedValue, (newVal) => {
+  emit('search', newVal)
+})
+
+watch(() => props.searchQuery, (newVal) => {
+  localSearchQuery.value = newVal
+})
 
 function toggle(id) {
   const s = new Set(expanded.value)
@@ -59,8 +79,8 @@ watch(() => props.activeCategory, (id) => {
         <div class="flex items-center">
           <div class="hanko h-8 w-8 shrink-0 text-[10px]" style="border-radius: 2px 0 0 2px;">搜</div>
           <input
-            :value="searchQuery"
-            @input="emit('search', $event.target.value)"
+            :value="localSearchQuery"
+            @input="handleSearchInput"
             type="search"
             placeholder="以名索物…"
             class="scroll-input flex-1 px-3 py-1.5 text-[13px]"
@@ -180,9 +200,7 @@ watch(() => props.activeCategory, (id) => {
   content: '';
   position: absolute;
   inset: 0;
-  background-image: url("data:image/svg+xml;utf8,<svg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.95  0 0 0 0 0.93  0 0 0 0 0.88  0 0 0 0.04 0'/></filter><rect width='200' height='200' filter='url(%23n)'/></svg>");
-  opacity: 0.5;
-  mix-blend-mode: overlay;
+  background: radial-gradient(ellipse at 50% 0%, rgba(217, 32, 32, 0.03) 0%, transparent 70%);
   pointer-events: none;
   z-index: -1;
 }

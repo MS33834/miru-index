@@ -10,6 +10,7 @@
     <meta name="description" content="漫藏 MIRU INDEX — ACGN 资源导航站，新和风杂志美学，聚合 26 个细分分类 166 条精选资源：网络代理、下载器、AI 工具、漫画、番剧、GalGame、轻小说、音乐、周边、资讯、绘画、视频、社区、GitHub 开源等。">
     <meta name="keywords" content="ACGN, 漫藏, 漫画, GalGame, 番剧, AI 翻译, 搜图, 资源导航, GitHub, Mihon, JM, 哔咔, 二次元, 印泥, 朱砂, 新和风">
     <meta name="theme-color" content="#0a0a0a">
+    <link rel="manifest" href="/miru-index/manifest.json">
     <meta name="author" content="badhope">
     <meta property="og:title" content="漫藏 · MIRU INDEX — ACGN 资源导航">
     <meta property="og:description" content="新和风杂志美学的 ACGN 资源导航 · 26 分类 · 166 条资源">
@@ -22,8 +23,27 @@
     <meta name="twitter:description" content="新和风杂志美学的 ACGN 资源导航 · 26 分类 · 166 条资源">
     <title>漫藏 · MIRU INDEX — ACGN 资源导航</title>
 
+    <!-- JSON-LD 结构化数据 -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "漫藏阁",
+      "alternateName": "MIRU INDEX",
+      "description": "ACGN 资源导航站，新和风杂志美学，聚合 26 个细分分类 166 条精选资源",
+      "url": "https://badhope.github.io/miru-index/",
+      "author": {
+        "@type": "Person",
+        "name": "badhope"
+      },
+      "keywords": "ACGN, 漫藏, 漫画, GalGame, 番剧, AI 翻译, 搜图, 资源导航, GitHub, 二次元",
+      "inLanguage": "zh-CN"
+    }
+    </script>
+
     <!-- 字体：国内 jsDelivr CDN + JS 异步加载（不阻塞首屏渲染，CSP 友好） -->
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-screen-webfont@1.7.0/style.css" as="style" />
     <noscript>
       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-screen-webfont@1.7.0/style.css" />
     </noscript>
