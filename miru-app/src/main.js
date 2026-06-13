@@ -7,12 +7,10 @@ export const isOffline = ref(!navigator.onLine)
 
 window.addEventListener('online', () => {
   isOffline.value = false
-  console.log('Network: Online')
 })
 
 window.addEventListener('offline', () => {
   isOffline.value = true
-  console.log('Network: Offline')
 })
 
 // CSP 友好的字体异步加载: 替代 index.html 的 onload 内联事件
@@ -28,11 +26,8 @@ createApp(App).mount('#app')
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/miru-index/sw.js')
-      .then((registration) => {
-        console.log('SW registered:', registration.scope)
-      })
       .catch((error) => {
-        console.log('SW registration failed:', error)
+        // 静默失败，不影响应用功能
       })
   })
 }

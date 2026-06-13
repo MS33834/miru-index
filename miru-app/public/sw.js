@@ -34,17 +34,8 @@ const CACHE_STRATEGIES = {
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then((cache) => {
-        console.log('[SW] Precaching core assets')
-        return cache.addAll(PRECACHE_ASSETS)
-      })
-      .then(() => {
-        console.log('[SW] Install complete')
-        return self.skipWaiting()
-      })
-      .catch((error) => {
-        console.error('[SW] Install failed:', error)
-      })
+      .then((cache) => cache.addAll(PRECACHE_ASSETS))
+      .then(() => self.skipWaiting())
   )
 })
 
@@ -55,15 +46,9 @@ self.addEventListener('activate', (event) => {
       return Promise.all(
         cacheNames
           .filter((name) => name.startsWith('miru-index-') && name !== CACHE_NAME)
-          .map((name) => {
-            console.log('[SW] Deleting old cache:', name)
-            return caches.delete(name)
-          })
+          .map((name) => caches.delete(name))
       )
-    }).then(() => {
-      console.log('[SW] Activate complete')
-      return self.clients.claim()
-    })
+    }).then(() => self.clients.claim())
   )
 })
 
@@ -119,17 +104,11 @@ async function cacheFirstStrategy(request, cacheName) {
     caches.open(cacheName)
       .then((cache) => {
         cache.put(request, responseToCache)
-        // 检查缓存大小并清理
         cleanupCache(cache, CACHE_STRATEGIES.assets.maxEntries)
-      })
-      .catch((error) => {
-        console.error('[SW] Cache put failed:', error)
       })
     
     return networkResponse
   } catch (error) {
-    console.error('[SW] Fetch failed:', error)
-    // 离线时返回空响应
     return new Response('Offline', { 
       status: 503, 
       statusText: 'Service Unavailable',
@@ -147,19 +126,13 @@ async function networkFirstStrategy(request, cacheName) {
       const responseToCache = networkResponse.clone()
       caches.open(cacheName)
         .then((cache) => cache.put(request, responseToCache))
-        .catch((error) => {
-          console.error('[SW] Cache put failed:', error)
-        })
     }
     
     return networkResponse
   } catch (error) {
-    console.error('[SW] Network request failed:', error)
-    
     // 网络失败时尝试缓存
     const cached = await caches.match(request)
     if (cached) {
-      console.log('[SW] Serving from cache:', request.url)
       return cached
     }
     
@@ -167,7 +140,6 @@ async function networkFirstStrategy(request, cacheName) {
     if (request.destination === 'document') {
       const fallback = await caches.match('/miru-index/index.html')
       if (fallback) {
-        console.log('[SW] Serving fallback index.html')
         return fallback
       }
     }
@@ -198,12 +170,10 @@ async function cleanupCache(cache, maxEntries) {
   try {
     const keys = await cache.keys()
     if (keys.length > maxEntries) {
-      // 删除最旧的缓存项
       const toDelete = keys.slice(0, keys.length - maxEntries)
       await Promise.all(toDelete.map(key => cache.delete(key)))
-      console.log(`[SW] Cleaned up ${toDelete.length} old cache entries`)
     }
   } catch (error) {
-    console.error('[SW] Cache cleanup failed:', error)
+    // 静默失败
   }
 }
