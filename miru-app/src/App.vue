@@ -228,48 +228,34 @@ watch([activeCategory, searchQuery], () => {
       <!-- Hero（首次进入且无搜索） -->
       <section v-if="loaded && !searchQuery && activeCategory === 'all'" class="hero">
         <div class="hero__inner">
-          <div class="flex items-center justify-between mb-10">
-            <div class="flex items-center gap-3">
-              <div class="hanko h-10 w-10 text-base stamp-anim">漫</div>
-              <div>
-                <div class="font-serif-cn text-[#f3ece0] text-lg font-bold leading-none tracking-wider">MIRU INDEX</div>
-                <div class="font-mono text-[#8a7a68] text-[10px] tracking-[0.3em] mt-1">EST · 2026 · ACGN</div>
-              </div>
-            </div>
-            <div class="hidden sm:flex items-center gap-2 font-mono text-[10px] text-[#8a7a68] tracking-[0.3em]">
-              <span class="ink-bar w-12"></span>
-              <span>VOL · 壹</span>
+          <!-- 简化的顶部标识 -->
+          <div class="flex items-center gap-3 mb-12">
+            <div class="hanko h-10 w-10 text-base">漫</div>
+            <div>
+              <div class="font-serif-cn text-[#f3ece0] text-lg font-bold tracking-wider">MIRU INDEX</div>
+              <div class="font-mono text-[#8a7a68] text-[10px] tracking-[0.3em] mt-1">ACGN · 2026</div>
             </div>
           </div>
 
+          <!-- 主标题区域 - 更简洁 -->
           <div class="relative">
-            <div aria-hidden="true" class="absolute -top-6 -left-2 sm:-left-4 kanji-num font-serif-cn select-none pointer-events-none" data-num="藏">藏</div>
-
-            <h1 class="relative">
-              <span class="hero-kanji ink-spread inline-block" style="animation-delay: 0.1s">漫藏</span>
-              <span class="hero-kanji ink-spread inline-block ml-2 sm:ml-4" style="animation-delay: 0.25s; -webkit-text-fill-color: rgba(217, 32, 32, 0.85); background: none;">藏經閣</span>
+            <h1 class="relative mb-6">
+              <span class="hero-title ink-spread inline-block">漫藏</span>
+              <span class="hero-title-sub ink-spread inline-block ml-4">藏經閣</span>
             </h1>
 
-            <div class="mt-6 sm:mt-8 flex flex-col sm:flex-row sm:items-end gap-3 sm:gap-6">
-              <div class="chapter-num">— MIRU · INDEX · 漫 — 藏 — 阁 —</div>
-            </div>
-
-            <p class="mt-5 sm:mt-7 max-w-2xl text-[#c4bba8] text-[15px] sm:text-base leading-[1.9] font-kai-cn">
-              一座属于 <span class="text-[#f3ece0]">ACGN</span> 的<span class="text-[#d92020]">印经阁</span>。
-              精选 <span class="text-[#c9a55c] font-serif-cn text-lg mx-1">{{ totalCount }}</span> 站 · 分 <span class="text-[#c9a55c] font-serif-cn text-lg mx-1">{{ categories.length }}</span> 卷 · <span class="text-[#c9a55c] font-serif-cn text-lg mx-1">{{ VOLUMES.length }}</span> 册 · 涵盖漫画 · 番剧 · GalGame · 轻小说 · AI · GitHub 开源 · 网络工具……凡诸次元之美，尽藏于此。
+            <p class="max-w-2xl text-[#c4bba8] text-base leading-[2] font-kai-cn mb-8">
+              一座属于 <span class="text-[#f3ece0] font-bold">ACGN</span> 的<span class="text-[#d92020] font-bold">印经阁</span>。
+              精选 <span class="text-[#c9a55c] font-serif-cn text-lg mx-1">{{ totalCount }}</span> 站 · 分 <span class="text-[#c9a55c] font-serif-cn text-lg mx-1">{{ categories.length }}</span> 卷 · 涵盖漫画 · 番剧 · GalGame · 轻小说 · AI · GitHub 开源 · 网络工具……
             </p>
 
-            <div class="mt-7 flex flex-wrap gap-3">
+            <!-- 简化的标签 -->
+            <div class="flex flex-wrap gap-2">
               <div class="hanko px-3 py-1.5 text-sm">朱泥 · ACGN</div>
-              <div class="hanko px-3 py-1.5 text-sm" style="background: #1a1410; color: #c9a55c; box-shadow: inset 0 0 0 1px rgba(201, 165, 92, 0.4);">御金 · {{ totalCount }}</div>
-              <div class="hanko px-3 py-1.5 text-sm" style="background: #0a0a0a; color: #f3ece0; box-shadow: inset 0 0 0 1px rgba(243, 236, 224, 0.3);">墨 · {{ VOLUMES.length }}卷</div>
+              <div class="hanko px-3 py-1.5 text-sm" style="background: #1a1410; color: #c9a55c;">御金 · {{ totalCount }}</div>
+              <div class="hanko px-3 py-1.5 text-sm" style="background: #0a0a0a; color: #f3ece0;">墨 · {{ VOLUMES.length }}卷</div>
             </div>
           </div>
-
-          <svg class="absolute top-32 right-8 w-24 h-24 opacity-30 hidden xl:block" viewBox="0 0 100 100" fill="none">
-            <path d="M10 50 Q 30 10, 50 50 T 90 50" stroke="#d92020" stroke-width="3" stroke-linecap="round" class="brush-stroke" fill="none"/>
-            <circle cx="85" cy="20" r="3" fill="#c9a55c"/>
-          </svg>
         </div>
       </section>
 
@@ -533,8 +519,85 @@ watch([activeCategory, searchQuery], () => {
 @media (min-width: 1024px) { .main { padding: 3rem 3rem 5rem; } }
 
 /* ============== Hero ============== */
-.hero { padding-bottom: 2rem; }
-.hero__inner { position: relative; }
+.hero {
+  padding: 4rem 1.5rem 3rem;
+  position: relative;
+}
+@media (min-width: 640px) { .hero { padding: 6rem 2rem 4rem; } }
+@media (min-width: 1024px) { .hero { padding: 8rem 3rem 5rem; } }
+
+.hero__inner {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.hero-title {
+  font-family: var(--serif);
+  font-size: clamp(3.5rem, 12vw, 6rem);
+  font-weight: 900;
+  color: var(--washi);
+  letter-spacing: 0.05em;
+  line-height: 1.1;
+}
+
+.hero-title-sub {
+  font-family: var(--serif);
+  font-size: clamp(3rem, 10vw, 5rem);
+  font-weight: 900;
+  color: var(--seal);
+  letter-spacing: 0.05em;
+  line-height: 1.1;
+  opacity: 0.9;
+}
+
+/* ============== 卷册标题 ============== */
+.volume__header {
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid rgba(217, 32, 32, 0.15);
+}
+
+.volume__title {
+  font-family: var(--serif);
+  font-size: 1.75rem;
+  font-weight: 900;
+  color: var(--washi);
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+}
+
+.volume__subtitle {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: #8a7a68;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+/* ============== 分类标题 ============== */
+.subgroup__head {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(201, 165, 92, 0.2);
+}
+
+.subgroup__title {
+  font-family: var(--serif);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--washi);
+  letter-spacing: 0.02em;
+}
+
+.subgroup__count {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: #8a7a68;
+  letter-spacing: 0.1em;
+}
 
 /* ============== 面包屑 ============== */
 .breadcrumb {

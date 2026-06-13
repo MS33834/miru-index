@@ -76,50 +76,50 @@ const descParts = computed(() => getHighlightedParts(props.item.desc, props.sear
     @click="handleClick"
     @keydown="handleKeydown"
     class="card-paper text-left card-rise focus:outline-none focus:ring-2 focus:ring-[#d92020] focus:ring-offset-2 focus:ring-offset-[#0a0a0a] relative"
-    :class="compact ? 'p-3.5 sm:p-4' : 'p-4 sm:p-5'"
+    :class="compact ? 'p-4 sm:p-5' : 'p-5 sm:p-6'"
     :style="{ animationDelay: (Math.min(index, 24) * 0.04) + 's' }"
     :aria-label="`${item.name} — ${item.desc || ''}`"
   >
-    <div v-if="isVisible" class="flex items-start justify-between gap-2 mb-2 sm:mb-3">
-      <h4 class="font-serif-cn text-base sm:text-lg font-bold text-[#1a1410] leading-tight line-clamp-1 flex-1"
-          :class="{ 'sm:text-xl': !compact }">
-        <template v-for="(part, idx) in nameParts" :key="idx">
-          <mark v-if="part.highlight" class="search-highlight">{{ part.text }}</mark>
-          <template v-else>{{ part.text }}</template>
-        </template>
-      </h4>
-      <div class="flex items-center gap-1.5 shrink-0">
-        <button
-          @click="handleFavoriteClick"
-          class="favorite-btn"
-          :class="{ 'is-favorite': isFavorite(item), 'is-animating': favoriteAnimating }"
-          :aria-label="isFavorite(item) ? '取消收藏' : '收藏'"
-        >
-          <svg width="14" height="14" viewBox="0 0 24 24" :fill="isFavorite(item) ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="2">
-            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-          </svg>
-        </button>
-        <span
-          v-if="item.health && item.health !== 'ok'"
-          :title="`健康: ${healthOf(item).label}`"
-          class="rounded-full"
-          :class="compact ? 'w-2 h-2' : 'w-2.5 h-2.5'"
-          :style="{ background: healthOf(item).color, boxShadow: `0 0 6px ${healthOf(item).color}88` }"
-        ></span>
-        <div class="hanko-circle stamp-anim"
-             :class="compact ? 'w-7 h-7 text-[10px]' : 'w-9 h-9 text-xs'"
-             :style="{ animationDelay: (Math.min(index, 18) * 0.05) + 's' }">藏</div>
+    <div v-if="isVisible" class="flex flex-col gap-3">
+      <!-- 标题行 -->
+      <div class="flex items-start justify-between gap-3">
+        <h4 class="font-serif-cn text-lg sm:text-xl font-bold text-[#1a1410] leading-tight line-clamp-1 flex-1">
+          <template v-for="(part, idx) in nameParts" :key="idx">
+            <mark v-if="part.highlight" class="search-highlight">{{ part.text }}</mark>
+            <template v-else>{{ part.text }}</template>
+          </template>
+        </h4>
+        <div class="flex items-center gap-2 shrink-0">
+          <button
+            @click="handleFavoriteClick"
+            class="favorite-btn"
+            :class="{ 'is-favorite': isFavorite(item), 'is-animating': favoriteAnimating }"
+            :aria-label="isFavorite(item) ? '取消收藏' : '收藏'"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" :fill="isFavorite(item) ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="2">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            </svg>
+          </button>
+          <span
+            v-if="item.health && item.health !== 'ok'"
+            :title="`健康: ${healthOf(item).label}`"
+            class="rounded-full w-2.5 h-2.5"
+            :style="{ background: healthOf(item).color, boxShadow: `0 0 8px ${healthOf(item).color}88` }"
+          ></span>
+        </div>
       </div>
-    </div>
-    <div v-if="isVisible" class="card-content">
-      <p v-if="item.desc" class="font-kai-cn text-[#3a2e22] leading-relaxed line-clamp-2 mb-2 sm:mb-3"
-         :class="compact ? 'text-[12.5px] sm:text-[13px]' : 'text-[13px] sm:text-sm'">
+
+      <!-- 描述 -->
+      <p v-if="item.desc" class="font-kai-cn text-[#3a2e22] leading-relaxed line-clamp-2 text-sm"
+         :class="compact ? 'text-[13px] sm:text-sm' : 'text-sm sm:text-base'">
         <template v-for="(part, idx) in descParts" :key="idx">
           <mark v-if="part.highlight" class="search-highlight">{{ part.text }}</mark>
           <template v-else>{{ part.text }}</template>
         </template>
       </p>
-      <div v-if="item.tags?.length" class="flex flex-wrap gap-1 sm:gap-1.5 mb-2 sm:mb-3">
+
+      <!-- 标签 -->
+      <div v-if="item.tags?.length" class="flex flex-wrap gap-1.5 sm:gap-2">
         <span
           v-for="t in item.tags.slice(0, compact ? 2 : 3)"
           :key="t"
@@ -132,17 +132,17 @@ const descParts = computed(() => getHighlightedParts(props.item.desc, props.sear
           :class="compact ? 'tag-sm' : 'tag-normal'"
         >+{{ item.tags.length - (compact ? 2 : 3) }}</span>
       </div>
-      <div class="flex items-center justify-between pt-1.5 sm:pt-2 border-t border-[#1a1410]/10">
-        <div class="font-mono text-[#5a4a3a] tracking-wider line-clamp-1 flex-1"
-             :class="compact ? 'text-[9px]' : 'text-[10px]'">
+
+      <!-- 底部信息 -->
+      <div class="flex items-center justify-between pt-3 border-t border-[#1a1410]/10">
+        <div class="font-mono text-[#5a4a3a] tracking-wider line-clamp-1 flex-1 text-xs">
           {{ item.proxy ? '◯ 需梯子' : '◯ 直连' }}
         </div>
-        <div class="text-[#a8161a] font-serif-cn tracking-wider"
-             :class="compact ? 'text-[11px]' : 'text-xs'">覌 →</div>
+        <div class="text-[#a8161a] font-serif-cn tracking-wider text-sm font-bold">覌 →</div>
       </div>
     </div>
     <div v-else class="card-placeholder">
-      <div class="hanko-circle w-9 h-9 text-xs opacity-30">藏</div>
+      <div class="hanko-circle w-10 h-10 text-xs opacity-30">藏</div>
     </div>
   </button>
 </template>
