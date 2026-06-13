@@ -48,35 +48,55 @@ function trapFocus(e) {
 }
 
 async function copyUrl() {
-  await doCopy(props.item.url, copied, '已抄录 ✓')
+  await doCopy(props.item.url, copied)
 }
 async function copyMirror() {
-  await doCopy(mirrorUrl.value, copiedMirror, '镜像已抄录 ✓')
+  await doCopy(mirrorUrl.value, copiedMirror)
 }
-async function doCopy(text, flagRef, msg) {
+async function doCopy(text, flagRef) {
+  if (!text) return
   try {
     await navigator.clipboard.writeText(text)
     flagRef.value = true
     setTimeout(() => (flagRef.value = false), 1500)
   } catch {
+    // 降级方案：创建临时 textarea
     const ta = document.createElement('textarea')
     ta.value = text
+    ta.style.position = 'fixed'
+    ta.style.left = '-9999px'
     document.body.appendChild(ta)
     ta.select()
-    try { document.execCommand('copy'); flagRef.value = true; setTimeout(() => (flagRef.value = false), 1500) } catch {}
+    try {
+      document.execCommand('copy')
+      flagRef.value = true
+      setTimeout(() => (flagRef.value = false), 1500)
+    } catch {
+      // 复制失败，静默处理
+    }
     document.body.removeChild(ta)
   }
 }
 
 function openInNewTab() {
   const target = isGitHub.value ? mirrorUrl.value : props.item.url
-  const w = window.open(target, '_blank', 'noopener,noreferrer')
-  if (!w) window.location.href = target
+  if (!isValidUrl(target)) return
+  const w = window.open(target, '_blank')
+  if (w) w.opener = null
+  else window.location.href = target
 }
 
 function openOriginal() {
-  const w = window.open(props.item.url, '_blank', 'noopener,noreferrer')
-  if (!w) window.location.href = props.item.url
+  if (!isValidUrl(props.item.url)) return
+  const w = window.open(props.item.url, '_blank')
+  if (w) w.opener = null
+  else window.location.href = props.item.url
+}
+
+function isValidUrl(url) {
+  if (!url) return false
+  // 只允许 http/https 协议
+  return /^https?:\/\//.test(url)
 }
 
 function selectMirror(m) {

@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { healthOf } from '../utils/mirror.js'
 import { useFavorites } from '../composables/useFavorites.js'
 import { useLazyLoad } from '../composables/useLazyLoad.js'
@@ -16,6 +16,7 @@ const emit = defineEmits(['open'])
 
 const { isFavorite, toggleFavorite } = useFavorites()
 const { target, isVisible } = useLazyLoad()
+const favoriteAnimating = ref(false)
 
 function handleClick() {
   emit('open', props.item, props.category)
@@ -31,6 +32,12 @@ function handleKeydown(e) {
 function handleFavoriteClick(e) {
   e.stopPropagation()
   toggleFavorite(props.item)
+  
+  // 触发收藏动画
+  favoriteAnimating.value = true
+  setTimeout(() => {
+    favoriteAnimating.value = false
+  }, 400)
 }
 
 // 高亮搜索关键词 - 返回分段数组用于安全渲染
@@ -85,7 +92,7 @@ const descParts = computed(() => getHighlightedParts(props.item.desc, props.sear
         <button
           @click="handleFavoriteClick"
           class="favorite-btn"
-          :class="{ 'is-favorite': isFavorite(item) }"
+          :class="{ 'is-favorite': isFavorite(item), 'is-animating': favoriteAnimating }"
           :aria-label="isFavorite(item) ? '取消收藏' : '收藏'"
         >
           <svg width="14" height="14" viewBox="0 0 24 24" :fill="isFavorite(item) ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="2">
@@ -178,6 +185,17 @@ const descParts = computed(() => getHighlightedParts(props.item.desc, props.sear
 }
 .favorite-btn.is-favorite {
   color: #c9a55c;
+}
+.favorite-btn.is-animating {
+  animation: favorite-bounce 0.4s ease;
+}
+@keyframes favorite-bounce {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.3);
+  }
 }
 .card-content {
   animation: fadeIn 0.3s ease-in;

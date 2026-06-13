@@ -63,11 +63,14 @@ body::after {
   inset: 0;
   pointer-events: none;
   z-index: 0;
+  /* 使用更轻量的噪点方案：缩小纹理尺寸，降低 GPU 压力 */
   background:
-    repeating-conic-gradient(rgba(243, 236, 224, 0.03) 0%, transparent 0.0008%, transparent 0.0018%) 50% 50% / 2500px 2500px,
-    repeating-conic-gradient(rgba(243, 236, 224, 0.02) 0%, transparent 0.001%, transparent 0.002%) 50% 50% / 2500px 2500px;
-  opacity: 0.6;
+    repeating-conic-gradient(rgba(243, 236, 224, 0.025) 0%, transparent 0.002%, transparent 0.004%) 50% 50% / 1500px 1500px;
+  opacity: 0.5;
   mix-blend-mode: overlay;
+  /* 合成层优化 */
+  will-change: auto;
+  contain: strict;
 }
 
 #app {
@@ -191,13 +194,14 @@ body::after {
   overflow: hidden;
   isolation: isolate;
 }
-/* 和纸纤维纹理 */
+/* 和纸纤维纹理 - 使用更轻量的方案 */
 .card-paper::before {
   content: '';
   position: absolute;
   inset: 0;
   background:
-    repeating-conic-gradient(rgba(26, 20, 16, 0.04) 0%, transparent 0.001%, transparent 0.002%) 50% 50% / 1500px 1500px;
+    radial-gradient(circle at 30% 40%, rgba(26, 20, 16, 0.03) 0%, transparent 60%),
+    radial-gradient(circle at 70% 60%, rgba(26, 20, 16, 0.02) 0%, transparent 60%);
   opacity: 0.7;
   mix-blend-mode: multiply;
   pointer-events: none;

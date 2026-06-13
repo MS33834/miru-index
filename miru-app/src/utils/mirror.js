@@ -27,6 +27,7 @@ const JSDELIVR_BASE = 'https://cdn.jsdelivr.net/gh/'
  * 判断 URL 是否为 GitHub 仓库主页（无 /blob/ /tree/ /releases/ /raw/ 等路径）
  */
 function isRepoHome(url) {
+  // 更严格的正则：匹配 github.com/owner/repo 且后面没有路径（除了可选的 / 或查询参数）
   return /^https:\/\/github\.com\/[^/]+\/[^/]+\/?(\?.*)?$/.test(url)
 }
 

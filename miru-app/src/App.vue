@@ -13,8 +13,15 @@ const activeCategory = ref('all')
 const modalItem = ref(null)
 const modalCategory = ref(null)
 const drawerOpen = ref(false)
-const sidebarCollapsed = ref(false)
+// 侧边栏折叠状态持久化到 localStorage
+const SIDEBAR_KEY = 'miru-sidebar-collapsed'
+const sidebarCollapsed = ref(localStorage.getItem(SIDEBAR_KEY) === 'true')
 const loaded = ref(false)
+
+// 监听侧边栏折叠状态变化并持久化
+watch(sidebarCollapsed, (val) => {
+  try { localStorage.setItem(SIDEBAR_KEY, String(val)) } catch {}
+})
 
 // 从配置导入
 const { VOLUMES, CHINESE_NUMS, UI } = APP_CONFIG
@@ -100,6 +107,28 @@ function scrollToTop() {
   window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
+// 抽屉焦点陷阱 + Escape 关闭
+const drawerPanelRef = ref(null)
+
+function handleDrawerKeydown(e) {
+  if (e.key === 'Escape') {
+    drawerOpen.value = false
+    return
+  }
+  if (e.key !== 'Tab' || !drawerPanelRef.value) return
+  const focusable = drawerPanelRef.value.querySelectorAll(
+    'a[href], button:not([disabled]), input, [tabindex]:not([tabindex="-1"])'
+  )
+  if (!focusable.length) return
+  const first = focusable[0]
+  const last = focusable[focusable.length - 1]
+  if (e.shiftKey && document.activeElement === first) {
+    e.preventDefault(); last.focus()
+  } else if (!e.shiftKey && document.activeElement === last) {
+    e.preventDefault(); first.focus()
+  }
+}
+
 // 键盘快捷键
 function handleKeydown(e) {
   // Ctrl/Cmd + K 聚焦搜索
@@ -179,8 +208,8 @@ watch([activeCategory, searchQuery], () => {
     <!-- =================== 抽屉（平板/手机） =================== -->
     <Teleport to="body">
       <Transition name="drawer">
-        <div v-if="drawerOpen" class="drawer-mask" @click="drawerOpen = false">
-          <div class="drawer-panel" @click.stop>
+        <div v-if="drawerOpen" class="drawer-mask" @click="drawerOpen = false" @keydown="handleDrawerKeydown">
+          <div ref="drawerPanelRef" class="drawer-panel" @click.stop role="dialog" aria-modal="true" aria-label="导航目录">
             <SidebarNav
               :active-category="activeCategory"
               :search-query="searchQuery"
@@ -402,7 +431,7 @@ watch([activeCategory, searchQuery], () => {
         class="back-to-top"
         aria-label="返回顶部"
       >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
           <polyline points="18 15 12 9 6 15" />
         </svg>
       </button>
@@ -410,8 +439,8 @@ watch([activeCategory, searchQuery], () => {
 
     <!-- =================== 离线状态提示 =================== -->
     <Transition name="fade">
-      <div v-if="isOffline" class="offline-banner">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <div v-if="isOffline" class="offline-banner" role="alert" aria-live="polite">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
           <line x1="1" y1="1" x2="23" y2="23"></line>
           <path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"></path>
           <path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"></path>
@@ -597,7 +626,7 @@ watch([activeCategory, searchQuery], () => {
 /* ============== 返回顶部按钮 ============== */
 .back-to-top {
   position: fixed;
-  bottom: 2rem;
+  bottom: calc(2rem + env(safe-area-inset-bottom));
   right: 2rem;
   width: 44px;
   height: 44px;
