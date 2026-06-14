@@ -1,4 +1,4 @@
-import { ref, onUnmounted } from 'vue'
+import { ref, onBeforeUnmount } from 'vue'
 
 /**
  * 防抖 composable
@@ -13,11 +13,15 @@ export function useDebounce(delay = 300) {
     if (timer) clearTimeout(timer)
     timer = setTimeout(() => {
       debouncedValue.value = value
+      timer = null
     }, delay)
   }
 
-  onUnmounted(() => {
-    if (timer) clearTimeout(timer)
+  onBeforeUnmount(() => {
+    if (timer) {
+      clearTimeout(timer)
+      timer = null
+    }
   })
 
   return { debouncedValue, setDebouncedValue }

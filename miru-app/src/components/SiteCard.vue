@@ -78,7 +78,7 @@ const descParts = computed(() => getHighlightedParts(props.item.desc, props.sear
     class="card-paper text-left card-rise focus:outline-none focus:ring-2 focus:ring-[#d92020] focus:ring-offset-2 focus:ring-offset-[#0a0a0a] relative"
     :class="compact ? 'p-4 sm:p-5' : 'p-5 sm:p-6'"
     :style="{ animationDelay: (Math.min(index, 24) * 0.04) + 's' }"
-    :aria-label="`${item.name} — ${item.desc || ''}`"
+    :aria-label="item.desc ? `${item.name} — ${item.desc}` : item.name"
   >
     <div v-if="isVisible" class="flex flex-col gap-3">
       <!-- 标题行 -->

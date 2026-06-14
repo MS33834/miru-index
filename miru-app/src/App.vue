@@ -291,9 +291,7 @@ watch([activeCategory, searchQuery], () => {
           <!-- 卷首 -->
           <header class="volume__header">
             <div class="flex items-end gap-4 sm:gap-6 mb-3 sm:mb-4">
-              <div class="relative">
-                <div class="kanji-num font-serif-cn" data-num="壹">{{ vol.chapterNum }}</div>
-              </div>
+              <div class="volume-num font-serif-cn">{{ vol.chapterNum }}</div>
               <div class="flex-1 pb-1">
                 <div class="chapter-num text-[#8a7a68] mb-1">CHAPTER · {{ String(vi + 1).padStart(2, '0') }} / {{ String(groupedByVolume.length).padStart(2, '0') }}</div>
                 <h2 class="font-serif-cn text-2xl sm:text-3xl text-[#f3ece0] font-bold tracking-wide">
@@ -344,9 +342,7 @@ watch([activeCategory, searchQuery], () => {
         >
           <header class="volume__header">
             <div class="flex items-end gap-4 sm:gap-6 mb-3 sm:mb-4">
-              <div class="relative">
-                <div class="kanji-num font-serif-cn" data-num="壹">{{ CHINESE_NUMS[gi + 1] || '壹' }}</div>
-              </div>
+              <div class="volume-num font-serif-cn">{{ CHINESE_NUMS[gi + 1] || '壹' }}</div>
               <div class="flex-1 pb-1">
                 <div class="chapter-num text-[#8a7a68] mb-1">CHAPTER · {{ String(gi + 1).padStart(2, '0') }}</div>
                 <h2 class="font-serif-cn text-2xl sm:text-3xl text-[#f3ece0] font-bold tracking-wide">

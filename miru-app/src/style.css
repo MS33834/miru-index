@@ -363,13 +363,14 @@ body::after {
   color: var(--gold);
   text-transform: uppercase;
 }
-.kanji-num::before {
-  content: attr(data-num);
-  position: absolute;
-  inset: 0;
-  -webkit-text-fill-color: var(--seal);
-  opacity: 0.18;
-  filter: blur(1px);
+
+.volume-num {
+  font-family: var(--serif);
+  font-weight: 900;
+  font-size: 3.5rem;
+  line-height: 1;
+  color: var(--seal);
+  text-shadow: 0 2px 12px rgba(217, 32, 32, 0.2);
 }
 
 .scroll-divider {

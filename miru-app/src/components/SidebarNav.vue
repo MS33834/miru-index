@@ -153,7 +153,7 @@ watch(() => props.activeCategory, (id) => {
               </div>
               <a
                 v-for="(item, i) in c.items.slice(0, 30)"
-                :key="i"
+                :key="item.url || i"
                 @click.prevent="emit('select', c.id)"
                 :href="item.url"
                 target="_blank"
