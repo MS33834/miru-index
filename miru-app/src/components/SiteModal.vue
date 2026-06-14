@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { GH_MIRRORS, ghMirror, healthOf } from '../utils/mirror.js'
+import { useEventListener } from '../composables/useEventListener.js'
 
 const props = defineProps({
   item: { type: Object, required: true },
@@ -13,18 +14,22 @@ const enterBtnRef = ref(null)
 const copied = ref(false)
 const copiedMirror = ref(false)
 const mirrorOpen = ref(false)
-const selectedMirror = ref(GH_MIRRORS[0])
+const selectedMirror = ref(GH_MIRRORS[0] || null)
+
+// 焦点恢复：保存打开前的活动元素
+let lastFocusedElement = null
 
 const health = computed(() => healthOf(props.item))
-const isGitHub = computed(() => props.item.url?.includes('github.com'))
+const isGitHub = computed(() => Boolean(props.item.url?.includes('github.com')))
 const mirrorUrl = computed(() => {
-  if (!isGitHub.value) return null
+  if (!isGitHub.value || !selectedMirror.value) return null
   return ghMirror(props.item.url, selectedMirror.value.id)
 })
 
 function onBackdropClick(e) {
   if (e.target === e.currentTarget) emit('close')
 }
+
 function onKeydown(e) {
   if (e.key === 'Escape') {
     if (mirrorOpen.value) { mirrorOpen.value = false; return }
@@ -32,50 +37,56 @@ function onKeydown(e) {
   }
   if (e.key === 'Tab') trapFocus(e)
 }
+
 function trapFocus(e) {
   if (!dialogRef.value) return
   const focusable = dialogRef.value.querySelectorAll(
     'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
   )
-  if (!focusable.length) return
+  if (focusable.length <= 1) return
   const first = focusable[0]
   const last = focusable[focusable.length - 1]
   if (e.shiftKey && document.activeElement === first) {
-    e.preventDefault(); last.focus()
+    e.preventDefault()
+    last.focus()
   } else if (!e.shiftKey && document.activeElement === last) {
-    e.preventDefault(); first.focus()
+    e.preventDefault()
+    first.focus()
   }
 }
 
-async function copyUrl() {
-  await doCopy(props.item.url, copied)
-}
-async function copyMirror() {
-  await doCopy(mirrorUrl.value, copiedMirror)
-}
 async function doCopy(text, flagRef) {
   if (!text) return
   try {
     await navigator.clipboard.writeText(text)
     flagRef.value = true
-    setTimeout(() => (flagRef.value = false), 1500)
+    setTimeout(() => { flagRef.value = false }, 1500)
   } catch {
-    // 降级方案：创建临时 textarea
+    // 降级方案
     const ta = document.createElement('textarea')
     ta.value = text
     ta.style.position = 'fixed'
     ta.style.left = '-9999px'
+    ta.setAttribute('readonly', '')
     document.body.appendChild(ta)
     ta.select()
     try {
       document.execCommand('copy')
       flagRef.value = true
-      setTimeout(() => (flagRef.value = false), 1500)
+      setTimeout(() => { flagRef.value = false }, 1500)
     } catch {
-      // 复制失败，静默处理
+      // 静默
     }
     document.body.removeChild(ta)
   }
+}
+
+async function copyUrl() { await doCopy(props.item.url, copied) }
+async function copyMirror() { await doCopy(mirrorUrl.value, copiedMirror) }
+
+function isValidUrl(url) {
+  if (!url) return false
+  return /^https?:\/\//.test(url)
 }
 
 function openInNewTab() {
@@ -93,25 +104,27 @@ function openOriginal() {
   else window.location.href = props.item.url
 }
 
-function isValidUrl(url) {
-  if (!url) return false
-  // 只允许 http/https 协议
-  return /^https?:\/\//.test(url)
-}
-
 function selectMirror(m) {
   selectedMirror.value = m
   mirrorOpen.value = false
 }
 
 onMounted(() => {
-  document.addEventListener('keydown', onKeydown)
+  // 保存当前焦点以便关闭时恢复
+  lastFocusedElement = document.activeElement
   document.body.style.overflow = 'hidden'
   nextTick(() => enterBtnRef.value?.focus())
 })
+
+// 改用 useEventListener 避免手动 cleanup
+useEventListener(typeof document !== 'undefined' ? document : null, 'keydown', onKeydown)
+
 onBeforeUnmount(() => {
-  document.removeEventListener('keydown', onKeydown)
   document.body.style.overflow = ''
+  // 恢复焦点
+  if (lastFocusedElement && typeof lastFocusedElement.focus === 'function') {
+    lastFocusedElement.focus()
+  }
 })
 </script>
 
@@ -120,7 +133,7 @@ onBeforeUnmount(() => {
     <div
       class="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-6 modal-backdrop"
       style="background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(12px);"
-      role="dialog" aria-modal="true" :aria-label="item.name"
+      role="dialog" aria-modal="true" :aria-labelledby="`modal-title-${item.name}`"
       @click="onBackdropClick"
     >
       <div
@@ -136,36 +149,30 @@ onBeforeUnmount(() => {
             0 0 0 1px rgba(217, 32, 32, 0.3);
         "
       >
-        <!-- 和纸纹理 (CSS noise 替代 SVG filter, 避免 ERR_INVALID_URL) -->
         <div aria-hidden="true" class="absolute inset-0 pointer-events-none rounded-[4px] washi"></div>
-
-        <!-- 顶部朱红虚线边 -->
         <div aria-hidden="true" class="absolute top-0 left-0 right-0 h-[3px] z-10" style="
           background: linear-gradient(90deg, #d92020 0%, #d92020 30%, transparent 30%, transparent 36%, #d92020 36%, #d92020 44%, transparent 44%);
           background-size: 12px 3px;
         "></div>
 
         <div class="relative">
-          <!-- 关闭 -->
           <button
+            type="button"
             @click="emit('close')"
-            aria-label="关闭"
+            aria-label="关闭对话框（按 Esc 退出）"
             class="modal-close absolute top-3 right-3 w-10 h-10 rounded-full flex items-center justify-center transition z-20"
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
               <line x1="6" y1="6" x2="18" y2="18" />
               <line x1="18" y1="6" x2="6" y2="18" />
             </svg>
           </button>
 
-          <!-- 头部：卷首 -->
           <header class="px-6 sm:px-10 pt-10 sm:pt-12 pb-5 border-b border-[#1a1410]/10">
-            <!-- 卷首 标识 -->
             <div class="flex items-center gap-2 mb-5 flex-wrap">
               <div class="hanko text-xs px-2.5 py-1 stamp-anim" v-if="category">
                 <span class="mr-1">{{ category.icon }}</span>{{ category.name }}
               </div>
-              <!-- 健康状态徽章 -->
               <div
                 class="font-serif-cn text-xs px-2.5 py-1 rounded-sm inline-flex items-center gap-1.5"
                 :style="{
@@ -175,7 +182,7 @@ onBeforeUnmount(() => {
                 }"
                 :title="`健康状态: ${health.label}`"
               >
-                <span :style="{ color: health.color, fontSize: '10px' }">{{ health.icon }}</span>
+                <span :style="{ color: health.color, fontSize: '10px' }" aria-hidden="true">{{ health.icon }}</span>
                 <span>{{ health.label }}</span>
               </div>
               <div
@@ -187,7 +194,7 @@ onBeforeUnmount(() => {
               </div>
             </div>
 
-            <h2 class="font-serif-cn text-3xl sm:text-4xl font-black text-[#1a1410] leading-tight pr-10 tracking-tight">
+            <h2 :id="`modal-title-${item.name}`" class="font-serif-cn text-3xl sm:text-4xl font-black text-[#1a1410] leading-tight pr-10 tracking-tight">
               {{ item.name }}
             </h2>
             <p v-if="item.desc" class="mt-3 font-kai-cn text-[#3a2e22] text-base sm:text-lg leading-relaxed">
@@ -195,9 +202,7 @@ onBeforeUnmount(() => {
             </p>
           </header>
 
-          <!-- 主体 -->
           <div class="px-6 sm:px-10 py-6 sm:py-8 space-y-7">
-            <!-- 标签 -->
             <section v-if="item.tags?.length">
               <div class="flex items-center gap-2 mb-3">
                 <div class="font-mono text-[10px] tracking-[0.3em] text-[#a8161a]">▎印 · TAGS</div>
@@ -212,7 +217,6 @@ onBeforeUnmount(() => {
               </div>
             </section>
 
-            <!-- 详细介绍 -->
             <section v-if="item.fullDesc">
               <div class="flex items-center gap-2 mb-3">
                 <div class="font-mono text-[10px] tracking-[0.3em] text-[#a8161a]">▎叙 · INTRO</div>
@@ -223,7 +227,6 @@ onBeforeUnmount(() => {
               </p>
             </section>
 
-            <!-- 特色 -->
             <section v-if="item.features?.length">
               <div class="flex items-center gap-2 mb-3">
                 <div class="font-mono text-[10px] tracking-[0.3em] text-[#a8161a]">▎特 · FEATURES</div>
@@ -235,13 +238,12 @@ onBeforeUnmount(() => {
                   class="font-kai-cn text-[#1a1410] text-sm flex items-center gap-2 px-3 py-2 rounded-sm"
                   style="background: rgba(201, 165, 92, 0.08); border: 1px solid rgba(201, 165, 92, 0.25);"
                 >
-                  <span class="text-[#a8161a] font-serif-cn font-bold">·</span>
+                  <span class="text-[#a8161a] font-serif-cn font-bold" aria-hidden="true">·</span>
                   <span>{{ f }}</span>
                 </li>
               </ul>
             </section>
 
-            <!-- URL + 镜像（GitHub 时显示） -->
             <section>
               <div class="flex items-center gap-2 mb-3">
                 <div class="font-mono text-[10px] tracking-[0.3em] text-[#a8161a]">▎址 · URL</div>
@@ -252,28 +254,35 @@ onBeforeUnmount(() => {
                 {{ item.url }}
               </code>
 
-              <!-- GitHub 镜像选择器 -->
               <div v-if="isGitHub" class="mt-4 rounded-sm overflow-hidden" style="border: 1px solid rgba(201, 165, 92, 0.3); background: rgba(201, 165, 92, 0.05);">
                 <button
+                  type="button"
                   @click="mirrorOpen = !mirrorOpen"
                   class="mirror-toggle w-full flex items-center justify-between gap-2 px-4 py-2.5 font-serif-cn text-sm transition"
+                  :aria-expanded="mirrorOpen"
+                  aria-label="切换镜像选择"
                 >
                   <span class="flex items-center gap-2">
                     <span class="font-mono text-[10px] tracking-[0.2em] text-[#a8161a]">▎镜 · MIRROR</span>
-                    <span>{{ selectedMirror.name }}</span>
+                    <span>{{ selectedMirror?.name || '选择镜像' }}</span>
                   </span>
-                  <span class="text-[10px] transition" :class="{ 'rotate-180': mirrorOpen }">▾</span>
+                  <span class="text-[10px] transition" :class="{ 'rotate-180': mirrorOpen }" aria-hidden="true">▾</span>
                 </button>
 
-                <div v-if="mirrorOpen" class="border-t" style="border-color: rgba(201, 165, 92, 0.2);">
+                <div v-if="mirrorOpen" class="border-t" style="border-color: rgba(201, 165, 92, 0.2);" role="listbox">
                   <div
                     v-for="m in GH_MIRRORS"
                     :key="m.id"
                     @click="selectMirror(m)"
                     class="mirror-option px-4 py-2 text-xs font-mono cursor-pointer transition flex items-center gap-2"
-                    :class="{ 'is-active': selectedMirror.id === m.id }"
+                    :class="{ 'is-active': selectedMirror?.id === m.id }"
+                    role="option"
+                    :aria-selected="selectedMirror?.id === m.id"
+                    tabindex="0"
+                    @keydown.enter="selectMirror(m)"
+                    @keydown.space.prevent="selectMirror(m)"
                   >
-                    <span :class="selectedMirror.id === m.id ? 'text-[#a8161a]' : 'opacity-30'">●</span>
+                    <span :class="selectedMirror?.id === m.id ? 'text-[#a8161a]' : 'opacity-30'" aria-hidden="true">●</span>
                     <span class="flex-1">{{ m.name }}</span>
                     <span class="opacity-50 text-[10px]">{{ m.id }}</span>
                   </div>
@@ -285,7 +294,6 @@ onBeforeUnmount(() => {
             </section>
           </div>
 
-          <!-- 底部按钮 -->
           <footer class="px-6 sm:px-10 py-6 sm:py-8 border-t border-[#1a1410]/10 flex flex-col sm:flex-row gap-3">
             <button
               ref="enterBtnRef"
@@ -303,11 +311,12 @@ onBeforeUnmount(() => {
               "
             >
               <span>入</span>
-              <span class="text-sm opacity-80">→</span>
+              <span class="text-sm opacity-80" aria-hidden="true">→</span>
               <span>{{ isGitHub ? '覌镜像' : '覌' }}</span>
             </button>
             <button
               v-if="isGitHub"
+              type="button"
               @click="openOriginal"
               class="btn-mute px-5 py-3.5 font-serif-cn font-bold text-sm transition flex items-center justify-center gap-2"
               title="打开 GitHub 原始链接（需梯子）"
@@ -316,14 +325,16 @@ onBeforeUnmount(() => {
             </button>
             <button
               v-if="isGitHub"
+              type="button"
               @click="copyMirror"
               class="btn-gold px-5 py-3.5 font-serif-cn font-bold text-sm transition flex items-center justify-center gap-2"
-              :title="`复制 ${selectedMirror.name} 镜像 URL`"
+              :title="`复制 ${selectedMirror?.name || '镜像'} URL`"
             >
               <span v-if="!copiedMirror">抄 · 镜</span>
               <span v-else class="text-[#a8161a]">已抄 ✓</span>
             </button>
             <button
+              type="button"
               @click="copyUrl"
               class="btn-dark px-6 py-3.5 font-serif-cn font-bold text-base transition flex items-center justify-center gap-2"
             >
@@ -331,6 +342,7 @@ onBeforeUnmount(() => {
               <span v-else class="text-[#a8161a]">已抄 ✓</span>
             </button>
             <button
+              type="button"
               @click="emit('close')"
               class="btn-text px-6 py-3.5 font-kai-cn text-base transition"
             >
@@ -344,7 +356,6 @@ onBeforeUnmount(() => {
 </template>
 
 <style scoped>
-/* 和纸纹理: 纯 CSS 模拟纸张质感, 避免 SVG filter 在 Modal 重挂载时报错 */
 .washi {
   background:
     radial-gradient(circle at 20% 30%, rgba(168, 22, 26, 0.025) 0, transparent 50%),
@@ -353,39 +364,26 @@ onBeforeUnmount(() => {
   mix-blend-mode: multiply;
   opacity: 0.85;
 }
-/* 关闭按钮 */
 .modal-close {
   background: rgba(184, 35, 31, 0.08);
   border: 1px solid rgba(184, 35, 31, 0.3);
   color: #a8161a;
 }
-.modal-close:hover {
-  background: rgba(184, 35, 31, 0.18);
-}
-
-/* 镜像下拉按钮 */
+.modal-close:hover { background: rgba(184, 35, 31, 0.18); }
 .mirror-toggle {
   color: #a4853e;
   background: transparent;
 }
-.mirror-toggle:hover {
-  background: rgba(201, 165, 92, 0.1);
-}
-
-/* 镜像选项 */
+.mirror-toggle:hover { background: rgba(201, 165, 92, 0.1); }
 .mirror-option {
   background: transparent;
   color: #5a4a3a;
 }
-.mirror-option:not(.is-active):hover {
-  background: rgba(201, 165, 92, 0.08);
-}
+.mirror-option:not(.is-active):hover { background: rgba(201, 165, 92, 0.08); }
 .mirror-option.is-active {
   background: rgba(201, 165, 92, 0.18);
   color: #a8161a;
 }
-
-/* 按钮：原 */
 .btn-mute {
   background: transparent;
   color: #5a4a3a;
@@ -393,12 +391,7 @@ onBeforeUnmount(() => {
   border-radius: 2px;
   letter-spacing: 0.05em;
 }
-.btn-mute:hover {
-  background: rgba(0, 0, 0, 0.05);
-  color: #1a1410;
-}
-
-/* 按钮：抄镜 */
+.btn-mute:hover { background: rgba(0, 0, 0, 0.05); color: #1a1410; }
 .btn-gold {
   background: transparent;
   color: #a4853e;
@@ -406,12 +399,7 @@ onBeforeUnmount(() => {
   border-radius: 2px;
   letter-spacing: 0.05em;
 }
-.btn-gold:hover {
-  background: rgba(201, 165, 92, 0.1);
-  color: #1a1410;
-}
-
-/* 按钮：抄录 */
+.btn-gold:hover { background: rgba(201, 165, 92, 0.1); color: #1a1410; }
 .btn-dark {
   background: transparent;
   color: #1a1410;
@@ -419,17 +407,11 @@ onBeforeUnmount(() => {
   border-radius: 2px;
   letter-spacing: 0.1em;
 }
-.btn-dark:hover {
-  background: rgba(0, 0, 0, 0.05);
-}
-
-/* 按钮：闭 */
+.btn-dark:hover { background: rgba(0, 0, 0, 0.05); }
 .btn-text {
   background: transparent;
   color: #5a4a3a;
   letter-spacing: 0.1em;
 }
-.btn-text:hover {
-  color: #1a1410;
-}
+.btn-text:hover { color: #1a1410; }
 </style>

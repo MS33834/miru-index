@@ -1,35 +1,32 @@
 <script setup>
-import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
+import { ref, shallowRef, computed, onMounted, onUnmounted, watch } from 'vue'
 import { categories } from './data/nav.js'
 import SiteModal from './components/SiteModal.vue'
 import SidebarNav from './components/SidebarNav.vue'
 import SiteCard from './components/SiteCard.vue'
+import ErrorBoundary from './components/ErrorBoundary.vue'
 import { isOffline } from './main.js'
 import { APP_CONFIG } from './config/constants.js'
 import { useScrollPosition } from './composables/useScrollPosition.js'
+import { paginate, totalPages } from './utils/paginate.js'
+import { clearHighlightCache } from './utils/highlight.js'
+
+const PAGE_SIZE = 24 // 每页 24 项，避免一次性渲染过多 DOM
 
 const searchQuery = ref('')
 const activeCategory = ref('all')
 const modalItem = ref(null)
 const modalCategory = ref(null)
 const drawerOpen = ref(false)
+const currentPage = ref(1)
+
 // 侧边栏折叠状态持久化到 localStorage
 const SIDEBAR_KEY = 'miru-sidebar-collapsed'
 const sidebarCollapsed = ref(localStorage.getItem(SIDEBAR_KEY) === 'true')
 const loaded = ref(false)
 
-// 监听侧边栏折叠状态变化并持久化
-watch(sidebarCollapsed, (val) => {
-  try { localStorage.setItem(SIDEBAR_KEY, String(val)) } catch {}
-})
-
-// 从配置导入
-const { VOLUMES, CHINESE_NUMS, UI } = APP_CONFIG
-
-// 使用滚动位置 composable
-const { showBackToTop } = useScrollPosition({ threshold: UI.BACK_TO_TOP_THRESHOLD })
-
-const allItems = computed(() =>
+// shallowRef 避免大数据量深度响应式化
+const allItems = shallowRef(
   categories.flatMap(c => c.items.map(i => ({ ...i, _category: c })))
 )
 
@@ -49,27 +46,68 @@ const filteredItems = computed(() => {
 
 const totalCount = computed(() => allItems.value.length)
 const filteredCount = computed(() => filteredItems.value.length)
+const totalPageCount = computed(() => totalPages(filteredItems.value.length, PAGE_SIZE))
+
+// 当前页数据（分页）
+const paginatedItems = computed(() => {
+  if (activeCategory.value !== 'all') return filteredItems.value // 单分类不分页
+  return paginate(filteredItems.value, currentPage.value, PAGE_SIZE)
+})
 
 const currentCategory = computed(() => {
   if (activeCategory.value === 'all') return null
   return categories.find(c => c.id === activeCategory.value)
 })
 
-// "全部"模式时按卷分组
+// 从配置导入
+const { VOLUMES, CHINESE_NUMS, UI } = APP_CONFIG
+
+// 使用滚动位置 composable
+const { showBackToTop } = useScrollPosition({ threshold: UI.BACK_TO_TOP_THRESHOLD })
+
+// 监听侧边栏折叠状态变化并持久化
+watch(sidebarCollapsed, (val) => {
+  try { localStorage.setItem(SIDEBAR_KEY, String(val)) } catch {}
+})
+
+// 切换搜索/分类时重置分页 + 清理高亮缓存
+watch([searchQuery, activeCategory], () => {
+  currentPage.value = 1
+  clearHighlightCache()
+})
+
+// "全部"模式时按卷分组 - 性能优化：避免重复 filter
 const groupedByVolume = computed(() => {
   if (activeCategory.value !== 'all') return null
+  const items = paginatedItems.value
+  if (activeCategory.value !== 'all' || !items.length) return []
+
   return VOLUMES.map((v, vi) => {
     // 预处理: 把卷内 catIds 解析为分类引用 + 仅保留有可见项的分类
-    const cats = v.catIds
+    const visibleCats = v.catIds
       .map(id => categories.find(c => c.id === id))
-      .filter(Boolean)
-    const visibleCatIds = new Set(cats.filter(c => c.items.length).map(c => c.id))
-    const items = filteredItems.value.filter(i => visibleCatIds.has(i._category.id))
+      .filter(c => c && c.items.length)
+
+    // 按 catId 分组 items
+    const groupsByCatId = new Map()
+    for (const item of items) {
+      if (v.catIds.includes(item._category.id)) {
+        if (!groupsByCatId.has(item._category.id)) {
+          groupsByCatId.set(item._category.id, [])
+        }
+        groupsByCatId.get(item._category.id).push(item)
+      }
+    }
+
+    const cats = visibleCats
+      .map(c => ({ ...c, items: groupsByCatId.get(c.id) || [] }))
+      .filter(c => c.items.length)
+
     return {
       ...v,
-      cats: cats.filter(c => visibleCatIds.has(c.id)),
+      cats,
       chapterNum: CHINESE_NUMS[vi + 1] || String(vi + 1),
-      items,
+      items: cats.flatMap(c => c.items)
     }
   }).filter(g => g.items.length > 0)
 })
@@ -79,7 +117,7 @@ const singleCategory = computed(() => {
   if (activeCategory.value === 'all') return null
   const cat = currentCategory.value
   if (!cat) return null
-  return [{ ...cat, items: filteredItems.value }]
+  return [{ ...cat, items: paginatedItems.value }]
 })
 
 function openModal(item, category) {
@@ -93,13 +131,28 @@ function closeModal() {
 function selectCategory(id) {
   activeCategory.value = id
   drawerOpen.value = false
-  // 滚回主区顶部
   if (typeof window !== 'undefined') {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 }
 function onSearch(q) {
   searchQuery.value = q
+}
+function clearSearch() {
+  searchQuery.value = ''
+  clearHighlightCache()
+}
+function nextPage() {
+  if (currentPage.value < totalPageCount.value) {
+    currentPage.value++
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+}
+function prevPage() {
+  if (currentPage.value > 1) {
+    currentPage.value--
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
 }
 
 // 返回顶部
@@ -131,13 +184,11 @@ function handleDrawerKeydown(e) {
 
 // 键盘快捷键
 function handleKeydown(e) {
-  // Ctrl/Cmd + K 聚焦搜索
   if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
     e.preventDefault()
     const searchInput = document.querySelector('.scroll-input')
     if (searchInput) searchInput.focus()
   }
-  // Escape 关闭模态框
   if (e.key === 'Escape' && modalItem.value) {
     closeModal()
   }
@@ -166,9 +217,10 @@ watch([activeCategory, searchQuery], () => {
 </script>
 
 <template>
-  <div class="layout">
-    <!-- =================== Skip Navigation 链接 =================== -->
-    <a href="#main-content" class="skip-nav">跳转到主要内容</a>
+  <ErrorBoundary>
+    <div class="layout">
+      <!-- =================== Skip Navigation 链接 =================== -->
+      <a href="#main-content" class="skip-nav">跳转到主要内容</a>
 
     <!-- =================== 桌面端侧边栏 =================== -->
     <div class="hidden lg:block sidebar-shell" :class="{ 'is-collapsed': sidebarCollapsed }">
@@ -277,8 +329,24 @@ watch([activeCategory, searchQuery], () => {
 
       <!-- 搜索结果条 -->
       <div v-if="searchQuery" class="search-result">
-        <div class="font-mono text-[10px] tracking-[0.3em] text-[#c9a55c]">▎索 · 寻 「{{ searchQuery }}」</div>
-        <div class="font-kai-cn text-[#c4bba8] text-sm mt-1">得 <span class="text-[#c9a55c] font-serif-cn text-lg mx-1">{{ filteredCount }}</span> 条结果</div>
+        <div class="flex items-center justify-between gap-3 flex-wrap">
+          <div>
+            <div class="font-mono text-[10px] tracking-[0.3em] text-[#c9a55c]">▎索 · 寻 「{{ searchQuery }}」</div>
+            <div class="font-kai-cn text-[#c4bba8] text-sm mt-1">得 <span class="text-[#c9a55c] font-serif-cn text-lg mx-1">{{ filteredCount }}</span> 条结果</div>
+          </div>
+          <button
+            type="button"
+            @click="clearSearch"
+            class="search-clear-btn"
+            aria-label="清空搜索"
+          >
+            <span>清空</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+              <line x1="6" y1="6" x2="18" y2="18" />
+              <line x1="18" y1="6" x2="6" y2="18" />
+            </svg>
+          </button>
+        </div>
       </div>
 
       <!-- 主体：分卷 OR 单一分类 -->
@@ -377,6 +445,33 @@ watch([activeCategory, searchQuery], () => {
         <div class="hanko-circle w-20 h-20 mx-auto mb-6 text-2xl">空</div>
         <p class="font-kai-cn text-[#8a7a68] text-lg">卷帙浩繁，未寻得所求之物……</p>
       </div>
+
+      <!-- 分页控件 -->
+      <nav v-if="activeCategory === 'all' && totalPageCount > 1" class="pagination" aria-label="分页导航">
+        <button
+          type="button"
+          @click="prevPage"
+          :disabled="currentPage === 1"
+          class="pagination__btn"
+          aria-label="上一页"
+        >
+          ← 前一页
+        </button>
+        <div class="pagination__info">
+          <span class="font-serif-cn text-[#c9a55c]">{{ currentPage }}</span>
+          <span class="text-[#5a4a3a]">/</span>
+          <span>{{ totalPageCount }}</span>
+        </div>
+        <button
+          type="button"
+          @click="nextPage"
+          :disabled="currentPage === totalPageCount"
+          class="pagination__btn"
+          aria-label="下一页"
+        >
+          后一页 →
+        </button>
+      </nav>
     </main>
 
     <!-- =================== FOOTER =================== -->
@@ -435,6 +530,7 @@ watch([activeCategory, searchQuery], () => {
       </div>
     </Transition>
   </div>
+  </ErrorBoundary>
 </template>
 
 <style scoped>
