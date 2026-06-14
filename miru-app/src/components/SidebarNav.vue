@@ -86,6 +86,12 @@ watch(() => props.activeCategory, (id) => {
             class="scroll-input flex-1 px-3 py-1.5 text-[13px]"
             style="border-radius: 0 2px 2px 0;"
             aria-label="搜索"
+            autocomplete="off"
+            autocapitalize="off"
+            autocorrect="off"
+            spellcheck="false"
+            inputmode="search"
+            enterkeyhint="search"
           />
         </div>
       </div>

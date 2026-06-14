@@ -45,7 +45,7 @@ body {
   overflow-x: hidden;
 }
 
-/* 全站噪点纹理 + 暗朱氛围光 */
+/* 全站氛围光 - 合并为单层，减少 GPU 合成 */
 body::before {
   content: '';
   position: fixed;
@@ -56,6 +56,9 @@ body::before {
     radial-gradient(ellipse 80% 50% at 12% 0%, rgba(217, 32, 32, 0.08), transparent 60%),
     radial-gradient(ellipse 60% 40% at 88% 18%, rgba(201, 165, 92, 0.06), transparent 60%),
     radial-gradient(ellipse 100% 60% at 50% 100%, rgba(184, 35, 31, 0.05), transparent 60%);
+  /* 提升至独立合成层 */
+  transform: translateZ(0);
+  will-change: auto;
 }
 body::after {
   content: '';
@@ -63,14 +66,18 @@ body::after {
   inset: 0;
   pointer-events: none;
   z-index: 0;
-  /* 使用更轻量的噪点方案：缩小纹理尺寸，降低 GPU 压力 */
+  /* 轻量噪点：单层低密度 */
   background:
-    repeating-conic-gradient(rgba(243, 236, 224, 0.025) 0%, transparent 0.002%, transparent 0.004%) 50% 50% / 1500px 1500px;
-  opacity: 0.5;
+    repeating-conic-gradient(rgba(243, 236, 224, 0.018) 0%, transparent 0.003%, transparent 0.006%) 50% 50% / 1500px 1500px;
+  opacity: 0.4;
   mix-blend-mode: overlay;
-  /* 合成层优化 */
-  will-change: auto;
   contain: strict;
+  transform: translateZ(0);
+}
+
+/* 减少动画模式 */
+@media (prefers-reduced-motion: reduce) {
+  body::before, body::after { display: none; }
 }
 
 #app {
@@ -477,6 +484,24 @@ body::after {
 }
 @media (min-width: 641px) {
   .hero-kanji { font-size: clamp(4rem, 12vw, 8.5rem); }
+}
+
+/* ----------------------------------------------------------------------------
+   减少动画偏好支持
+---------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  body::before, body::after { display: none !important; }
+  .card-rise { animation: none; opacity: 1; }
+  .stamp-anim { animation: none; }
+  .ink-spread { animation: none; opacity: 1; transform: none; }
 }
 
 /* ----------------------------------------------------------------------------
