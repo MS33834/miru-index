@@ -64,6 +64,7 @@ watch(() => props.activeCategory, (id) => {
           </div>
         </div>
         <button
+          type="button"
           @click="emit('toggle')"
           class="w-7 h-7 rounded-sm flex items-center justify-center text-[#8a7a68] hover:text-[#d92020] hover:bg-[#d92020]/10 transition shrink-0"
           :aria-label="collapsed ? '展开目录' : '折叠目录'"
@@ -101,9 +102,11 @@ watch(() => props.activeCategory, (id) => {
     <nav class="flex-1 overflow-y-auto py-2 scrollbar-thin">
       <!-- 全部 -->
       <button
+        type="button"
         @click="emit('select', 'all')"
         :class="['sidebar-item', activeCategory === 'all' ? 'is-active' : '']"
         :title="collapsed ? '全部' : ''"
+        :aria-current="activeCategory === 'all' ? 'page' : undefined"
       >
         <div class="sidebar-item__lead">
           <span class="sidebar-item__icon">⌘</span>
@@ -123,9 +126,11 @@ watch(() => props.activeCategory, (id) => {
       <button
         v-for="(c, idx) in categories"
         :key="c.id"
+        type="button"
         @click="emit('select', c.id)"
         :class="['sidebar-item', activeCategory === c.id ? 'is-active' : '']"
         :title="collapsed ? c.name : ''"
+        :aria-current="activeCategory === c.id ? 'page' : undefined"
       >
         <div class="sidebar-item__lead">
           <span class="sidebar-item__icon">{{ c.icon }}</span>

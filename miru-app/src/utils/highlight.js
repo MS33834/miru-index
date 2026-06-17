@@ -1,11 +1,4 @@
 /**
- * 转义正则元字符
- */
-function escapeRegExp(s) {
-  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-}
-
-/**
  * 高亮搜索关键词 - 返回分段数组用于安全渲染（XSS 防护）
  * 使用缓存避免重复扫描，166 卡片 × 2 文本块 = 332 次扫描优化为 ~2 次
  */
@@ -16,8 +9,8 @@ export function getHighlightedParts(text, query) {
   if (!text) return [{ text: '', highlight: false }]
   if (!query) return [{ text, highlight: false }]
   
-  // 缓存 key
-  const cacheKey = text + '||' + query
+  // 缓存 key：使用不可打印分隔符，避免 text 含 || 时冲突
+  const cacheKey = `${text}\0${query}`
   const cached = highlightCache.get(cacheKey)
   if (cached) return cached
   
@@ -58,5 +51,3 @@ export function getHighlightedParts(text, query) {
 export function clearHighlightCache() {
   highlightCache.clear()
 }
-
-export { escapeRegExp }

@@ -15,7 +15,9 @@ function reset() {
 }
 
 function reload() {
-  window.location.reload()
+  if (typeof window !== 'undefined') {
+    window.location.reload()
+  }
 }
 </script>
 

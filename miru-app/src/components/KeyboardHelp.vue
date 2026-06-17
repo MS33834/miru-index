@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { ref, onMounted, onBeforeUnmount, watch } from 'vue'
 import { useEventListener } from '../composables/useEventListener.js'
 
 const props = defineProps({
@@ -17,11 +17,20 @@ useEventListener(typeof document !== 'undefined' ? document : null, 'keydown', (
   }
 })
 
-onMounted(() => {
+function focusDialog() {
   if (props.open) {
     lastFocus = document.activeElement
     requestAnimationFrame(() => dialogRef.value?.focus())
+  } else if (lastFocus?.focus) {
+    lastFocus.focus()
+    lastFocus = null
   }
+}
+
+watch(() => props.open, focusDialog, { flush: 'post' })
+
+onMounted(() => {
+  if (props.open) focusDialog()
 })
 
 onBeforeUnmount(() => {

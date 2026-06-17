@@ -112,7 +112,6 @@ function selectMirror(m) {
 onMounted(() => {
   // 保存当前焦点以便关闭时恢复
   lastFocusedElement = document.activeElement
-  document.body.style.overflow = 'hidden'
   nextTick(() => enterBtnRef.value?.focus())
 })
 
@@ -120,7 +119,6 @@ onMounted(() => {
 useEventListener(typeof document !== 'undefined' ? document : null, 'keydown', onKeydown)
 
 onBeforeUnmount(() => {
-  document.body.style.overflow = ''
   // 恢复焦点
   if (lastFocusedElement && typeof lastFocusedElement.focus === 'function') {
     lastFocusedElement.focus()

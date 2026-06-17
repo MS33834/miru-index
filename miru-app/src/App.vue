@@ -71,6 +71,13 @@ watch(sidebarCollapsed, (val) => {
   try { localStorage.setItem(SIDEBAR_KEY, String(val)) } catch {}
 })
 
+// 弹窗 / 抽屉 / 帮助打开时统一锁定 body 滚动
+watch([() => modalItem.value, helpOpen, drawerOpen], ([modal, help, drawer]) => {
+  if (typeof document !== 'undefined') {
+    document.body.style.overflow = (modal || help || drawer) ? 'hidden' : ''
+  }
+}, { flush: 'post' })
+
 // 切换时重置 + 清缓存 + 更新页面标题
 watch([searchQuery, activeCategory], () => {
   currentPage.value = 1
@@ -196,17 +203,20 @@ function handleKeydown(e) {
   const target = e.target
   const inInput = target?.matches?.('input, textarea, [contenteditable]')
 
+  if (e.key === 'Escape') {
+    if (modalItem.value) { closeModal(); return }
+    if (helpOpen.value) { helpOpen.value = false; return }
+    if (drawerOpen.value) { drawerOpen.value = false; return }
+  }
+
+  // 当弹窗/抽屉/帮助打开时，禁用全局导航快捷键，避免冲突
+  if (modalItem.value || helpOpen.value || drawerOpen.value) return
+
   if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
     e.preventDefault()
     const searchInput = document.querySelector('.scroll-input')
     if (searchInput) searchInput.focus()
     return
-  }
-
-  if (e.key === 'Escape') {
-    if (modalItem.value) { closeModal(); return }
-    if (helpOpen.value) { helpOpen.value = false; return }
-    if (drawerOpen.value) { drawerOpen.value = false; return }
   }
 
   // 按 ? 打开帮助
@@ -349,7 +359,7 @@ onUnmounted(() => {
 
       <!-- 面包屑 -->
       <div v-if="!searchQuery" class="breadcrumb">
-        <button @click="selectCategory('all')" class="breadcrumb__item" :class="{ 'is-current': activeCategory === 'all' }">
+        <button type="button" @click="selectCategory('all')" class="breadcrumb__item" :class="{ 'is-current': activeCategory === 'all' }">
           <span>⌘</span> 總藏
         </button>
         <template v-if="currentCategory">
@@ -419,7 +429,7 @@ onUnmounted(() => {
                 <span class="subgroup__icon">{{ cat.icon }}</span>
                 <h3 class="font-serif-cn text-base sm:text-lg font-bold text-[#f3ece0] tracking-wider">{{ cat.name }}</h3>
                 <span class="ink-bar flex-1 min-w-[40px]"></span>
-                <button @click="selectCategory(cat.id)" class="subgroup__more">全卷 →</button>
+                <button type="button" @click="selectCategory(cat.id)" class="subgroup__more">全卷 →</button>
               </div>
               <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
                 <SiteCard

@@ -26,7 +26,7 @@ if (typeof window !== 'undefined') {
 createApp(App).mount('#app')
 
 // 注册 Service Worker（使用 BASE_URL 确保路径正确）
-if ('serviceWorker' in navigator) {
+if (typeof navigator !== 'undefined' && 'serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     const swUrl = import.meta.env.BASE_URL + 'sw.js'
     navigator.serviceWorker.register(swUrl)

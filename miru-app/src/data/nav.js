@@ -482,11 +482,6 @@ export const categories = [
         tags: ['番剧', 'Compose', 'Bangumi'], features: ['现代 UI', '追番同步', 'KMP'], proxy: false
       },
       {
-        name: 'Mihon 番剧', url: 'https://github.com/aniyomiorg/aniyomi', health: 'ok', mirrors: ['https://gh-proxy.com/https://raw.githubusercontent.com/aniyomiorg/aniyomi/HEAD', 'https://cdn.jsdelivr.net/gh/aniyomiorg/aniyomi@latest'], desc: '番剧+漫画',
-        fullDesc: 'Mihon 的番剧衍生态，单独抽出番剧追番功能，提供与漫画同源的扩展仓库。',
-        tags: ['番剧', '扩展', 'Mihon'], features: ['扩展源', 'Mihon 同源', '追番'], proxy: false
-      },
-      {
         name: '弹弹play', url: 'https://www.dandanplay.com/', health: 'ok', desc: '老牌弹幕播放器',
         fullDesc: '老牌本地视频 + 弹幕匹配播放器，可自动从视频文件匹配第三方弹幕库（包含部分番剧），是下载党追番利器。',
         tags: ['弹幕', '本地', '匹配'], features: ['弹幕匹配', '本地播放', '多格式'], proxy: false

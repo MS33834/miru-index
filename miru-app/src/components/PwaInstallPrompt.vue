@@ -2,33 +2,35 @@
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 
 const show = ref(false)
+const installed = ref(false)
 let deferredPrompt = null
-let installed = false
+
+function onBeforeInstallPrompt(e) {
+  e.preventDefault()
+  deferredPrompt = e
+  // 延迟显示（避免首屏干扰）
+  setTimeout(() => { show.value = true }, 3000)
+}
+
+function onAppInstalled() {
+  installed.value = true
+  show.value = false
+}
 
 onMounted(() => {
   // 检查是否已安装
   if (window.matchMedia('(display-mode: standalone)').matches) {
-    installed = true
+    installed.value = true
     return
   }
 
-  // 监听 beforeinstallprompt
-  window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault()
-    deferredPrompt = e
-    // 延迟显示（避免首屏干扰）
-    setTimeout(() => { show.value = true }, 3000)
-  })
-
-  // 监听已安装
-  window.addEventListener('appinstalled', () => {
-    installed = true
-    show.value = false
-  })
+  window.addEventListener('beforeinstallprompt', onBeforeInstallPrompt)
+  window.addEventListener('appinstalled', onAppInstalled)
 })
 
 onBeforeUnmount(() => {
-  // 事件监听由 window 自动清理（这里仅在 onMounted 中添加）
+  window.removeEventListener('beforeinstallprompt', onBeforeInstallPrompt)
+  window.removeEventListener('appinstalled', onAppInstalled)
 })
 
 async function install() {
