@@ -1,0 +1,235 @@
+<script setup>
+import { computed, ref } from 'vue'
+import { healthOf } from '../utils/mirror.js'
+import { getHighlightedParts } from '../utils/highlight.js'
+import { useFavorites } from '../composables/useFavorites.js'
+import { useLazyLoad } from '../composables/useLazyLoad.js'
+
+const props = defineProps({
+  item: { type: Object, required: true },
+  category: { type: Object, required: true },
+  index: { type: Number, default: 0 },
+  compact: { type: Boolean, default: false },
+  searchQuery: { type: String, default: '' }
+})
+
+const emit = defineEmits(['open'])
+
+const { isFavorite, toggleFavorite } = useFavorites()
+const { target, isVisible } = useLazyLoad()
+const favoriteAnimating = ref(false)
+
+function handleClick() {
+  emit('open', props.item, props.category)
+}
+
+function handleKeydown(e) {
+  if (e.key === 'Enter' || e.key === ' ') {
+    e.preventDefault()
+    emit('open', props.item, props.category)
+  }
+}
+
+function handleFavoriteClick(e) {
+  e.stopPropagation()
+  e.preventDefault()
+  toggleFavorite(props.item)
+  favoriteAnimating.value = true
+  setTimeout(() => { favoriteAnimating.value = false }, 400)
+}
+
+function handleFavoriteKeydown(e) {
+  if (e.key === 'Enter' || e.key === ' ') {
+    e.stopPropagation()
+    e.preventDefault()
+    handleFavoriteClick(e)
+  }
+}
+
+const nameParts = computed(() => getHighlightedParts(props.item.name, props.searchQuery))
+const descParts = computed(() => getHighlightedParts(props.item.desc, props.searchQuery))
+</script>
+
+<template>
+  <div
+    ref="target"
+    class="card-paper-wrap"
+    :style="{ animationDelay: (Math.min(index, 24) * 0.04) + 's' }"
+  >
+    <button
+      type="button"
+      @click="handleClick"
+      @keydown="handleKeydown"
+      class="card-paper card-rise focus:outline-none focus:ring-2 focus:ring-[#d92020] focus:ring-offset-2 focus:ring-offset-[#0a0a0a] relative"
+      :class="compact ? 'p-4 sm:p-5' : 'p-5 sm:p-6'"
+      :aria-label="item.desc ? `${item.name} — ${item.desc}` : item.name"
+    >
+      <div v-if="isVisible" class="flex flex-col gap-3">
+        <div class="flex items-start justify-between gap-3">
+          <h4 class="font-serif-cn text-lg sm:text-xl font-bold text-[#1a1410] leading-tight line-clamp-1 flex-1">
+            <template v-for="(part, idx) in nameParts" :key="idx">
+              <mark v-if="part.highlight" class="search-highlight">{{ part.text }}</mark>
+              <template v-else>{{ part.text }}</template>
+            </template>
+          </h4>
+          <div class="flex items-center gap-2 shrink-0">
+            <span
+              v-if="item.health && item.health !== 'ok'"
+              :title="`健康: ${healthOf(item).label}`"
+              class="rounded-full w-2.5 h-2.5"
+              :style="{ background: healthOf(item).color, boxShadow: `0 0 8px ${healthOf(item).color}88` }"
+              aria-hidden="true"
+            ></span>
+          </div>
+        </div>
+
+        <p v-if="item.desc" class="font-kai-cn text-[#3a2e22] leading-relaxed line-clamp-2 text-sm"
+           :class="compact ? 'text-[13px] sm:text-sm' : 'text-sm sm:text-base'">
+          <template v-for="(part, idx) in descParts" :key="idx">
+            <mark v-if="part.highlight" class="search-highlight">{{ part.text }}</mark>
+            <template v-else>{{ part.text }}</template>
+          </template>
+        </p>
+
+        <div v-if="item.tags?.length" class="flex flex-wrap gap-1.5 sm:gap-2">
+          <span
+            v-for="t in item.tags.slice(0, compact ? 2 : 3)"
+            :key="t"
+            class="tag-stamp"
+            :class="compact ? 'tag-sm' : 'tag-normal'"
+          >#{{ t }}</span>
+          <span
+            v-if="item.tags.length > (compact ? 2 : 3)"
+            class="tag-stamp tag-extra"
+            :class="compact ? 'tag-sm' : 'tag-normal'"
+          >+{{ item.tags.length - (compact ? 2 : 3) }}</span>
+        </div>
+
+        <div class="flex items-center justify-between pt-3 border-t border-[#1a1410]/10">
+          <div class="font-mono text-[#5a4a3a] tracking-wider line-clamp-1 flex-1 text-xs">
+            {{ item.proxy ? '◯ 需梯子' : '◯ 直连' }}
+          </div>
+          <div class="text-[#a8161a] font-serif-cn tracking-wider text-sm font-bold">覌 →</div>
+        </div>
+      </div>
+      <div v-else class="card-skeleton" aria-hidden="true">
+        <div class="skeleton-line w-3/4 h-5"></div>
+        <div class="skeleton-line w-full h-3"></div>
+        <div class="skeleton-line w-5/6 h-3"></div>
+        <div class="flex gap-2 mt-2">
+          <div class="skeleton-line w-12 h-4"></div>
+          <div class="skeleton-line w-16 h-4"></div>
+        </div>
+      </div>
+    </button>
+
+    <!-- 收藏按钮：移出 button 嵌套，使用独立 div + role -->
+    <div
+      role="button"
+      tabindex="0"
+      @click="handleFavoriteClick"
+      @keydown="handleFavoriteKeydown"
+      class="favorite-btn-floating"
+      :class="{ 'is-favorite': isFavorite(item), 'is-animating': favoriteAnimating }"
+      :aria-label="isFavorite(item) ? `取消收藏 ${item.name}` : `收藏 ${item.name}`"
+      :aria-pressed="isFavorite(item)"
+    >
+      <svg width="14" height="14" viewBox="0 0 24 24" :fill="isFavorite(item) ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+      </svg>
+    </div>
+  </div>
+</template>
+
+<style scoped>
+.tag-sm { font-size: 0.65rem; padding: 0.1rem 0.4rem; }
+.tag-normal { font-size: 0.7rem; padding: 0.2rem 0.5rem; }
+.tag-stamp {
+  background: rgba(168, 22, 26, 0.08);
+  border: 1px solid rgba(168, 22, 26, 0.3);
+  color: #a8161a;
+}
+.tag-extra {
+  background: rgba(201, 165, 92, 0.1);
+  border-color: rgba(201, 165, 92, 0.3);
+  color: #a4853e;
+}
+
+/* 卡片包装器 - 支持悬浮收藏按钮 */
+.card-paper-wrap {
+  position: relative;
+}
+
+/* 悬浮收藏按钮 - 独立元素，避免 button 嵌套 */
+.favorite-btn-floating {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(243, 236, 224, 0.85);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(168, 22, 26, 0.15);
+  color: #8a7a68;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: all 0.2s;
+  z-index: 2;
+  user-select: none;
+}
+.favorite-btn-floating:hover {
+  background: rgba(243, 236, 224, 0.95);
+  color: #c9a55c;
+  transform: scale(1.1);
+  border-color: rgba(201, 165, 92, 0.4);
+}
+.favorite-btn-floating:focus-visible {
+  outline: 2px solid #d92020;
+  outline-offset: 2px;
+}
+.favorite-btn-floating.is-favorite {
+  color: #c9a55c;
+  background: rgba(243, 236, 224, 0.95);
+}
+.favorite-btn-floating.is-animating {
+  animation: favorite-bounce 0.4s ease;
+}
+@keyframes favorite-bounce {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.4); }
+}
+
+/* Skeleton 骨架屏 */
+.card-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-height: 120px;
+}
+.skeleton-line {
+  background: linear-gradient(
+    90deg,
+    rgba(168, 22, 26, 0.04) 0%,
+    rgba(168, 22, 26, 0.08) 50%,
+    rgba(168, 22, 26, 0.04) 100%
+  );
+  background-size: 200% 100%;
+  border-radius: 2px;
+  animation: skeleton-shimmer 1.5s infinite;
+}
+@keyframes skeleton-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.search-highlight {
+  background: rgba(217, 32, 32, 0.2);
+  color: #a8161a;
+  padding: 0 2px;
+  border-radius: 2px;
+  font-weight: 700;
+}
+</style>

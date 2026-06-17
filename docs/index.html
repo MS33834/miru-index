@@ -4,34 +4,60 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="color-scheme" content="dark" />
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' data: https://cdn.jsdelivr.net; connect-src 'self' https://cdn.jsdelivr.net; base-uri 'self'; form-action 'self'; object-src 'none'">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' data: https://cdn.jsdelivr.net; connect-src 'self' https://cdn.jsdelivr.net; base-uri 'self'; form-action 'self'; object-src 'none'; frame-ancestors 'none';">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta name="referrer" content="strict-origin-when-cross-origin">
     <meta name="description" content="漫藏 MIRU INDEX — ACGN 资源导航站，新和风杂志美学，聚合 26 个细分分类 166 条精选资源：网络代理、下载器、AI 工具、漫画、番剧、GalGame、轻小说、音乐、周边、资讯、绘画、视频、社区、GitHub 开源等。">
     <meta name="keywords" content="ACGN, 漫藏, 漫画, GalGame, 番剧, AI 翻译, 搜图, 资源导航, GitHub, Mihon, JM, 哔咔, 二次元, 印泥, 朱砂, 新和风">
     <meta name="theme-color" content="#0a0a0a">
+    <link rel="manifest" href="/miru-index/manifest.json">
     <meta name="author" content="badhope">
     <meta property="og:title" content="漫藏 · MIRU INDEX — ACGN 资源导航">
     <meta property="og:description" content="新和风杂志美学的 ACGN 资源导航 · 26 分类 · 166 条资源">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://badhope.github.io/miru-index/">
-    <meta property="og:image" content="https://badhope.github.io/miru-index/favicon.svg">
+    <meta property="og:image" content="https://badhope.github.io/miru-index/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
     <meta property="og:locale" content="zh_CN">
-    <meta name="twitter:card" content="summary">
+    <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="漫藏 · MIRU INDEX — ACGN 资源导航">
     <meta name="twitter:description" content="新和风杂志美学的 ACGN 资源导航 · 26 分类 · 166 条资源">
+    <meta name="twitter:image" content="https://badhope.github.io/miru-index/og-image.png">
+    <link rel="canonical" href="https://badhope.github.io/miru-index/">
     <title>漫藏 · MIRU INDEX — ACGN 资源导航</title>
 
-    <!-- 字体：国内 jsDelivr CDN + JS 异步加载（不阻塞首屏渲染，CSP 友好） -->
+    <!-- JSON-LD 结构化数据 -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "漫藏阁",
+      "alternateName": "MIRU INDEX",
+      "description": "ACGN 资源导航站，新和风杂志美学，聚合 26 个细分分类 166 条精选资源",
+      "url": "https://badhope.github.io/miru-index/",
+      "author": {
+        "@type": "Person",
+        "name": "badhope"
+      },
+      "keywords": "ACGN, 漫藏, 漫画, GalGame, 番剧, AI 翻译, 搜图, 资源导航, GitHub, 二次元",
+      "inLanguage": "zh-CN"
+    }
+    </script>
+
+    <!-- 字体：国内 jsDelivr CDN，preconnect 预连接 + preload 样式表（不阻塞首屏） -->
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net" />
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-screen-webfont@1.7.0/style.css" as="style" onload="this.onload=null;this.rel='stylesheet'" />
     <noscript>
       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-screen-webfont@1.7.0/style.css" />
     </noscript>
 
     <!-- 印章风 favicon -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,%3Csvg xmlns='http%3A//www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='6' fill='%23f3ece0'/%3E%3Crect x='6' y='6' width='88' height='88' fill='none' stroke='%23d92020' stroke-width='4' rx='2'/%3E%3Ctext x='50' y='40' text-anchor='middle' fill='%23d92020' font-family='serif' font-size='34' font-weight='900'%3E漫%3C/text%3E%3Ctext x='50' y='78' text-anchor='middle' fill='%23d92020' font-family='serif' font-size='34' font-weight='900'%3E藏%3C/text%3E%3C/svg%3E" />
-    <script type="module" crossorigin src="/miru-index/assets/index-COQdFl_q.js"></script>
-    <link rel="stylesheet" crossorigin href="/miru-index/assets/index-Begh5Hnc.css">
+    <script type="module" crossorigin src="/miru-index/assets/js/index-CR9XP3bR.js"></script>
+    <link rel="modulepreload" crossorigin href="/miru-index/assets/js/vue-vendor-iHiRTVN_.js">
+    <link rel="stylesheet" crossorigin href="/miru-index/assets/css/index-Dw8utcN-.css">
   </head>
   <body class="bg-[#0a0a0a] text-[#f3ece0] min-h-screen antialiased">
     <div id="app"></div>

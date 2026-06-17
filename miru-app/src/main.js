@@ -1,12 +1,29 @@
-import { createApp } from 'vue'
+import { createApp, ref } from 'vue'
 import App from './App.vue'
 import './style.css'
 
-// CSP 友好的字体异步加载: 替代 index.html 的 onload 内联事件
-// 仅追加 <link rel="stylesheet">, 不使用 preload (避免 crossorigin 不匹配警告)
-const link = document.createElement('link')
-link.rel = 'stylesheet'
-link.href = 'https://cdn.jsdelivr.net/npm/lxgw-wenkai-screen-webfont@1.7.0/style.css'
-document.head.appendChild(link)
+// 全局网络状态（SSR 安全）
+export const isOffline = ref(typeof navigator !== 'undefined' ? !navigator.onLine : false)
+
+if (typeof window !== 'undefined') {
+  window.addEventListener('online', () => {
+    isOffline.value = false
+  })
+
+  window.addEventListener('offline', () => {
+    isOffline.value = true
+  })
+}
 
 createApp(App).mount('#app')
+
+// 注册 Service Worker（使用 BASE_URL 确保路径正确）
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    const swUrl = import.meta.env.BASE_URL + 'sw.js'
+    navigator.serviceWorker.register(swUrl)
+      .catch(() => {
+        // 静默失败，不影响应用功能
+      })
+  })
+}
