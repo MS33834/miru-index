@@ -3,22 +3,20 @@
 
 /**
  * GitHub 加速镜像源
- * fmt='repo'  → 仓库主页镜像（jsDelivr 风格）：https://cdn.jsdelivr.net/gh/owner/repo
+ * fmt='raw'  → jsDelivr / CDN 风格，仅适合 blob/raw 文件，转成 cdn.jsdelivr.net/gh/owner/repo@branch/path
  * fmt='proxy' → 任意 GitHub URL 代理（gh-proxy 风格）：base + 原 URL
  */
 export const GH_MIRRORS = [
-  { id: 'jsdelivr', name: 'jsDelivr CDN',  fmt: 'repo'  },
+  { id: 'jsdelivr', name: 'jsDelivr CDN',  fmt: 'raw'   },
   { id: 'ghproxy',  name: 'GhProxy',        fmt: 'proxy' },
   { id: 'ghps',     name: 'GhProxy.net',    fmt: 'proxy' },
   { id: 'mirror',   name: 'GhProxy Mirror', fmt: 'proxy' },
-  { id: 'fastgit',  name: 'FastGit',        fmt: 'proxy' },
 ]
 
 const GH_PROXY_BASES = {
   ghproxy: 'https://gh-proxy.com/',
   ghps:    'https://ghps.cc/',
   mirror:  'https://mirror.ghproxy.com/',
-  fastgit: 'https://raw.fastgit.org/',
 }
 
 const JSDELIVR_BASE = 'https://cdn.jsdelivr.net/gh/'
@@ -27,24 +25,47 @@ const JSDELIVR_BASE = 'https://cdn.jsdelivr.net/gh/'
  * 判断 URL 是否为 GitHub 仓库主页（无 /blob/ /tree/ /releases/ /raw/ 等路径）
  */
 function isRepoHome(url) {
-  // 更严格的正则：匹配 github.com/owner/repo 且后面没有路径（除了可选的 / 或查询参数）
   return /^https:\/\/github\.com\/[^/]+\/[^/]+\/?(\?.*)?$/.test(url)
 }
 
 /**
+ * 从 GitHub 文件 URL 提取 owner/repo@ref/path，用于 jsDelivr
+ * 支持 github.com/owner/repo/blob/ref/path 与 raw.githubusercontent.com/owner/repo/ref/path
+ */
+function extractGhPath(url) {
+  let path = null
+
+  // github.com/owner/repo/blob/ref/path → owner/repo@ref/path
+  const blobMatch = url.match(/^https:\/\/github\.com\/([^/]+\/[^/]+)\/blob\/(.+)$/)
+  if (blobMatch) {
+    path = `${blobMatch[1]}@${blobMatch[2]}`
+  }
+
+  // raw.githubusercontent.com/owner/repo/ref/path → owner/repo@ref/path
+  const rawMatch = url.match(/^https:\/\/raw\.githubusercontent\.com\/([^/]+\/[^/]+)\/(.+)$/)
+  if (rawMatch) {
+    path = `${rawMatch[1]}@${rawMatch[2]}`
+  }
+
+  return path
+}
+
+/**
  * 把 GitHub URL 转为镜像 URL
- *  - fmt=repo (jsDelivr): 仓库主页 / 任意 URL 走 cdn.jsdelivr.net/gh/owner/repo
- *  - fmt=proxy: 把 GitHub URL 当成代理前缀拼接
+ *  - fmt=raw (jsDelivr): 仅对 blob/raw 文件 URL 生效，返回 cdn.jsdelivr.net/gh/owner/repo@ref/path
+ *  - fmt=proxy: 把 GitHub URL 当成代理前缀拼接，适用于任意 GitHub 页面
  */
 export function ghMirror(url, mirrorId = 'jsdelivr') {
   if (!url || !url.includes('github.com')) return url
 
   const m = GH_MIRRORS.find(x => x.id === mirrorId) || GH_MIRRORS[0]
 
-  if (m.fmt === 'repo') {
-    // jsDelivr 仓库页：owner/repo
-    const path = url.replace('https://github.com/', '').split('/').slice(0, 2).join('/')
-    return JSDELIVR_BASE + path
+  if (m.fmt === 'raw') {
+    const path = extractGhPath(url)
+    // jsDelivr 只能代理 raw 文件，仓库主页回退到默认 proxy
+    if (path) return JSDELIVR_BASE + path
+    // 仓库主页没有合适 raw 路径，fallback 到 proxy
+    return GH_PROXY_BASES.ghproxy + url
   }
 
   // proxy 镜像：base + 原 URL（gh-proxy 风格）

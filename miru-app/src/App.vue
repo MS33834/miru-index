@@ -71,10 +71,19 @@ watch(sidebarCollapsed, (val) => {
   try { localStorage.setItem(SIDEBAR_KEY, String(val)) } catch {}
 })
 
-// 切换时重置 + 清缓存
+// 切换时重置 + 清缓存 + 更新页面标题
 watch([searchQuery, activeCategory], () => {
   currentPage.value = 1
   clearHighlightCache()
+
+  if (searchQuery.value) {
+    document.title = `搜索: ${searchQuery.value} - 漫藏阁`
+  } else if (activeCategory.value !== 'all') {
+    const cat = categories.find(c => c.id === activeCategory.value)
+    document.title = `${cat?.name || ''} - 漫藏阁`
+  } else {
+    document.title = '漫藏阁 - ACGN 资源导航'
+  }
 })
 
 // 卷册分组（仅"全部"模式）
@@ -240,17 +249,6 @@ onMounted(() => {
 
 onUnmounted(() => {
   window.removeEventListener('keydown', handleKeydown)
-})
-
-watch([activeCategory, searchQuery], () => {
-  if (searchQuery.value) {
-    document.title = `搜索: ${searchQuery.value} - 漫藏阁`
-  } else if (activeCategory.value !== 'all') {
-    const cat = categories.find(c => c.id === activeCategory.value)
-    document.title = `${cat?.name || ''} - 漫藏阁`
-  } else {
-    document.title = '漫藏阁 - ACGN 资源导航'
-  }
 })
 </script>
 
@@ -686,55 +684,6 @@ watch([activeCategory, searchQuery], () => {
   opacity: 0.9;
 }
 
-/* ============== 卷册标题 ============== */
-.volume__header {
-  margin-bottom: 2rem;
-  padding-bottom: 1rem;
-  border-bottom: 2px solid rgba(217, 32, 32, 0.15);
-}
-
-.volume__title {
-  font-family: var(--serif);
-  font-size: 1.75rem;
-  font-weight: 900;
-  color: var(--washi);
-  letter-spacing: 0.05em;
-  margin-bottom: 0.5rem;
-}
-
-.volume__subtitle {
-  font-family: var(--mono);
-  font-size: 0.75rem;
-  color: #8a7a68;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-}
-
-/* ============== 分类标题 ============== */
-.subgroup__head {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 1.25rem;
-  padding-bottom: 0.75rem;
-  border-bottom: 1px solid rgba(201, 165, 92, 0.2);
-}
-
-.subgroup__title {
-  font-family: var(--serif);
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--washi);
-  letter-spacing: 0.02em;
-}
-
-.subgroup__count {
-  font-family: var(--mono);
-  font-size: 0.75rem;
-  color: #8a7a68;
-  letter-spacing: 0.1em;
-}
-
 /* ============== 面包屑 ============== */
 .breadcrumb {
   display: flex;
@@ -784,16 +733,7 @@ watch([activeCategory, searchQuery], () => {
 
 /* ============== 卷 ============== */
 .volumes { display: flex; flex-direction: column; gap: 4rem; }
-.volume__header { margin-bottom: 1.5rem; }
 .subgroup { margin-top: 2rem; }
-.subgroup__head {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  margin-bottom: 1rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid rgba(217, 32, 32, 0.1);
-}
 .subgroup__icon { font-size: 1.1rem; }
 .subgroup__more {
   font-family: var(--serif);

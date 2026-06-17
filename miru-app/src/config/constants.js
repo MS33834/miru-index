@@ -28,15 +28,18 @@ export const APP_CONFIG = {
     MAX_ANIMATION_DELAY: 24,
   },
   
-  // 缓存配置
+  // 缓存配置（与 public/sw.js 保持一致）
   CACHE: {
-    VERSION: 'v2',
+    VERSION: 'v3',
     NAME_PREFIX: 'miru-index-',
     PRECACHE_ASSETS: [
       '/miru-index/',
       '/miru-index/index.html',
       '/miru-index/manifest.json',
-      '/miru-index/favicon.svg'
+      '/miru-index/robots.txt',
+      '/miru-index/sitemap.xml',
+      '/miru-index/favicon.svg',
+      '/miru-index/og-image.png'
     ]
   }
 }

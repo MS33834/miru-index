@@ -45,10 +45,9 @@
     }
     </script>
 
-    <!-- 字体：国内 jsDelivr CDN，preconnect 预连接 + preload 样式表（不阻塞首屏） -->
+    <!-- 字体：国内 jsDelivr CDN，preconnect 预连接；实际加载由 main.js 异步完成，避免 CSP 内联事件 -->
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
     <link rel="dns-prefetch" href="https://cdn.jsdelivr.net" />
-    <link rel="preload" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-screen-webfont@1.7.0/style.css" as="style" onload="this.onload=null;this.rel='stylesheet'" />
     <noscript>
       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-screen-webfont@1.7.0/style.css" />
     </noscript>

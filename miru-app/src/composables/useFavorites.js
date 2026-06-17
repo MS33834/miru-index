@@ -25,15 +25,16 @@ function saveFavorites(favorites) {
 const state = ref(loadFavorites())
 watch(state, (newVal) => saveFavorites(newVal), { deep: true })
 
-// 缓存函数引用（避免每次 useFavorites() 都创建新函数）
-const isFavoriteCache = new WeakMap()
+// 缓存：收藏 URL 的 Set，state 变化时重建
+let favoriteUrlSet = new Set(state.value.map(f => f.url))
+
+watch(state, (newVal) => {
+  favoriteUrlSet = new Set(newVal.map(f => f.url))
+}, { deep: true })
 
 function isFavorite(item) {
   if (!item?.url) return false
-  // 性能优化：使用 Set 查找
-  const set = isFavoriteCache.get(item)
-  if (set !== undefined) return set.has(item.url)
-  return state.value.some(f => f.url === item.url)
+  return favoriteUrlSet.has(item.url)
 }
 
 function toggleFavorite(item) {
@@ -44,13 +45,10 @@ function toggleFavorite(item) {
   } else {
     state.value.push({ ...item })
   }
-  // 失效缓存
-  isFavoriteCache.clear()
 }
 
 function clearFavorites() {
   state.value = []
-  isFavoriteCache.clear()
 }
 
 export function useFavorites() {

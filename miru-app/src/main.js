@@ -2,6 +2,14 @@ import { createApp, ref } from 'vue'
 import App from './App.vue'
 import './style.css'
 
+// 异步加载霞鹜文楷屏幕阅读版字体（避开 CSP 对内联事件处理器的限制）
+if (typeof document !== 'undefined') {
+  const link = document.createElement('link')
+  link.rel = 'stylesheet'
+  link.href = 'https://cdn.jsdelivr.net/npm/lxgw-wenkai-screen-webfont@1.7.0/style.css'
+  document.head.appendChild(link)
+}
+
 // 全局网络状态（SSR 安全）
 export const isOffline = ref(typeof navigator !== 'undefined' ? !navigator.onLine : false)
 

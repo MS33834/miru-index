@@ -9,7 +9,8 @@ const PRECACHE_ASSETS = [
   '/miru-index/manifest.json',
   '/miru-index/robots.txt',
   '/miru-index/sitemap.xml',
-  '/miru-index/favicon.svg'
+  '/miru-index/favicon.svg',
+  '/miru-index/og-image.png'
 ]
 
 // 缓存策略配置
