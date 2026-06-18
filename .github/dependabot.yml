@@ -1,26 +1,22 @@
 version: 2
 
-# Dependabot configuration
-# - Single weekly schedule
-# - Auto-rebase to keep PRs current
-# - Production/development groups for clean batched PRs
-
 updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
       day: "monday"
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 5
     labels:
       - "dependencies"
       - "ci"
-    commit-message:
-      prefix: "ci"
-      include: "scope"
-    rebase-strategy: "auto"
-    groups:
-      production-dependencies:
-        dependency-type: "production"
-      development-dependencies:
-        dependency-type: "development"
+
+  - package-ecosystem: "npm"
+    directory: "/miru-app"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "frontend"

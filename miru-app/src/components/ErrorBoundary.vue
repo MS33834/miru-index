@@ -63,13 +63,13 @@ function reload() {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #d92020;
+  background: #ff4d4f;
   color: #f3ece0;
   font-family: var(--serif);
   font-weight: 900;
   font-size: 2rem;
   border-radius: 4px;
-  box-shadow: 0 4px 12px rgba(217, 32, 32, 0.3);
+  box-shadow: 0 4px 12px rgba(255, 77, 79, 0.3);
 }
 .error-boundary__title {
   font-family: var(--serif);
@@ -108,7 +108,7 @@ function reload() {
   border: none;
   border-radius: 2px;
   cursor: pointer;
-  background: #d92020;
+  background: #ff4d4f;
   color: #f3ece0;
   transition: all 0.2s;
 }

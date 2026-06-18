@@ -1,39 +1,25 @@
-# 资源采集说明
+# 资源来源说明
 
-本仓库所有资源均通过以下公开渠道汇总，按项目活跃度（最近 12 个月内有 commit / release）筛选，分类整理后写入 `README.md` 与 `LINKS.md`。
+本仓库收录的项目链接均来自公开渠道，主要是 GitHub、gitcode.com 等开源平台。收录时会大致看一下项目最近是否有更新、是否还能访问，然后按用途分类整理到 `README.md` 和 `LINKS.md` 里。
 
-## 采集时间
-- 采集日期：2026-06-04
-- 筛选窗口：最近 ~12 个月有 commit 或 release
+## 更新时间
 
-## 采集来源
-- WebSearch / WebFetch（针对 GitHub.com、gitcode.com、aur.archlinux.org、sourceforge.net、mihon.app、hakuneko.download、kavitareader.com、flathub.org 等开源镜像的公开元数据）
-- GitHub 仓库的 README、Releases、Tags、Changelogs 等公开信息
+- 最近整理：2026-06-17
+- 一般只保留最近一年内还有 commit 或 release 的项目
 
-## 收录规则
-1. 与 JM 漫画（禁漫天堂 / 18comic / jmcomic）、哔咔哔咔（PicACG / manhuabika / bika）或同类漫画软件（E-Hentai、nhentai、拷贝漫画、MangaDex、HakuNeko、Suwayomi、Mihon、Tachiyomi 等）相关；
-2. 最近 12 个月内仍有 commit / release（视作「最近有更新」）；
-3. 仓库为公开仓库，有明确开源协议；
-4. 客户端 / 下载器 / API SDK / 通用工具 / 翻译 / 自托管等不同形态均收录。
+## 来源渠道
 
-## 分类逻辑
-- **按目标站优先**：JM → 哔咔 → E-Hentai / nhentai → 通用；
-- **按生态整合**：Tachiyomi / Mihon 生态（多源阅读器）、Suwayomi（自托管服务器）、HakuNeko（通用下载器）、Kavita / Komga（本地库管理）、manga-image-translator（翻译）；
-- **按用途细分**：下载器 / 客户端 / API / 翻译 / 自托管 / 辅助工具；
-- **按平台补充**：桌面 / Android / iOS / 跨平台 / NAS。
+- GitHub 公开仓库、Releases、Tags
+- gitcode.com 等国内镜像站
+- AUR、SourceForge、Flathub 等公开软件源
+- 各项目官方文档或首页
 
-## 后续维护
-- 如果某个仓库超过 12 个月无更新，可考虑下移或移除；
-- 如果发现新项目，欢迎通过 Issue / PR 提交；
-- 请勿收录与本主题无关的仓库，或包含侵权 / 闭源 / 商业破解资源的链接。
+## 收录原则
 
-## 开源协议
-- 本仓库文档以 **MIT License** 发布（见 [LICENSE](LICENSE)）；
-- `docs/` 前端站点的代码与数据均为 MIT，可自由复用、修改、再发布；
-- 引用到的第三方项目 / 站点，遵循其各自的开源协议或服务条款。
+1. 与漫画、ACG、下载工具、阅读器、代理/网络工具等主题相关；
+2. 项目公开可访问，且最近一年内仍有维护痕迹；
+3. 不收录侵权、闭源破解或明显违法的资源。
 
 ## 免责声明
-本仓库仅做资源导航与索引，不托管任何受版权保护的内容。使用者请遵守：
-- 各国 / 各地区相关法律法规；
-- 各个上游项目所声明的开源协议；
-- 相关内容平台的 ToS / 用户协议。
+
+本仓库只做链接索引，不托管任何第三方内容。使用时请遵守当地法律法规以及各平台的服务条款。

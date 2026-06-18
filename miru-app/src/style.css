@@ -11,8 +11,9 @@
   --ink: #0a0a0a;
   --ink-2: #1a1410;
   --ink-3: #221a14;
-  --seal: #d92020;       /* 印泥朱砂 */
+  --seal: #ff4d4f;       /* 印泥朱砂（提亮以满足 WCAG AA 对比度） */
   --seal-deep: #a8161a;  /* 深朱 */
+  --seal-bright: #ff4d4f; /* 高亮朱红 */
   --gold: #c9a55c;       /* 御金 */
   --washi: #f3ece0;      /* 和纸 */
   --washi-2: #e6dcc8;    /* 旧和纸 */
@@ -25,7 +26,7 @@
   --mono: 'JetBrains Mono', 'SF Mono', 'Consolas', 'Courier New', monospace;
   --cursive: 'Long Cang', 'STXingkai', '行楷', cursive;
 
-  --shadow-seal: 0 0 0 1px rgba(217, 32, 32, 0.3), 0 4px 12px rgba(217, 32, 32, 0.18);
+  --shadow-seal: 0 0 0 1px rgba(255, 77, 79, 0.3), 0 4px 12px rgba(255, 77, 79, 0.18);
   --shadow-paper: 0 1px 0 rgba(243, 236, 224, 0.05), 0 8px 24px rgba(0, 0, 0, 0.4);
   --shadow-paper-hover: 0 1px 0 rgba(243, 236, 224, 0.08), 0 18px 48px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(201, 165, 92, 0.25);
 }
@@ -53,7 +54,7 @@ body::before {
   pointer-events: none;
   z-index: 0;
   background:
-    radial-gradient(ellipse 80% 50% at 12% 0%, rgba(217, 32, 32, 0.08), transparent 60%),
+    radial-gradient(ellipse 80% 50% at 12% 0%, rgba(255, 77, 79, 0.08), transparent 60%),
     radial-gradient(ellipse 60% 40% at 88% 18%, rgba(201, 165, 92, 0.06), transparent 60%),
     radial-gradient(ellipse 100% 60% at 50% 100%, rgba(184, 35, 31, 0.05), transparent 60%);
   /* 提升至独立合成层 */
@@ -133,8 +134,8 @@ body::after {
   box-shadow:
     inset 0 0 0 1px rgba(255, 255, 255, 0.12),
     inset 0 0 6px rgba(0, 0, 0, 0.18),
-    0 0 0 1px rgba(217, 32, 32, 0.3),
-    0 2px 6px rgba(217, 32, 32, 0.25);
+    0 0 0 1px rgba(255, 77, 79, 0.3),
+    0 2px 6px rgba(255, 77, 79, 0.25);
 }
 .hanko::before {
   content: '';
@@ -168,8 +169,8 @@ body::after {
   box-shadow:
     inset 0 0 0 1px rgba(255, 255, 255, 0.12),
     inset 0 0 6px rgba(0, 0, 0, 0.18),
-    0 0 0 1px rgba(217, 32, 32, 0.3),
-    0 2px 8px rgba(217, 32, 32, 0.3);
+    0 0 0 1px rgba(255, 77, 79, 0.3),
+    0 2px 8px rgba(255, 77, 79, 0.3);
 }
 .hanko-circle::before {
   content: '';
@@ -247,7 +248,7 @@ body::after {
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  text-shadow: 0 0 40px rgba(217, 32, 32, 0.18);
+  text-shadow: 0 0 40px rgba(255, 77, 79, 0.18);
   position: relative;
 }
 
@@ -257,7 +258,7 @@ body::after {
   line-height: 0.9;
   letter-spacing: -0.02em;
   color: var(--seal);
-  text-shadow: 0 2px 20px rgba(217, 32, 32, 0.2);
+  text-shadow: 0 2px 20px rgba(255, 77, 79, 0.2);
   position: relative;
 }
 
@@ -293,7 +294,7 @@ body::after {
 .volume__header {
   margin-bottom: 2rem;
   padding-bottom: 1rem;
-  border-bottom: 2px solid rgba(217, 32, 32, 0.15);
+  border-bottom: 2px solid rgba(255, 77, 79, 0.15);
 }
 
 .volume__title {
@@ -322,7 +323,7 @@ body::after {
   gap: 0.75rem;
   margin-bottom: 1.25rem;
   padding-bottom: 0.75rem;
-  border-bottom: 1px solid rgba(201, 165, 92, 0.2);
+  border-bottom: 1px solid rgba(201, 165, 92, 0.25);
 }
 
 .subgroup__title {
@@ -377,7 +378,7 @@ body::after {
   font-size: 3.5rem;
   line-height: 1;
   color: var(--seal);
-  text-shadow: 0 2px 12px rgba(217, 32, 32, 0.2);
+  text-shadow: 0 2px 12px rgba(255, 77, 79, 0.2);
 }
 
 .scroll-divider {
@@ -397,6 +398,11 @@ body::after {
   font-family: var(--serif);
   color: var(--seal);
   font-size: 0.9rem;
+}
+
+/* 响应式：提升小屏触控与可读性 */
+@media (max-width: 640px) {
+  .subgroup__head { gap: 0.5rem; }
 }
 
 /* ----------------------------------------------------------------------------
@@ -535,20 +541,21 @@ body::after {
   font-family: var(--serif);
   font-size: 0.85rem;
   font-weight: 600;
-  padding: 0.45rem 0.85rem;
-  background: rgba(217, 32, 32, 0.1);
-  color: #d92020;
-  border: 1px solid rgba(217, 32, 32, 0.3);
+  padding: 0.5rem 1rem;
+  background: rgba(255, 77, 79, 0.1);
+  color: #ff4d4f;
+  border: 1px solid rgba(255, 77, 79, 0.3);
   border-radius: 2px;
   cursor: pointer;
   transition: all 0.2s;
+  min-height: 36px;
 }
 .search-clear-btn:hover {
-  background: rgba(217, 32, 32, 0.2);
-  border-color: rgba(217, 32, 32, 0.5);
+  background: rgba(255, 77, 79, 0.2);
+  border-color: rgba(255, 77, 79, 0.5);
 }
 .search-clear-btn:focus-visible {
-  outline: 2px solid #d92020;
+  outline: 2px solid #ff4d4f;
   outline-offset: 2px;
 }
 
@@ -562,13 +569,13 @@ body::after {
   gap: 1.5rem;
   padding: 3rem 0 2rem;
   margin-top: 2rem;
-  border-top: 1px solid rgba(217, 32, 32, 0.15);
+  border-top: 1px solid rgba(255, 77, 79, 0.15);
 }
 .pagination__btn {
   font-family: var(--serif);
   font-size: 0.9rem;
   font-weight: 600;
-  padding: 0.6rem 1.4rem;
+  padding: 0.65rem 1.5rem;
   background: rgba(243, 236, 224, 0.05);
   color: #c4bba8;
   border: 1px solid rgba(201, 165, 92, 0.3);
@@ -576,14 +583,18 @@ body::after {
   cursor: pointer;
   transition: all 0.2s;
   letter-spacing: 0.05em;
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 .pagination__btn:hover:not(:disabled) {
-  background: rgba(217, 32, 32, 0.1);
+  background: rgba(255, 77, 79, 0.1);
   color: #f3ece0;
-  border-color: rgba(217, 32, 32, 0.5);
+  border-color: rgba(255, 77, 79, 0.5);
 }
 .pagination__btn:focus-visible {
-  outline: 2px solid #d92020;
+  outline: 2px solid #ff4d4f;
   outline-offset: 2px;
 }
 .pagination__btn:disabled {

@@ -144,12 +144,12 @@ onBeforeUnmount(() => {
           box-shadow:
             inset 0 0 0 1px rgba(243, 236, 224, 0.5),
             0 30px 80px rgba(0, 0, 0, 0.7),
-            0 0 0 1px rgba(217, 32, 32, 0.3);
+            0 0 0 1px rgba(255, 77, 79, 0.3);
         "
       >
         <div aria-hidden="true" class="absolute inset-0 pointer-events-none rounded-[4px] washi"></div>
         <div aria-hidden="true" class="absolute top-0 left-0 right-0 h-[3px] z-10" style="
-          background: linear-gradient(90deg, #d92020 0%, #d92020 30%, transparent 30%, transparent 36%, #d92020 36%, #d92020 44%, transparent 44%);
+          background: linear-gradient(90deg, #ff4d4f 0%, #ff4d4f 30%, transparent 30%, transparent 36%, #ff4d4f 36%, #ff4d4f 44%, transparent 44%);
           background-size: 12px 3px;
         "></div>
 
@@ -292,17 +292,17 @@ onBeforeUnmount(() => {
             </section>
           </div>
 
-          <footer class="px-6 sm:px-10 py-6 sm:py-8 border-t border-[#1a1410]/10 flex flex-col sm:flex-row gap-3">
+          <footer class="px-6 sm:px-10 py-6 sm:py-8 border-t border-[#1a1410]/10 flex flex-col sm:flex-row flex-wrap gap-3">
             <button
               ref="enterBtnRef"
               type="button"
               @click="openInNewTab"
               class="flex-1 text-center px-6 py-3.5 font-serif-cn font-bold text-base transition stamp-anim flex items-center justify-center gap-2"
               style="
-                background: linear-gradient(180deg, #d92020 0%, #a8161a 100%);
+                background: linear-gradient(180deg, #ff4d4f 0%, #a8161a 100%);
                 color: #f3ece0;
                 border: 1px solid #a8161a;
-                box-shadow: 0 4px 14px rgba(217, 32, 32, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+                box-shadow: 0 4px 14px rgba(255, 77, 79, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.15);
                 border-radius: 2px;
                 letter-spacing: 0.1em;
                 cursor: pointer;

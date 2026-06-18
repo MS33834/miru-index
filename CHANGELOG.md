@@ -1,26 +1,16 @@
-# Changelog
+# 更新日志
 
-All notable changes to this project will be documented in this file.
+## 2026-06-17
 
-The format is loosely based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
-and this project tries to follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
-where it makes sense.
+### 前端站点
 
-## [Unreleased]
+- 重构为基于 Vue 3 + Vite 的静态站点（`miru-app/`），构建产物输出到 `docs/`。
+- 新增分类侧边栏、搜索高亮、卷册分组、分页、PWA 提示、快捷键帮助、返回顶部。
+- 修复颜色对比度、触控目标大小等可访问性问题。
+- 优化懒加载与构建产物体积。
 
-### Added
+### 仓库整理
 
-- Initial OSS hygiene pass: community health files, code owners,
-  dependabot, secret scanning, and CI workflows.
-
-### Changed
-
-- n/a
-
-### Fixed
-
-- n/a
-
-### Removed
-
-- n/a
+- 清理重复/过时的 Issue 模板与社区文件。
+- 更新 CI 工作流，真正执行前端构建检查。
+- 更新 Dependabot 配置，覆盖 GitHub Actions 与 npm 依赖。

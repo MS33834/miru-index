@@ -60,7 +60,7 @@ const descParts = computed(() => getHighlightedParts(props.item.desc, props.sear
       type="button"
       @click="handleClick"
       @keydown="handleKeydown"
-      class="card-paper card-rise focus:outline-none focus:ring-2 focus:ring-[#d92020] focus:ring-offset-2 focus:ring-offset-[#0a0a0a] relative"
+      class="card-paper card-rise focus:outline-none focus:ring-2 focus:ring-[#ff4d4f] focus:ring-offset-2 focus:ring-offset-[#0a0a0a] relative"
       :class="compact ? 'p-4 sm:p-5' : 'p-5 sm:p-6'"
       :aria-label="item.desc ? `${item.name} — ${item.desc}` : item.name"
     >
@@ -133,6 +133,7 @@ const descParts = computed(() => getHighlightedParts(props.item.desc, props.sear
       :class="{ 'is-favorite': isFavorite(item), 'is-animating': favoriteAnimating }"
       :aria-label="isFavorite(item) ? `取消收藏 ${item.name}` : `收藏 ${item.name}`"
       :aria-pressed="isFavorite(item)"
+      title="收藏"
     >
       <svg width="14" height="14" viewBox="0 0 24 24" :fill="isFavorite(item) ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="2" aria-hidden="true">
         <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
@@ -163,10 +164,10 @@ const descParts = computed(() => getHighlightedParts(props.item.desc, props.sear
 /* 悬浮收藏按钮 - 独立元素，避免 button 嵌套 */
 .favorite-btn-floating {
   position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
-  width: 28px;
-  height: 28px;
+  top: 0.35rem;
+  right: 0.35rem;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -187,7 +188,7 @@ const descParts = computed(() => getHighlightedParts(props.item.desc, props.sear
   border-color: rgba(201, 165, 92, 0.4);
 }
 .favorite-btn-floating:focus-visible {
-  outline: 2px solid #d92020;
+  outline: 2px solid #ff4d4f;
   outline-offset: 2px;
 }
 .favorite-btn-floating.is-favorite {
@@ -226,7 +227,7 @@ const descParts = computed(() => getHighlightedParts(props.item.desc, props.sear
 }
 
 .search-highlight {
-  background: rgba(217, 32, 32, 0.2);
+  background: rgba(255, 77, 79, 0.22);
   color: #a8161a;
   padding: 0 2px;
   border-radius: 2px;

@@ -34,18 +34,30 @@ function getObserver(options) {
 export function useLazyLoad(options = {}) {
   const target = ref(null)
   const isVisible = ref(false)
+  let fallbackTimer = null
 
   onMounted(() => {
     // 延迟到下一帧确保 DOM 已渲染
-    requestAnimationFrame(() => {
-      const el = target.value
-      if (!el) return
-      targetMap.set(el, { isVisible })
-      getObserver(options).observe(el)
-    })
+    const el = target.value
+    if (!el) return
+    targetMap.set(el, { isVisible })
+    getObserver(options).observe(el)
+
+    // 兜底：若 observer 因某些环境未触发，2s 后自动显示内容
+    fallbackTimer = setTimeout(() => {
+      if (!isVisible.value) {
+        isVisible.value = true
+        getObserver(options).unobserve(el)
+        targetMap.delete(el)
+      }
+    }, 2000)
   })
 
   onBeforeUnmount(() => {
+    if (fallbackTimer) {
+      clearTimeout(fallbackTimer)
+      fallbackTimer = null
+    }
     const el = target.value
     if (!el) return
     const observer = getObserver(options)

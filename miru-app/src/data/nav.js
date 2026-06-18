@@ -152,7 +152,7 @@ export const categories = [
       {
         name: 'trace.moe', url: 'https://trace.moe/', health: 'mirror', desc: '动漫截图搜番',
         fullDesc: '基于深度学习的动漫截图反向搜番引擎，给一张动画截图就能精准定位是哪部番剧的第几集（误差秒级），搜番党终极利器。',
-        tags: ['动漫', '截图', 'AI'], features: ['秒级定位', '番剧匹配', 'AI 识别'], proxy: false
+        tags: ['动漫', '截图', '识别'], features: ['秒级定位', '番剧匹配', '深度学习'], proxy: false
       },
       {
         name: '3D-IQDB', url: 'https://3d.iqdb.org/', health: 'mirror', desc: '3D 搜图',
@@ -163,33 +163,33 @@ export const categories = [
   },
   {
     id: 'ai',
-    name: 'AI 工具',
+    name: '工坊工具',
     icon: '🤖',
     items: [
       {
-        name: '漫画图片翻译', url: 'https://github.com/zyddnys/manga-image-translator', health: 'ok', mirrors: ['https://gh-proxy.com/https://raw.githubusercontent.com/zyddnys/manga-image-translator/HEAD', 'https://cdn.jsdelivr.net/gh/zyddnys/manga-image-translator@latest'], desc: 'AI 漫画翻译',
-        fullDesc: '开源的 AI 漫画图片翻译工具，支持中日英多语言，文字检测 + OCR + 擦除 + 重绘一体化，可本地部署或 Colab 运行。',
-        tags: ['AI', '漫画', 'OCR'], features: ['多语言', '一键擦除', '可本地'], proxy: false
+        name: '漫画图片翻译', url: 'https://github.com/zyddnys/manga-image-translator', health: 'ok', mirrors: ['https://gh-proxy.com/https://raw.githubusercontent.com/zyddnys/manga-image-translator/HEAD', 'https://cdn.jsdelivr.net/gh/zyddnys/manga-image-translator@latest'], desc: '漫画图片翻译',
+        fullDesc: '开源漫画图片翻译工具，支持中日英多语言，文字检测 + OCR + 擦除 + 重绘一体化，可本地部署或 Colab 运行。',
+        tags: ['漫画', '翻译', 'OCR'], features: ['多语言', '一键擦除', '可本地'], proxy: false
       },
       {
         name: 'BallonTranslator', url: 'https://github.com/dmMaze/BallonsTranslator', health: 'ok', mirrors: ['https://gh-proxy.com/https://raw.githubusercontent.com/dmMaze/BallonsTranslator/HEAD', 'https://cdn.jsdelivr.net/gh/dmMaze/BallonsTranslator@latest'], desc: '带 GUI 的漫画翻译',
         fullDesc: '基于 manga-image-translator 的 GUI 客户端，支持选区编辑、人工校对、批量翻译，对比漫画翻译的"PS 替代品"。',
-        tags: ['AI', 'GUI', '校对'], features: ['可视化', '选区编辑', '批量'], proxy: false
+        tags: ['GUI', '翻译', '校对'], features: ['可视化', '选区编辑', '批量'], proxy: false
       },
       {
-        name: 'SillyTavern', url: 'https://github.com/SillyTavern/SillyTavern', health: 'ok', mirrors: ['https://gh-proxy.com/https://raw.githubusercontent.com/SillyTavern/SillyTavern/HEAD', 'https://cdn.jsdelivr.net/gh/SillyTavern/SillyTavern@latest'], desc: 'AI 角色扮演前端',
-        fullDesc: '开源 AI 角色扮演 / 聊天前端，可接入 OpenAI / Claude / 本地 LLaMA 等多种 API，ACGN 角色卡社区生态庞大。',
-        tags: ['AI', '角色扮演', '本地'], features: ['多 API', '角色卡', '社区生态'], proxy: false
+        name: 'SillyTavern', url: 'https://github.com/SillyTavern/SillyTavern', health: 'ok', mirrors: ['https://gh-proxy.com/https://raw.githubusercontent.com/SillyTavern/SillyTavern/HEAD', 'https://cdn.jsdelivr.net/gh/SillyTavern/SillyTavern@latest'], desc: '角色扮演前端',
+        fullDesc: '开源角色扮演 / 聊天前端，可接入 OpenAI / Claude / 本地 LLaMA 等多种 API，ACGN 角色卡社区生态庞大。',
+        tags: ['角色扮演', '本地', '聊天'], features: ['多 API', '角色卡', '社区生态'], proxy: false
       },
       {
-        name: 'image-matting', url: 'https://github.com/AUTOMATIC1111/stable-diffusion-webui-rembg', health: 'ok', mirrors: ['https://gh-proxy.com/https://raw.githubusercontent.com/AUTOMATIC1111/stable-diffusion-webui-rembg/HEAD', 'https://cdn.jsdelivr.net/gh/AUTOMATIC1111/stable-diffusion-webui-rembg@latest'], desc: 'AI 抠图',
+        name: 'image-matting', url: 'https://github.com/AUTOMATIC1111/stable-diffusion-webui-rembg', health: 'ok', mirrors: ['https://gh-proxy.com/https://raw.githubusercontent.com/AUTOMATIC1111/stable-diffusion-webui-rembg/HEAD', 'https://cdn.jsdelivr.net/gh/AUTOMATIC1111/stable-diffusion-webui-rembg@latest'], desc: 'SD 抠图插件',
         fullDesc: 'Stable Diffusion WebUI 的抠图插件（rembg），基于 RMBG-1.4 模型，识别发丝级边缘细节，二次元图抠图表现尤其好，可作为 SD WebUI 扩展直接安装。',
-        tags: ['AI', '抠图', 'SD'], features: ['发丝级', '二次元优化', 'SD 插件'], proxy: false
+        tags: ['抠图', 'SD', '扩展'], features: ['发丝级', '二次元优化', 'SD 插件'], proxy: false
       },
       {
-        name: 'comic-translate', url: 'https://github.com/ogkalu2/comic-translate', health: 'ok', mirrors: ['https://gh-proxy.com/https://raw.githubusercontent.com/ogkalu2/comic-translate/HEAD', 'https://cdn.jsdelivr.net/gh/ogkalu2/comic-translate@latest'], desc: 'AI 漫画批量翻译',
+        name: 'comic-translate', url: 'https://github.com/ogkalu2/comic-translate', health: 'ok', mirrors: ['https://gh-proxy.com/https://raw.githubusercontent.com/ogkalu2/comic-translate/HEAD', 'https://cdn.jsdelivr.net/gh/ogkalu2/comic-translate@latest'], desc: '漫画批量翻译',
         fullDesc: 'Comic Translate 是支持多服务（Sugoi / DeepL / GPT-4 / Gemini）的开源漫画翻译工具，界面现代，批量处理友好。',
-        tags: ['AI', '翻译', '批量'], features: ['多服务', '现代 UI', '批量'], proxy: false
+        tags: ['翻译', '批量', '漫画'], features: ['多服务', '现代 UI', '批量'], proxy: false
       },
       {
         name: 'kohya_ss GUI', url: 'https://github.com/bmaltais/kohya_ss', health: 'ok', mirrors: ['https://gh-proxy.com/https://raw.githubusercontent.com/bmaltais/kohya_ss/HEAD', 'https://cdn.jsdelivr.net/gh/bmaltais/kohya_ss@latest'], desc: 'SD 训练 GUI',
@@ -198,7 +198,7 @@ export const categories = [
       },
       {
         name: 'SD WebUI', url: 'https://github.com/AUTOMATIC1111/stable-diffusion-webui', health: 'ok', mirrors: ['https://gh-proxy.com/https://raw.githubusercontent.com/AUTOMATIC1111/stable-diffusion-webui/HEAD', 'https://cdn.jsdelivr.net/gh/AUTOMATIC1111/stable-diffusion-webui@latest'], desc: 'SD 开源鼻祖',
-        fullDesc: 'AUTOMATIC1111 的 Stable Diffusion WebUI，SD 开源生态的鼻祖和事实标准，支持文生图 / 图生图 / 后期处理 / 扩展插件，是二次元 AI 绘画的标配。',
+        fullDesc: 'AUTOMATIC1111 的 Stable Diffusion WebUI，SD 开源生态的鼻祖和事实标准，支持文生图 / 图生图 / 后期处理 / 扩展插件，是二次元绘图的主流工具。',
         tags: ['SD', 'WebUI', '扩展'], features: ['插件生态', '文生图', '图生图'], proxy: false
       },
       {
@@ -207,9 +207,9 @@ export const categories = [
         tags: ['SD', '节点', '进阶'], features: ['节点拼接', '高效率', '可复现'], proxy: false
       },
       {
-        name: 'LobeChat', url: 'https://github.com/lobehub/lobe-chat', health: 'ok', mirrors: ['https://gh-proxy.com/https://raw.githubusercontent.com/lobehub/lobe-chat/HEAD', 'https://cdn.jsdelivr.net/gh/lobehub/lobe-chat@latest'], desc: '开源 ChatGPT',
-        fullDesc: '开源 ChatGPT / LLM 对话前端（Web / Desktop），支持多模型（OpenAI / Claude / Gemini / Ollama），UI 现代，可本地部署，对中文优化好。',
-        tags: ['AI', 'Chat', '多模型'], features: ['多模型', '本地', '现代 UI'], proxy: false
+        name: 'LobeChat', url: 'https://github.com/lobehub/lobe-chat', health: 'ok', mirrors: ['https://gh-proxy.com/https://raw.githubusercontent.com/lobehub/lobe-chat/HEAD', 'https://cdn.jsdelivr.net/gh/lobehub/lobe-chat@latest'], desc: '多模型对话',
+        fullDesc: '开源多模型对话前端（Web / Desktop），支持 OpenAI / Claude / Gemini / Ollama 等，UI 现代，可本地部署，对中文优化好。',
+        tags: ['对话', '多模型', '本地'], features: ['多模型', '本地', '现代 UI'], proxy: false
       },
       {
         name: 'Civitai', url: 'https://civitai.com/', health: 'mirror', desc: 'SD 模型市场',
@@ -217,13 +217,13 @@ export const categories = [
         tags: ['SD', '模型', 'LoRA'], features: ['模型市场', 'LoRA 库', '提示词'], proxy: true
       },
       {
-        name: 'Hugging Face', url: 'https://huggingface.co/', health: 'mirror', desc: 'AI 模型 / 数据集',
-        fullDesc: 'Hugging Face 全球最大 AI 开源社区，托管 100 万 + 模型 / 10 万 + 数据集，Transformers 库官方主站，模型 Spaces 可在线试用。',
-        tags: ['AI', '模型', '数据集'], features: ['百万模型', 'Spaces', 'Transformers'], proxy: true
+        name: 'Hugging Face', url: 'https://huggingface.co/', health: 'mirror', desc: '模型 / 数据集',
+        fullDesc: 'Hugging Face 全球最大的机器学习开源社区，托管 100 万 + 模型 / 10 万 + 数据集，Transformers 库官方主站，模型 Spaces 可在线试用。',
+        tags: ['模型', '数据集', '社区'], features: ['百万模型', 'Spaces', 'Transformers'], proxy: true
       },
       {
-        name: 'Replicate', url: 'https://replicate.com/', health: 'mirror', desc: '云端 AI 推理',
-        fullDesc: 'Replicate 云端 AI 推理平台，开发者通过 API 调用 1000+ 开源模型（SD / Whisper / Llama 等），按秒计费，无需 GPU。',
+        name: 'Replicate', url: 'https://replicate.com/', health: 'mirror', desc: '云端模型推理',
+        fullDesc: 'Replicate 云端模型推理平台，开发者通过 API 调用 1000+ 开源模型（SD / Whisper / Llama 等），按秒计费，无需 GPU。',
         tags: ['云端', 'API', '推理'], features: ['云端 GPU', '按秒计费', 'API 简单'], proxy: true
       },
       {
@@ -335,7 +335,7 @@ export const categories = [
       },
       {
         name: '游民星空', url: 'https://www.gamersky.com/', health: 'ok', desc: '游戏资讯门户',
-        fullDesc: '老牌游戏综合门户，资讯 / 评测 / 攻略 / 视频全覆盖，AI / ACG / 主机 / 单机内容均有。',
+        fullDesc: '老牌游戏综合门户，资讯 / 评测 / 攻略 / 视频全覆盖，ACG / 主机 / 单机内容均有。',
         tags: ['游戏', '门户', '评测'], features: ['资讯全', '评测多', '视频'], proxy: false
       },
     ]
@@ -809,13 +809,13 @@ export const categories = [
         tags: ['自托管', 'OPDS', 'Web'], features: ['OPDS', 'REST API', '家庭友好'], proxy: false
       },
       {
-        name: 'Real-ESRGAN', url: 'https://github.com/xinntao/Real-ESRGAN', health: 'ok', mirrors: ['https://gh-proxy.com/https://raw.githubusercontent.com/xinntao/Real-ESRGAN/HEAD', 'https://cdn.jsdelivr.net/gh/xinntao/Real-ESRGAN@latest'], desc: 'AI 图像超分',
+        name: 'Real-ESRGAN', url: 'https://github.com/xinntao/Real-ESRGAN', health: 'ok', mirrors: ['https://gh-proxy.com/https://raw.githubusercontent.com/xinntao/Real-ESRGAN/HEAD', 'https://cdn.jsdelivr.net/gh/xinntao/Real-ESRGAN@latest'], desc: '图像超分',
         fullDesc: '腾讯 ARC 实验室开源的图像 / 视频超分算法，Anime6B / Video 多个模型，是当前开源超分的事实标准之一。',
         tags: ['超分', '腾讯', '开源'], features: ['多模型', '视频支持', '高质量'], proxy: false
       },
       {
         name: 'Real-CUGAN', url: 'https://github.com/nihui/realcugan-ncnn-vulkan', health: 'ok', mirrors: ['https://gh-proxy.com/https://raw.githubusercontent.com/nihui/realcugan-ncnn-vulkan/HEAD', 'https://cdn.jsdelivr.net/gh/nihui/realcugan-ncnn-vulkan@latest'], desc: 'B站开源超分',
-        fullDesc: 'B站 AI Lab 开源的动漫专用超分算法原项目 + nihui 维护的 ncnn-vulkan 桌面 GUI 版，对二次元画面细节保留好，开箱即用。',
+        fullDesc: 'B站开源的动漫专用超分算法原项目 + nihui 维护的 ncnn-vulkan 桌面 GUI 版，对二次元画面细节保留好，开箱即用。',
         tags: ['超分', 'B站', '二次元'], features: ['二次元', 'GUI', '开源'], proxy: false
       },
       {
@@ -860,8 +860,8 @@ export const categories = [
       },
       {
         name: 'Subtitle Edit', url: 'https://github.com/SubtitleEdit/subtitleedit', health: 'ok', mirrors: ['https://gh-proxy.com/https://github.com/SubtitleEdit/subtitleedit', 'https://cdn.jsdelivr.net/gh/SubtitleEdit/subtitleedit@latest'], desc: '字幕编辑器',
-        fullDesc: 'Subtitle Edit 开源字幕编辑器（Win / Mac / Linux），支持字幕时间轴调整、翻译、OCR 识别、AI 翻译，是字幕组 / 翻译党的核心工具。',
-        tags: ['字幕', '编辑', 'OCR'], features: ['时间轴', 'OCR', 'AI 翻译'], proxy: false
+        fullDesc: 'Subtitle Edit 开源字幕编辑器（Win / Mac / Linux），支持字幕时间轴调整、翻译、OCR 识别、机器翻译，是字幕组 / 翻译党的核心工具。',
+        tags: ['字幕', '编辑', 'OCR'], features: ['时间轴', 'OCR', '机器翻译'], proxy: false
       },
       {
         name: 'MeoW 追番', url: 'https://github.com/EstrellaXD/Auto_Bangumi', health: 'ok', mirrors: ['https://gh-proxy.com/https://github.com/EstrellaXD/Auto_Bangumi', 'https://cdn.jsdelivr.net/gh/EstrellaXD/Auto_Bangumi@latest'], desc: '番剧自动追番',
@@ -984,7 +984,7 @@ export const categories = [
   },
   {
     id: 'imgai',
-    name: '图像 AI',
+    name: '图像处理',
     icon: '🖼️',
     items: [
       {
@@ -1009,28 +1009,28 @@ export const categories = [
       },
       {
         name: 'chaiNNer', url: 'https://github.com/chaiNNer-org/chaiNNer', health: 'ok', mirrors: ['https://gh-proxy.com/https://raw.githubusercontent.com/chaiNNer-org/chaiNNer/HEAD', 'https://cdn.jsdelivr.net/gh/chaiNNer-org/chaiNNer@latest'], desc: '节点式图像处理',
-        fullDesc: '节点式（Node-based）图像处理工具，可视化拼接超分 / 修复 / 上色等 AI 模型，适合进阶玩家。',
+        fullDesc: '节点式（Node-based）图像处理工具，可视化拼接超分 / 修复 / 上色等模型，适合进阶玩家。',
         tags: ['节点', '可视化', '进阶'], features: ['节点', '可视化', '可拼装'], proxy: false
       },
       {
-        name: 'Bigjpg', url: 'https://bigjpg.com/', health: 'ok', desc: '在线 AI 放大',
-        fullDesc: 'Bigjpg 在线 AI 图像放大服务，基于 Waifu2x / Real-ESRGAN 等模型，对二次元插画 / 漫画的放大效果行业领先，支持免费 + 付费。',
+        name: 'Bigjpg', url: 'https://bigjpg.com/', health: 'ok', desc: '在线图像放大',
+        fullDesc: 'Bigjpg 在线图像放大服务，基于 Waifu2x / Real-ESRGAN 等模型，对二次元插画 / 漫画的放大效果行业领先，支持免费 + 付费。',
         tags: ['在线', '放大', '二次元'], features: ['在线', '二次元', '多模型'], proxy: false
       },
       {
-        name: 'Remini', url: 'https://remini.ai/', health: 'mirror', desc: 'AI 人像修复',
-        fullDesc: 'Remini AI 人像修复 / 增强工具，老照片 / 模糊照片 / 低清人像可一键变高清，APP 端 AppStore 装机量过亿。',
+        name: 'Remini', url: 'https://remini.ai/', health: 'mirror', desc: '人像修复',
+        fullDesc: 'Remini 人像修复 / 增强工具，老照片 / 模糊照片 / 低清人像可一键变高清，APP 端 AppStore 装机量过亿。',
         tags: ['人像', '修复', '高清'], features: ['人像修复', 'APP', '老照片'], proxy: true
       },
       {
-        name: 'Upscayl', url: 'https://upscayl.org/', health: 'ok', desc: '桌面 AI 超分',
-        fullDesc: 'Upscayl 开源桌面 AI 图像超分工具（Win / Mac / Linux），集成 Real-ESRGAN 多模型，本地处理不传图，隐私友好。',
+        name: 'Upscayl', url: 'https://upscayl.org/', health: 'ok', desc: '桌面图像超分',
+        fullDesc: 'Upscayl 开源桌面图像超分工具（Win / Mac / Linux），集成 Real-ESRGAN 多模型，本地处理不传图，隐私友好。',
         tags: ['开源', '桌面', '超分'], features: ['本地处理', '多模型', '开源'], proxy: false
       },
       {
-        name: 'Cutout', url: 'https://www.cutout.pro/', health: 'mirror', desc: 'AI 抠图 / 编辑',
-        fullDesc: 'Cutout Pro 在线 AI 抠图 / 图像增强 / 视频抠像工具，5 秒自动识别主体，支持批量处理，免费版够用。',
-        tags: ['抠图', '在线', 'AI'], features: ['一键抠图', '视频抠像', '批量'], proxy: true
+        name: 'Cutout', url: 'https://www.cutout.pro/', health: 'mirror', desc: '在线抠图 / 编辑',
+        fullDesc: 'Cutout Pro 在线抠图 / 图像增强 / 视频抠像工具，5 秒自动识别主体，支持批量处理，免费版够用。',
+        tags: ['抠图', '在线', '编辑'], features: ['一键抠图', '视频抠像', '批量'], proxy: true
       },
 
     ]

@@ -77,7 +77,7 @@
 
 | 用途 | 推荐项目 | 链接 |
 | --- | --- | --- |
-| AI 漫画图片翻译（Web / CLI / Docker） | manga-image-translator | https://github.com/zyddnys/manga-image-translator |
+| 漫画图片翻译（Web / CLI / Docker） | manga-image-translator | https://github.com/zyddnys/manga-image-translator |
 | 漫画翻译 GUI（PySide6） | BalloonTranslator | https://github.com/dmMaze/BalloonTranslator |
 | 漫画专用 OCR 模型 | Manga-OCR | https://github.com/kha-white/manga-ocr |
 | EPUB / PDF OCR 嵌字生成器 | mokuro | https://github.com/kha-white/mokuro |

@@ -1,5 +1,5 @@
 <script setup>
-import { ref, shallowRef, computed, onMounted, onUnmounted, watch } from 'vue'
+import { ref, shallowRef, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { categories } from './data/nav.js'
 import SiteModal from './components/SiteModal.vue'
 import SidebarNav from './components/SidebarNav.vue'
@@ -177,6 +177,15 @@ function prevPage() {
 function scrollToTop() {
   window.scrollTo({ top: 0, behavior: 'smooth' })
 }
+function focusSearch() {
+  sidebarCollapsed.value = false
+  nextTick(() => {
+    setTimeout(() => {
+      const searchInput = document.querySelector('.scroll-input')
+      if (searchInput) searchInput.focus()
+    }, 350)
+  })
+}
 
 const drawerPanelRef = ref(null)
 function handleDrawerKeydown(e) {
@@ -277,6 +286,7 @@ onUnmounted(() => {
         @select="selectCategory"
         @search="onSearch"
         @toggle="sidebarCollapsed = !sidebarCollapsed"
+        @search-focus="focusSearch"
       />
     </div>
 
@@ -285,7 +295,7 @@ onUnmounted(() => {
       <div class="flex items-center gap-2">
         <button
           @click="drawerOpen = true"
-          class="w-10 h-10 flex items-center justify-center text-[#f3ece0] hover:bg-[#d92020]/10 rounded-sm"
+          class="w-11 h-11 flex items-center justify-center text-[#f3ece0] hover:bg-[#ff4d4f]/10 rounded-sm"
           aria-label="打开目录"
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
@@ -295,19 +305,27 @@ onUnmounted(() => {
           </svg>
         </button>
         <div class="hanko h-7 w-7 text-[11px]">漫</div>
-        <div class="font-serif-cn font-bold text-[#f3ece0] text-sm tracking-wider">MIRU INDEX</div>
+        <div class="font-serif-cn text-base font-bold text-[#f3ece0] tracking-wider">MIRU INDEX</div>
       </div>
       <div class="flex items-center gap-1.5">
-        <div class="hanko text-[9px] px-1.5 py-0.5">第{{ VOLUMES.length }}卷</div>
-        <div class="hanko text-[9px] px-1.5 py-0.5" style="background: #1a1410; color: #c9a55c; box-shadow: inset 0 0 0 1px rgba(201, 165, 92, 0.4);">{{ totalCount }}</div>
+        <div class="hanko text-[10px] px-2 py-1">第{{ VOLUMES.length }}卷</div>
+        <div class="hanko text-[10px] px-2 py-1" style="background: #1a1410; color: #c9a55c; box-shadow: inset 0 0 0 1px rgba(201, 165, 92, 0.4);">{{ totalCount }}</div>
       </div>
     </header>
 
     <!-- =================== 抽屉（平板/手机） =================== -->
     <Teleport to="body">
       <Transition name="drawer">
-        <div v-if="drawerOpen" class="drawer-mask" @click="drawerOpen = false" @keydown="handleDrawerKeydown">
-          <div ref="drawerPanelRef" class="drawer-panel" @click.stop role="dialog" aria-modal="true" aria-label="导航目录">
+        <div
+          v-if="drawerOpen"
+          class="drawer-mask"
+          @click="drawerOpen = false"
+          @keydown="handleDrawerKeydown"
+          role="dialog"
+          aria-modal="true"
+          aria-label="导航目录"
+        >
+          <div ref="drawerPanelRef" class="drawer-panel" @click.stop>
             <SidebarNav
               :active-category="activeCategory"
               :search-query="searchQuery"
@@ -343,8 +361,8 @@ onUnmounted(() => {
             </h1>
 
             <p class="max-w-2xl text-[#c4bba8] text-base leading-[2] font-kai-cn mb-8">
-              一座属于 <span class="text-[#f3ece0] font-bold">ACGN</span> 的<span class="text-[#d92020] font-bold">印经阁</span>。
-              精选 <span class="text-[#c9a55c] font-serif-cn text-lg mx-1">{{ totalCount }}</span> 站 · 分 <span class="text-[#c9a55c] font-serif-cn text-lg mx-1">{{ categories.length }}</span> 卷 · 涵盖漫画 · 番剧 · GalGame · 轻小说 · AI · GitHub 开源 · 网络工具……
+              一座属于 <span class="text-[#f3ece0] font-bold">ACGN</span> 的<span class="text-[#ff4d4f] font-bold">印经阁</span>。
+              精选 <span class="text-[#c9a55c] font-serif-cn text-lg mx-1">{{ totalCount }}</span> 站 · 分 <span class="text-[#c9a55c] font-serif-cn text-lg mx-1">{{ categories.length }}</span> 卷 · 涵盖漫画 · 番剧 · GalGame · 轻小说 · 绘图 · GitHub 开源 · 网络工具……
             </p>
 
             <!-- 简化的标签 -->
@@ -409,9 +427,9 @@ onUnmounted(() => {
               <div class="flex-1 pb-1">
                 <div class="chapter-num text-[#8a7a68] mb-1">CHAPTER · {{ String(vi + 1).padStart(2, '0') }} / {{ String(groupedByVolume.length).padStart(2, '0') }}</div>
                 <h2 class="font-serif-cn text-2xl sm:text-3xl text-[#f3ece0] font-bold tracking-wide">
-                  <span class="text-[#d92020] mr-2">卷</span>{{ vol.name.replace('卷', '') }} · {{ vol.title }}
+                  <span class="text-[#ff4d4f] mr-2">卷</span>{{ vol.name.replace('卷', '') }} · {{ vol.title }}
                 </h2>
-                <div class="mt-1.5 text-[#c9a55c] font-mono text-[10px] tracking-[0.2em]">{{ vol.sub }} · {{ vol.items.length }} 帖</div>
+                <div class="mt-1.5 text-[#c9a55c] font-mono text-[11px] tracking-[0.2em]">{{ vol.sub }} · {{ vol.items.length }} 帖</div>
               </div>
               <div class="hidden sm:flex items-center gap-2 pb-1">
                 <div class="hanko text-xs px-2.5 py-1 stamp-anim">第{{ vol.chapterNum }}卷</div>
@@ -460,7 +478,7 @@ onUnmounted(() => {
               <div class="flex-1 pb-1">
                 <div class="chapter-num text-[#8a7a68] mb-1">CHAPTER · {{ String(gi + 1).padStart(2, '0') }}</div>
                 <h2 class="font-serif-cn text-2xl sm:text-3xl text-[#f3ece0] font-bold tracking-wide">
-                  <span class="text-[#d92020] mr-2">{{ group.icon }}</span>{{ group.name }}
+                  <span class="text-[#ff4d4f] mr-2">{{ group.icon }}</span>{{ group.name }}
                 </h2>
                 <div class="mt-1.5 text-[#8a7a68] font-mono text-[10px] tracking-[0.2em]">{{ group.items.length }} 帖 · 共 {{ group.items.length }} 卷</div>
               </div>
@@ -505,7 +523,7 @@ onUnmounted(() => {
         </button>
         <div class="pagination__info">
           <span class="font-serif-cn text-[#c9a55c]">{{ currentPage }}</span>
-          <span class="text-[#5a4a3a]">/</span>
+          <span class="text-[#8a7a68]">/</span>
           <span>{{ totalPageCount }}</span>
         </div>
         <button
@@ -533,7 +551,7 @@ onUnmounted(() => {
           凡收录之站，皆经编者亲手验证<br>
           然网络无常，若有失效，请以宽容待之
         </p>
-        <div class="mt-6 font-mono text-[10px] text-[#5a4a3a] tracking-[0.3em]">
+        <div class="mt-6 font-mono text-[10px] text-[#8a7a68] tracking-[0.3em]">
           © 2026 · MIRU INDEX · CC BY-SA 4.0
         </div>
       </div>
@@ -611,7 +629,7 @@ onUnmounted(() => {
   top: 0;
   height: 100vh;
   z-index: 30;
-  border-right: 1px solid rgba(217, 32, 32, 0.15);
+  border-right: 1px solid rgba(255, 77, 79, 0.15);
   transition: all 0.3s;
   width: 280px;
 }
@@ -624,7 +642,7 @@ onUnmounted(() => {
   z-index: 30;
   background: rgba(10, 10, 10, 0.92);
   backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(217, 32, 32, 0.15);
+  border-bottom: 1px solid rgba(255, 77, 79, 0.15);
   padding: 0.75rem 1rem;
   display: flex;
   align-items: center;
@@ -652,6 +670,11 @@ onUnmounted(() => {
 .drawer-enter-from .drawer-panel { transform: translateX(-100%); }
 .drawer-leave-to { opacity: 0; }
 .drawer-leave-to .drawer-panel { transform: translateX(-100%); }
+
+.drawer-panel .sidebar {
+  border-right: none;
+  box-shadow: none;
+}
 
 /* ============== 主区 ============== */
 .main {
@@ -700,7 +723,7 @@ onUnmounted(() => {
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 0 1.25rem;
-  border-bottom: 1px dashed rgba(217, 32, 32, 0.15);
+  border-bottom: 1px dashed rgba(255, 77, 79, 0.15);
   margin-bottom: 1.5rem;
   flex-wrap: wrap;
 }
@@ -719,8 +742,8 @@ onUnmounted(() => {
   gap: 0.3rem;
 }
 .breadcrumb__item:not(.is-current):hover { color: #f3ece0; background: rgba(201, 165, 92, 0.1); }
-.breadcrumb__item.is-current { color: #d92020; font-weight: 700; }
-.breadcrumb__sep { color: #5a4a3a; font-family: var(--mono); font-size: 0.85rem; }
+.breadcrumb__item.is-current { color: #ff4d4f; font-weight: 700; }
+.breadcrumb__sep { color: #8a7a68; font-family: var(--mono); font-size: 0.85rem; }
 .breadcrumb__count {
   margin-left: auto;
   font-family: var(--kai);
@@ -736,8 +759,8 @@ onUnmounted(() => {
 .search-result {
   padding: 1rem 1.25rem;
   margin-bottom: 1.5rem;
-  background: rgba(217, 32, 32, 0.05);
-  border-left: 3px solid #d92020;
+  background: rgba(255, 77, 79, 0.05);
+  border-left: 3px solid #ff4d4f;
   border-radius: 0 4px 4px 0;
 }
 
@@ -747,26 +770,35 @@ onUnmounted(() => {
 .subgroup__icon { font-size: 1.1rem; }
 .subgroup__more {
   font-family: var(--serif);
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   color: #c9a55c;
   background: transparent;
   border: 0;
   cursor: pointer;
-  padding: 0.2rem 0.5rem;
+  padding: 0.45rem 0.75rem;
   border-radius: 2px;
   transition: all 0.2s;
   white-space: nowrap;
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
 }
-.subgroup__more:hover { color: #d92020; background: rgba(217, 32, 32, 0.1); padding-left: 0.7rem; }
+.subgroup__more:hover { color: #ff4d4f; background: rgba(255, 77, 79, 0.1); padding-left: 0.95rem; }
 
 .empty { text-align: center; padding: 4rem 0; }
+
+/* ============== 移动端微调 ============== */
+@media (max-width: 640px) {
+  .breadcrumb__item { font-size: 0.9rem; padding: 0.35rem 0.6rem; }
+  .subgroup__head { gap: 0.6rem; }
+}
 
 /* ============== Footer ============== */
 .site-footer {
   position: relative;
   margin-top: 4rem;
   padding: 3rem 1rem;
-  border-top: 1px solid rgba(217, 32, 32, 0.2);
+  border-top: 1px solid rgba(255, 77, 79, 0.2);
   text-align: center;
 }
 @media (min-width: 1024px) { .site-footer { padding: 3rem 2rem; } }
@@ -777,8 +809,8 @@ onUnmounted(() => {
   position: fixed;
   bottom: calc(2rem + env(safe-area-inset-bottom));
   right: 2rem;
-  width: 44px;
-  height: 44px;
+  width: 48px;
+  height: 48px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -787,17 +819,23 @@ onUnmounted(() => {
   border: none;
   border-radius: 50%;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(217, 32, 32, 0.3);
+  box-shadow: 0 4px 12px rgba(255, 77, 79, 0.3);
   transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
   z-index: 40;
 }
 .back-to-top:hover {
   transform: translateY(-4px);
-  box-shadow: 0 6px 20px rgba(217, 32, 32, 0.4);
+  box-shadow: 0 6px 20px rgba(255, 77, 79, 0.4);
   background: var(--seal-deep);
 }
 .back-to-top:active {
   transform: translateY(-2px);
+}
+@media (max-width: 640px) {
+  .back-to-top {
+    bottom: calc(5.5rem + env(safe-area-inset-bottom));
+    right: 1rem;
+  }
 }
 
 .fade-enter-active,
@@ -821,7 +859,7 @@ onUnmounted(() => {
   padding: 0.75rem 1.25rem;
   background: rgba(26, 20, 16, 0.95);
   color: var(--washi);
-  border: 1px solid rgba(217, 32, 32, 0.3);
+  border: 1px solid rgba(255, 77, 79, 0.3);
   border-radius: 4px;
   font-family: var(--kai);
   font-size: 0.875rem;

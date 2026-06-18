@@ -8,7 +8,7 @@ const props = defineProps({
   searchQuery: { type: String, default: '' },
   collapsed: { type: Boolean, default: false }
 })
-const emit = defineEmits(['select', 'search', 'toggle'])
+const emit = defineEmits(['select', 'search', 'toggle', 'search-focus'])
 
 const expanded = ref(new Set(['all']))  // 默认展开"全部"
 const allCount = computed(() => categories.reduce((a, c) => a + c.items.length, 0))
@@ -54,7 +54,7 @@ watch(() => props.activeCategory, (id) => {
     :class="collapsed ? 'sidebar--collapsed' : ''"
   >
     <!-- 头部：标题 + 折叠 -->
-    <div class="px-4 pt-5 pb-4 border-b border-[#d92020]/15">
+    <div class="px-4 pt-5 pb-4 border-b border-[#ff4d4f]/15">
       <div class="flex items-center justify-between mb-3">
         <div class="flex items-center gap-2.5">
           <div class="hanko h-8 w-8 text-[13px] shrink-0">藏</div>
@@ -64,9 +64,21 @@ watch(() => props.activeCategory, (id) => {
           </div>
         </div>
         <button
+          v-if="collapsed"
+          type="button"
+          @click="emit('search-focus')"
+          class="w-8 h-8 rounded-sm flex items-center justify-center text-[#8a7a68] hover:text-[#ff4d4f] hover:bg-[#ff4d4f]/10 transition shrink-0"
+          aria-label="展开搜索"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="8" />
+            <path d="M21 21l-4.35-4.35" />
+          </svg>
+        </button>
+        <button
           type="button"
           @click="emit('toggle')"
-          class="w-7 h-7 rounded-sm flex items-center justify-center text-[#8a7a68] hover:text-[#d92020] hover:bg-[#d92020]/10 transition shrink-0"
+          class="w-8 h-8 rounded-sm flex items-center justify-center text-[#8a7a68] hover:text-[#ff4d4f] hover:bg-[#ff4d4f]/10 transition shrink-0"
           :aria-label="collapsed ? '展开目录' : '折叠目录'"
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
@@ -184,11 +196,11 @@ watch(() => props.activeCategory, (id) => {
     </nav>
 
     <!-- 底部：统计 + 印章 -->
-    <div v-if="!collapsed" class="px-4 py-4 border-t border-[#d92020]/15">
+    <div v-if="!collapsed" class="px-4 py-4 border-t border-[#ff4d4f]/15">
       <div class="flex items-center gap-2 mb-2">
         <div class="ink-bar flex-1"></div>
       </div>
-      <div class="font-mono text-[9px] text-[#5a4a3a] tracking-[0.25em] mb-2">
+      <div class="font-mono text-[10px] text-[#8a7a68] tracking-[0.25em] mb-2">
         共 {{ categories.length }} 卷 · {{ allCount }} 帖
       </div>
       <div class="flex items-center gap-2">
@@ -211,7 +223,7 @@ watch(() => props.activeCategory, (id) => {
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse at 50% 0%, rgba(217, 32, 32, 0.03) 0%, transparent 70%);
+  background: radial-gradient(ellipse at 50% 0%, rgba(255, 77, 79, 0.03) 0%, transparent 70%);
   pointer-events: none;
   z-index: -1;
 }
@@ -244,8 +256,8 @@ watch(() => props.activeCategory, (id) => {
 }
 .sidebar-item.is-active {
   color: #f3ece0;
-  background: linear-gradient(90deg, rgba(217, 32, 32, 0.18) 0%, rgba(217, 32, 32, 0.04) 100%);
-  border-left-color: #d92020;
+  background: linear-gradient(90deg, rgba(255, 77, 79, 0.18) 0%, rgba(255, 77, 79, 0.04) 100%);
+  border-left-color: #ff4d4f;
 }
 .sidebar-item.is-active .sidebar-item__name {
   font-weight: 700;
@@ -257,29 +269,29 @@ watch(() => props.activeCategory, (id) => {
 .sidebar-item__trail { display: flex; align-items: center; gap: 0.4rem; }
 .sidebar-item__count {
   font-family: var(--mono);
-  font-size: 9px;
-  color: #8a7a68;
-  background: rgba(243, 236, 224, 0.05);
+  font-size: 10px;
+  color: #c4bba8;
+  background: rgba(243, 236, 224, 0.08);
   padding: 1px 5px;
   border-radius: 2px;
   min-width: 18px;
   text-align: center;
 }
 .sidebar-item.is-active .sidebar-item__count {
-  color: #d92020;
-  background: rgba(217, 32, 32, 0.15);
+  color: #ff4d4f;
+  background: rgba(255, 77, 79, 0.15);
 }
 .sidebar-item__chevron {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 16px;
-  height: 16px;
-  color: #5a4a3a;
+  width: 28px;
+  height: 28px;
+  color: #8a7a68;
   border-radius: 2px;
   transition: all 0.2s;
 }
-.sidebar-item__chevron:hover { color: #d92020; background: rgba(217, 32, 32, 0.1); }
+.sidebar-item__chevron:hover { color: #ff4d4f; background: rgba(255, 77, 79, 0.1); }
 .sidebar-item__chevron.is-open svg { transform: rotate(180deg); }
 .sidebar-item__chevron svg { transition: transform 0.2s; }
 .sidebar-item__indicator {
@@ -289,9 +301,9 @@ watch(() => props.activeCategory, (id) => {
   transform: translateY(-50%);
   width: 4px;
   height: 14px;
-  background: #d92020;
+  background: #ff4d4f;
   border-radius: 1px;
-  box-shadow: 0 0 8px rgba(217, 32, 32, 0.5);
+  box-shadow: 0 0 8px rgba(255, 77, 79, 0.5);
 }
 
 /* 折叠态 */
@@ -303,19 +315,19 @@ watch(() => props.activeCategory, (id) => {
 .sidebar-divider {
   padding: 0.65rem 0.9rem 0.4rem;
   font-family: var(--mono);
-  font-size: 9px;
-  color: #5a4a3a;
+  font-size: 10px;
+  color: #8a7a68;
   letter-spacing: 0.25em;
   text-align: center;
 }
-.sidebar-divider .ornament { color: #8a7a68; }
+.sidebar-divider .ornament { color: #c4bba8; }
 
 /* 展开的资源列表（手风琴） */
 .sidebar-resources {
   max-height: 60vh;
   overflow-y: auto;
   padding: 0 0 0.5rem;
-  border-top: 1px solid rgba(217, 32, 32, 0.1);
+  border-top: 1px solid rgba(255, 77, 79, 0.1);
   margin-top: 0.25rem;
 }
 .sidebar-resources__group { padding: 0.5rem 0.6rem 0.4rem; }
@@ -326,7 +338,7 @@ watch(() => props.activeCategory, (id) => {
   padding: 0.3rem 0.4rem 0.4rem;
   letter-spacing: 0.08em;
 }
-.sidebar-resources__title .ornament { color: #d92020; margin-right: 4px; }
+.sidebar-resources__title .ornament { color: #ff4d4f; margin-right: 4px; }
 .sidebar-resources__item {
   display: flex;
   align-items: center;
@@ -346,8 +358,8 @@ watch(() => props.activeCategory, (id) => {
 }
 .sidebar-resources__num {
   font-family: var(--mono);
-  font-size: 9px;
-  color: #5a4a3a;
+  font-size: 10px;
+  color: #8a7a68;
   width: 16px;
   flex-shrink: 0;
 }
@@ -355,8 +367,8 @@ watch(() => props.activeCategory, (id) => {
 .sidebar-resources__more {
   padding: 0.2rem 0.4rem;
   font-family: var(--mono);
-  font-size: 9px;
-  color: #5a4a3a;
+  font-size: 10px;
+  color: #8a7a68;
   letter-spacing: 0.1em;
 }
 
@@ -364,7 +376,7 @@ watch(() => props.activeCategory, (id) => {
 .scrollbar-thin::-webkit-scrollbar { width: 4px; }
 .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
 .scrollbar-thin::-webkit-scrollbar-thumb { background: #2a1e16; border-radius: 2px; }
-.scrollbar-thin::-webkit-scrollbar-thumb:hover { background: #d92020; }
+.scrollbar-thin::-webkit-scrollbar-thumb:hover { background: #ff4d4f; }
 .scrollbar-thin { scrollbar-width: thin; scrollbar-color: #2a1e16 transparent; }
 
 /* 展开动画 */

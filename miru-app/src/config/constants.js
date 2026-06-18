@@ -8,7 +8,7 @@ export const APP_CONFIG = {
   // 卷册配置
   VOLUMES: [
     { id: 'v1', name: '卷壹', title: '網絡工具', sub: 'Network · Tools', catIds: ['proxy', 'downloader', 'archive', 'imagesearch'] },
-    { id: 'v2', name: '卷贰', title: 'AI 工坊', sub: 'AI · Workshop', catIds: ['ai', 'imgai'] },
+    { id: 'v2', name: '卷贰', title: '工坊', sub: 'Workshop', catIds: ['ai', 'imgai'] },
     { id: 'v3', name: '卷叁', title: 'ACG 主场', sub: 'ACGN · Main', catIds: ['manga', 'manga_app', 'anime_site', 'anime_app', 'galgame_res', 'novel', 'library'] },
     { id: 'v4', name: '卷肆', title: '社区 · 资讯', sub: 'Community · News', catIds: ['news', 'community', 'galgame_news'] },
     { id: 'v5', name: '卷伍', title: '视听娱乐', sub: 'Audio · Visual', catIds: ['music', 'draw', 'video', 'sticker'] },
