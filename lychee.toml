@@ -14,7 +14,7 @@ exclude = [
 ]
 
 # 根相对链接解析基准
-base = "https://MS33834.github.io/miru-index/"
+base_url = "https://MS33834.github.io/miru-index/"
 
 # 接受的 HTTP 状态码：403/502/503 常为 CDN/防火墙/临时维护，不视为死链
 accept = [200, 204, 301, 302, 303, 307, 308, 403, 502, 503]
