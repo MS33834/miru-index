@@ -1,0 +1,29 @@
+# Lychee 链接检查配置
+# 目标：拦截真正的死链，同时不对临时网络波动或反爬策略过度敏感
+
+# 超时与重试
+timeout = 30
+retries = 2
+
+# 扫描范围：包含仓库内文件，同时以部署后的站点作为根相对链接基准
+include = ["."]
+exclude = [
+  # 构建产物与依赖目录无需检查
+  "docs/assets/*",
+  "miru-app/node_modules/*",
+]
+
+# 根相对链接解析基准
+base = "https://MS33834.github.io/miru-index/"
+
+# 接受的 HTTP 状态码：403/502/503 常为 CDN/防火墙/临时维护，不视为死链
+accept = [200, 204, 301, 302, 303, 307, 308, 403, 502, 503]
+
+# 不检查邮件地址
+include_mail = false
+
+# 不检查本地回环
+exclude_loopback = true
+
+# GitHub 请求可能触发速率限制，使用 GITHUB_TOKEN 提升额度
+github_token = "GITHUB_TOKEN"

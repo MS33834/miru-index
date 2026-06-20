@@ -28,6 +28,6 @@ jobs:
       - name: lychee
         uses: lycheeverse/lychee-action@v2.8.0
         with:
-          args: --verbose --no-progress --exclude-loopback .
+          args: --config lychee.toml --verbose --no-progress
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

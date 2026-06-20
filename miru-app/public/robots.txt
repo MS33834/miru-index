@@ -1,3 +1,3 @@
 User-agent: *
 Allow: /
-Sitemap: https://badhope.github.io/miru-index/sitemap.xml
+Sitemap: https://MS33834.github.io/miru-index/sitemap.xml
