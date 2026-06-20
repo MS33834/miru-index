@@ -1,16 +1,25 @@
 # Lychee 链接检查配置
-# 目标：拦截真正的死链，同时不对临时网络波动或反爬策略过度敏感
+# 目标：拦截真正的死链，同时不对临时网络波动、反爬策略或未部署站点过度敏感
 
 # 超时与重试
 timeout = 30
 max_retries = 2
 
-# 扫描范围：包含仓库内文件，同时以部署后的站点作为根相对链接基准
+# 扫描范围
 include = ["."]
 exclude = [
-  # 构建产物与依赖目录无需检查
+  # 构建产物与依赖目录
   "docs/assets/*",
   "miru-app/node_modules/*",
+  # 说明文档中的外部资源链接由单独任务维护，不阻塞 CI
+  "README.md",
+  "LINKS.md",
+  "SITES.md",
+  "CONTRIBUTING.md",
+  "docs/README.md",
+  "docs/TROUBLESHOOTING.md",
+  # 站点尚未部署到 GitHub Pages，排除该域名避免误报
+  ".*ms33834\\.github\\.io.*",
 ]
 
 # 根相对链接解析基准
