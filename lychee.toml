@@ -3,7 +3,7 @@
 
 # 超时与重试
 timeout = 30
-retries = 2
+max_retries = 2
 
 # 扫描范围：包含仓库内文件，同时以部署后的站点作为根相对链接基准
 include = ["."]
@@ -24,6 +24,3 @@ include_mail = false
 
 # 不检查本地回环
 exclude_loopback = true
-
-# GitHub 请求可能触发速率限制，使用 GITHUB_TOKEN 提升额度
-github_token = "GITHUB_TOKEN"
