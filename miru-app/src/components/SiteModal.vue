@@ -5,7 +5,7 @@ import { useEventListener } from '../composables/useEventListener.js'
 
 const props = defineProps({
   item: { type: Object, required: true },
-  category: { type: Object, default: null }
+  category: { type: Object, default: null },
 })
 const emit = defineEmits(['close'])
 
@@ -32,7 +32,10 @@ function onBackdropClick(e) {
 
 function onKeydown(e) {
   if (e.key === 'Escape') {
-    if (mirrorOpen.value) { mirrorOpen.value = false; return }
+    if (mirrorOpen.value) {
+      mirrorOpen.value = false
+      return
+    }
     emit('close')
   }
   if (e.key === 'Tab') trapFocus(e)
@@ -40,10 +43,15 @@ function onKeydown(e) {
 
 function trapFocus(e) {
   if (!dialogRef.value) return
-  const focusable = dialogRef.value.querySelectorAll(
-    'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
-  )
-  if (focusable.length <= 1) return
+  const focusable = Array.from(
+    dialogRef.value.querySelectorAll(
+      'a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    )
+  ).filter((el) => !el.disabled && el.offsetParent !== null)
+  if (focusable.length < 2) {
+    e.preventDefault()
+    return
+  }
   const first = focusable[0]
   const last = focusable[focusable.length - 1]
   if (e.shiftKey && document.activeElement === first) {
@@ -60,7 +68,9 @@ async function doCopy(text, flagRef) {
   try {
     await navigator.clipboard.writeText(text)
     flagRef.value = true
-    setTimeout(() => { flagRef.value = false }, 1500)
+    setTimeout(() => {
+      flagRef.value = false
+    }, 1500)
   } catch {
     // 降级方案
     const ta = document.createElement('textarea')
@@ -73,7 +83,9 @@ async function doCopy(text, flagRef) {
     try {
       document.execCommand('copy')
       flagRef.value = true
-      setTimeout(() => { flagRef.value = false }, 1500)
+      setTimeout(() => {
+        flagRef.value = false
+      }, 1500)
     } catch {
       // 静默
     }
@@ -81,8 +93,12 @@ async function doCopy(text, flagRef) {
   }
 }
 
-async function copyUrl() { await doCopy(props.item.url, copied) }
-async function copyMirror() { await doCopy(mirrorUrl.value, copiedMirror) }
+async function copyUrl() {
+  await doCopy(props.item.url, copied)
+}
+async function copyMirror() {
+  await doCopy(mirrorUrl.value, copiedMirror)
+}
 
 function isValidUrl(url) {
   if (!url) return false
@@ -130,8 +146,10 @@ onBeforeUnmount(() => {
   <Teleport to="body">
     <div
       class="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-6 modal-backdrop"
-      style="background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(12px);"
-      role="dialog" aria-modal="true" :aria-labelledby="`modal-title-${item.name}`"
+      style="background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(12px)"
+      role="dialog"
+      aria-modal="true"
+      :aria-labelledby="`modal-title-${item.name}`"
       @click="onBackdropClick"
     >
       <div
@@ -148,10 +166,23 @@ onBeforeUnmount(() => {
         "
       >
         <div aria-hidden="true" class="absolute inset-0 pointer-events-none rounded-[4px] washi"></div>
-        <div aria-hidden="true" class="absolute top-0 left-0 right-0 h-[3px] z-10" style="
-          background: linear-gradient(90deg, #ff4d4f 0%, #ff4d4f 30%, transparent 30%, transparent 36%, #ff4d4f 36%, #ff4d4f 44%, transparent 44%);
-          background-size: 12px 3px;
-        "></div>
+        <div
+          aria-hidden="true"
+          class="absolute top-0 left-0 right-0 h-[3px] z-10"
+          style="
+            background: linear-gradient(
+              90deg,
+              #ff4d4f 0%,
+              #ff4d4f 30%,
+              transparent 30%,
+              transparent 36%,
+              #ff4d4f 36%,
+              #ff4d4f 44%,
+              transparent 44%
+            );
+            background-size: 12px 3px;
+          "
+        ></div>
 
         <div class="relative">
           <button
@@ -160,7 +191,16 @@ onBeforeUnmount(() => {
             aria-label="关闭对话框（按 Esc 退出）"
             class="modal-close absolute top-3 right-3 w-10 h-10 rounded-full flex items-center justify-center transition z-20"
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              aria-hidden="true"
+            >
               <line x1="6" y1="6" x2="18" y2="18" />
               <line x1="18" y1="6" x2="6" y2="18" />
             </svg>
@@ -169,7 +209,8 @@ onBeforeUnmount(() => {
           <header class="px-6 sm:px-10 pt-10 sm:pt-12 pb-5 border-b border-[#1a1410]/10">
             <div class="flex items-center gap-2 mb-5 flex-wrap">
               <div class="hanko text-xs px-2.5 py-1 stamp-anim" v-if="category">
-                <span class="mr-1">{{ category.icon }}</span>{{ category.name }}
+                <span class="mr-1">{{ category.icon }}</span
+                >{{ category.name }}
               </div>
               <div
                 class="font-serif-cn text-xs px-2.5 py-1 rounded-sm inline-flex items-center gap-1.5"
@@ -186,13 +227,16 @@ onBeforeUnmount(() => {
               <div
                 v-if="item.proxy"
                 class="font-serif-cn text-xs px-2.5 py-1 rounded-sm"
-                style="background: rgba(201, 165, 92, 0.2); color: #a4853e; border: 1px solid rgba(201, 165, 92, 0.4);"
+                style="background: rgba(201, 165, 92, 0.2); color: #a4853e; border: 1px solid rgba(201, 165, 92, 0.4)"
               >
                 需梯子
               </div>
             </div>
 
-            <h2 :id="`modal-title-${item.name}`" class="font-serif-cn text-3xl sm:text-4xl font-black text-[#1a1410] leading-tight pr-10 tracking-tight">
+            <h2
+              :id="`modal-title-${item.name}`"
+              class="font-serif-cn text-3xl sm:text-4xl font-black text-[#1a1410] leading-tight pr-10 tracking-tight"
+            >
               {{ item.name }}
             </h2>
             <p v-if="item.desc" class="mt-3 font-kai-cn text-[#3a2e22] text-base sm:text-lg leading-relaxed">
@@ -204,21 +248,35 @@ onBeforeUnmount(() => {
             <section v-if="item.tags?.length">
               <div class="flex items-center gap-2 mb-3">
                 <div class="font-mono text-[10px] tracking-[0.3em] text-[#a8161a]">▎印 · TAGS</div>
-                <div class="flex-1 h-px" style="background: linear-gradient(90deg, rgba(168, 22, 26, 0.3), transparent);"></div>
+                <div
+                  class="flex-1 h-px"
+                  style="background: linear-gradient(90deg, rgba(168, 22, 26, 0.3), transparent)"
+                ></div>
               </div>
               <div class="flex flex-wrap gap-2">
                 <span
-                  v-for="t in item.tags" :key="t"
+                  v-for="t in item.tags"
+                  :key="t"
                   class="tag-stamp"
-                  style="background: rgba(168, 22, 26, 0.1); border-color: rgba(168, 22, 26, 0.4); color: #a8161a; font-size: 0.78rem; padding: 0.3rem 0.65rem;"
-                >#{{ t }}</span>
+                  style="
+                    background: rgba(168, 22, 26, 0.1);
+                    border-color: rgba(168, 22, 26, 0.4);
+                    color: #a8161a;
+                    font-size: 0.78rem;
+                    padding: 0.3rem 0.65rem;
+                  "
+                  >#{{ t }}</span
+                >
               </div>
             </section>
 
             <section v-if="item.fullDesc">
               <div class="flex items-center gap-2 mb-3">
                 <div class="font-mono text-[10px] tracking-[0.3em] text-[#a8161a]">▎叙 · INTRO</div>
-                <div class="flex-1 h-px" style="background: linear-gradient(90deg, rgba(168, 22, 26, 0.3), transparent);"></div>
+                <div
+                  class="flex-1 h-px"
+                  style="background: linear-gradient(90deg, rgba(168, 22, 26, 0.3), transparent)"
+                ></div>
               </div>
               <p class="font-kai-cn text-[#1a1410] leading-[1.95] text-[15px] sm:text-[16px]">
                 {{ item.fullDesc }}
@@ -228,13 +286,17 @@ onBeforeUnmount(() => {
             <section v-if="item.features?.length">
               <div class="flex items-center gap-2 mb-3">
                 <div class="font-mono text-[10px] tracking-[0.3em] text-[#a8161a]">▎特 · FEATURES</div>
-                <div class="flex-1 h-px" style="background: linear-gradient(90deg, rgba(168, 22, 26, 0.3), transparent);"></div>
+                <div
+                  class="flex-1 h-px"
+                  style="background: linear-gradient(90deg, rgba(168, 22, 26, 0.3), transparent)"
+                ></div>
               </div>
               <ul class="grid grid-cols-2 sm:grid-cols-3 gap-2">
                 <li
-                  v-for="(f, i) in item.features" :key="i"
+                  v-for="(f, i) in item.features"
+                  :key="i"
                   class="font-kai-cn text-[#1a1410] text-sm flex items-center gap-2 px-3 py-2 rounded-sm"
-                  style="background: rgba(201, 165, 92, 0.08); border: 1px solid rgba(201, 165, 92, 0.25);"
+                  style="background: rgba(201, 165, 92, 0.08); border: 1px solid rgba(201, 165, 92, 0.25)"
                 >
                   <span class="text-[#a8161a] font-serif-cn font-bold" aria-hidden="true">·</span>
                   <span>{{ f }}</span>
@@ -245,14 +307,23 @@ onBeforeUnmount(() => {
             <section>
               <div class="flex items-center gap-2 mb-3">
                 <div class="font-mono text-[10px] tracking-[0.3em] text-[#a8161a]">▎址 · URL</div>
-                <div class="flex-1 h-px" style="background: linear-gradient(90deg, rgba(168, 22, 26, 0.3), transparent);"></div>
+                <div
+                  class="flex-1 h-px"
+                  style="background: linear-gradient(90deg, rgba(168, 22, 26, 0.3), transparent)"
+                ></div>
               </div>
 
-              <code class="block bg-[#0a0a0a] border border-[#1a1410] rounded-sm px-4 py-3 text-[#c9a55c] text-xs sm:text-sm break-all font-mono">
+              <code
+                class="block bg-[#0a0a0a] border border-[#1a1410] rounded-sm px-4 py-3 text-[#c9a55c] text-xs sm:text-sm break-all font-mono"
+              >
                 {{ item.url }}
               </code>
 
-              <div v-if="isGitHub" class="mt-4 rounded-sm overflow-hidden" style="border: 1px solid rgba(201, 165, 92, 0.3); background: rgba(201, 165, 92, 0.05);">
+              <div
+                v-if="isGitHub"
+                class="mt-4 rounded-sm overflow-hidden"
+                style="border: 1px solid rgba(201, 165, 92, 0.3); background: rgba(201, 165, 92, 0.05)"
+              >
                 <button
                   type="button"
                   @click="mirrorOpen = !mirrorOpen"
@@ -267,7 +338,7 @@ onBeforeUnmount(() => {
                   <span class="text-[10px] transition" :class="{ 'rotate-180': mirrorOpen }" aria-hidden="true">▾</span>
                 </button>
 
-                <div v-if="mirrorOpen" class="border-t" style="border-color: rgba(201, 165, 92, 0.2);" role="listbox">
+                <div v-if="mirrorOpen" class="border-t" style="border-color: rgba(201, 165, 92, 0.2)" role="listbox">
                   <div
                     v-for="m in GH_MIRRORS"
                     :key="m.id"
@@ -280,11 +351,20 @@ onBeforeUnmount(() => {
                     @keydown.enter="selectMirror(m)"
                     @keydown.space.prevent="selectMirror(m)"
                   >
-                    <span :class="selectedMirror?.id === m.id ? 'text-[#a8161a]' : 'opacity-30'" aria-hidden="true">●</span>
+                    <span :class="selectedMirror?.id === m.id ? 'text-[#a8161a]' : 'opacity-30'" aria-hidden="true"
+                      >●</span
+                    >
                     <span class="flex-1">{{ m.name }}</span>
                     <span class="opacity-50 text-[10px]">{{ m.id }}</span>
                   </div>
-                  <code class="block px-4 py-2 text-[10px] sm:text-[11px] break-all font-mono" style="background: rgba(0,0,0,0.05); color: #5a4a3a; border-top: 1px dashed rgba(201, 165, 92, 0.3);">
+                  <code
+                    class="block px-4 py-2 text-[10px] sm:text-[11px] break-all font-mono"
+                    style="
+                      background: rgba(0, 0, 0, 0.05);
+                      color: #5a4a3a;
+                      border-top: 1px dashed rgba(201, 165, 92, 0.3);
+                    "
+                  >
                     {{ mirrorUrl }}
                   </code>
                 </div>
@@ -292,7 +372,9 @@ onBeforeUnmount(() => {
             </section>
           </div>
 
-          <footer class="px-6 sm:px-10 py-6 sm:py-8 border-t border-[#1a1410]/10 flex flex-col sm:flex-row flex-wrap gap-3">
+          <footer
+            class="px-6 sm:px-10 py-6 sm:py-8 border-t border-[#1a1410]/10 flex flex-col sm:flex-row flex-wrap gap-3"
+          >
             <button
               ref="enterBtnRef"
               type="button"
@@ -302,7 +384,9 @@ onBeforeUnmount(() => {
                 background: linear-gradient(180deg, #ff4d4f 0%, #a8161a 100%);
                 color: #f3ece0;
                 border: 1px solid #a8161a;
-                box-shadow: 0 4px 14px rgba(255, 77, 79, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+                box-shadow:
+                  0 4px 14px rgba(255, 77, 79, 0.35),
+                  inset 0 1px 0 rgba(255, 255, 255, 0.15);
                 border-radius: 2px;
                 letter-spacing: 0.1em;
                 cursor: pointer;
@@ -339,11 +423,7 @@ onBeforeUnmount(() => {
               <span v-if="!copied">抄 · 录</span>
               <span v-else class="text-[#a8161a]">已抄 ✓</span>
             </button>
-            <button
-              type="button"
-              @click="emit('close')"
-              class="btn-text px-6 py-3.5 font-kai-cn text-base transition"
-            >
+            <button type="button" @click="emit('close')" class="btn-text px-6 py-3.5 font-kai-cn text-base transition">
               闭
             </button>
           </footer>
@@ -367,17 +447,23 @@ onBeforeUnmount(() => {
   border: 1px solid rgba(184, 35, 31, 0.3);
   color: #a8161a;
 }
-.modal-close:hover { background: rgba(184, 35, 31, 0.18); }
+.modal-close:hover {
+  background: rgba(184, 35, 31, 0.18);
+}
 .mirror-toggle {
   color: #a4853e;
   background: transparent;
 }
-.mirror-toggle:hover { background: rgba(201, 165, 92, 0.1); }
+.mirror-toggle:hover {
+  background: rgba(201, 165, 92, 0.1);
+}
 .mirror-option {
   background: transparent;
   color: #5a4a3a;
 }
-.mirror-option:not(.is-active):hover { background: rgba(201, 165, 92, 0.08); }
+.mirror-option:not(.is-active):hover {
+  background: rgba(201, 165, 92, 0.08);
+}
 .mirror-option.is-active {
   background: rgba(201, 165, 92, 0.18);
   color: #a8161a;
@@ -389,7 +475,10 @@ onBeforeUnmount(() => {
   border-radius: 2px;
   letter-spacing: 0.05em;
 }
-.btn-mute:hover { background: rgba(0, 0, 0, 0.05); color: #1a1410; }
+.btn-mute:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: #1a1410;
+}
 .btn-gold {
   background: transparent;
   color: #a4853e;
@@ -397,7 +486,10 @@ onBeforeUnmount(() => {
   border-radius: 2px;
   letter-spacing: 0.05em;
 }
-.btn-gold:hover { background: rgba(201, 165, 92, 0.1); color: #1a1410; }
+.btn-gold:hover {
+  background: rgba(201, 165, 92, 0.1);
+  color: #1a1410;
+}
 .btn-dark {
   background: transparent;
   color: #1a1410;
@@ -405,11 +497,15 @@ onBeforeUnmount(() => {
   border-radius: 2px;
   letter-spacing: 0.1em;
 }
-.btn-dark:hover { background: rgba(0, 0, 0, 0.05); }
+.btn-dark:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
 .btn-text {
   background: transparent;
   color: #5a4a3a;
   letter-spacing: 0.1em;
 }
-.btn-text:hover { color: #1a1410; }
+.btn-text:hover {
+  color: #1a1410;
+}
 </style>

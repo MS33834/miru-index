@@ -26,11 +26,15 @@ const state = ref(loadFavorites())
 watch(state, (newVal) => saveFavorites(newVal), { deep: true })
 
 // 缓存：收藏 URL 的 Set，state 变化时重建
-let favoriteUrlSet = new Set(state.value.map(f => f.url))
+let favoriteUrlSet = new Set(state.value.map((f) => f.url))
 
-watch(state, (newVal) => {
-  favoriteUrlSet = new Set(newVal.map(f => f.url))
-}, { deep: true })
+watch(
+  state,
+  (newVal) => {
+    favoriteUrlSet = new Set(newVal.map((f) => f.url))
+  },
+  { deep: true }
+)
 
 function isFavorite(item) {
   if (!item?.url) return false
@@ -39,7 +43,7 @@ function isFavorite(item) {
 
 function toggleFavorite(item) {
   if (!item?.url) return
-  const index = state.value.findIndex(f => f.url === item.url)
+  const index = state.value.findIndex((f) => f.url === item.url)
   if (index >= 0) {
     state.value.splice(index, 1)
   } else {
@@ -56,6 +60,6 @@ export function useFavorites() {
     favorites: readonly(state),
     isFavorite,
     toggleFavorite,
-    clearFavorites
+    clearFavorites,
   }
 }

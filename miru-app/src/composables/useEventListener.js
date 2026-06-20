@@ -9,7 +9,7 @@ import { onMounted, onBeforeUnmount } from 'vue'
  */
 export function useEventListener(target, event, handler, options) {
   if (!target) return
-  
+
   // 支持字符串事件名（keydown 等）
   onMounted(() => add(target, event, handler, options))
   onBeforeUnmount(() => remove(target, event, handler, options))

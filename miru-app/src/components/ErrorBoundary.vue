@@ -30,7 +30,9 @@ function reload() {
       <pre class="error-boundary__message">{{ String(error.message || error) }}</pre>
       <div class="error-boundary__actions">
         <button type="button" @click="reset" class="error-boundary__btn">重试</button>
-        <button type="button" @click="reload" class="error-boundary__btn error-boundary__btn--secondary">刷新页面</button>
+        <button type="button" @click="reload" class="error-boundary__btn error-boundary__btn--secondary">
+          刷新页面
+        </button>
       </div>
     </div>
   </div>

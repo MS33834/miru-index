@@ -8,7 +8,7 @@ const BASE_URL = process.env.BASE_URL || 'http://localhost:4173/miru-index/'
 const OUT_DIR = path.resolve(process.cwd(), 'scripts', 'audit-output')
 
 async function ensureDir(dir) {
-  try { await fs.mkdir(dir, { recursive: true }) } catch {}
+  try { await fs.mkdir(dir, { recursive: true }) } catch { /* 忽略已存在 */ }
 }
 
 async function runAudit() {

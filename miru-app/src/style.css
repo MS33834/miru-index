@@ -2,7 +2,7 @@
    漫藏 MIRU INDEX — 新和风杂志 / 印章美学
    ========================================================================== */
 
-@import "tailwindcss";
+@import 'tailwindcss';
 
 /* ----------------------------------------------------------------------------
    字体与基础排版
@@ -11,24 +11,28 @@
   --ink: #0a0a0a;
   --ink-2: #1a1410;
   --ink-3: #221a14;
-  --seal: #ff4d4f;       /* 印泥朱砂（提亮以满足 WCAG AA 对比度） */
-  --seal-deep: #a8161a;  /* 深朱 */
+  --seal: #ff4d4f; /* 印泥朱砂（提亮以满足 WCAG AA 对比度） */
+  --seal-deep: #a8161a; /* 深朱 */
   --seal-bright: #ff4d4f; /* 高亮朱红 */
-  --gold: #c9a55c;       /* 御金 */
-  --washi: #f3ece0;      /* 和纸 */
-  --washi-2: #e6dcc8;    /* 旧和纸 */
-  --ashi: #8a7a68;       /* 足袋 */
-  --bun: #2a1e16;        /* 文 */
+  --gold: #c9a55c; /* 御金 */
+  --washi: #f3ece0; /* 和纸 */
+  --washi-2: #e6dcc8; /* 旧和纸 */
+  --ashi: #8a7a68; /* 足袋 */
+  --bun: #2a1e16; /* 文 */
 
   /* 字体堆栈：优先网络字体（异步加载），无网时回退到系统字体 */
-  --serif: 'Noto Serif SC', 'Source Han Serif SC', 'Songti SC', 'STSongti', 'STSong', 'SimSun', '宋体', 'Times New Roman', serif;
-  --kai: 'LXGW WenKai Screen', 'LXGW WenKai', 'Klee One', 'STKaiti', 'KaiTi', 'STZhongsong', '楷体', 'Songti SC', cursive;
+  --serif:
+    'Noto Serif SC', 'Source Han Serif SC', 'Songti SC', 'STSongti', 'STSong', 'SimSun', '宋体', 'Times New Roman',
+    serif;
+  --kai:
+    'LXGW WenKai Screen', 'LXGW WenKai', 'Klee One', 'STKaiti', 'KaiTi', 'STZhongsong', '楷体', 'Songti SC', cursive;
   --mono: 'JetBrains Mono', 'SF Mono', 'Consolas', 'Courier New', monospace;
   --cursive: 'Long Cang', 'STXingkai', '行楷', cursive;
 
   --shadow-seal: 0 0 0 1px rgba(255, 77, 79, 0.3), 0 4px 12px rgba(255, 77, 79, 0.18);
   --shadow-paper: 0 1px 0 rgba(243, 236, 224, 0.05), 0 8px 24px rgba(0, 0, 0, 0.4);
-  --shadow-paper-hover: 0 1px 0 rgba(243, 236, 224, 0.08), 0 18px 48px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(201, 165, 92, 0.25);
+  --shadow-paper-hover:
+    0 1px 0 rgba(243, 236, 224, 0.08), 0 18px 48px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(201, 165, 92, 0.25);
 }
 
 html {
@@ -68,8 +72,8 @@ body::after {
   pointer-events: none;
   z-index: 0;
   /* 轻量噪点：单层低密度 */
-  background:
-    repeating-conic-gradient(rgba(243, 236, 224, 0.018) 0%, transparent 0.003%, transparent 0.006%) 50% 50% / 1500px 1500px;
+  background: repeating-conic-gradient(rgba(243, 236, 224, 0.018) 0%, transparent 0.003%, transparent 0.006%) 50% 50% /
+    1500px 1500px;
   opacity: 0.4;
   mix-blend-mode: overlay;
   contain: strict;
@@ -78,7 +82,10 @@ body::after {
 
 /* 减少动画模式 */
 @media (prefers-reduced-motion: reduce) {
-  body::before, body::after { display: none; }
+  body::before,
+  body::after {
+    display: none;
+  }
 }
 
 #app {
@@ -93,28 +100,66 @@ body::after {
 }
 
 /* 滚动条 */
-::-webkit-scrollbar { width: 8px; height: 8px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--bun); border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: var(--seal); }
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--bun);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--seal);
+}
 
-.scrollbar-hide::-webkit-scrollbar { display: none; }
-.scrollbar-hide { scrollbar-width: none; }
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  scrollbar-width: none;
+}
 
 /* 文字截断 */
-.line-clamp-1 { display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
-.line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.line-clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.line-clamp-1 {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
 
 /* 性能 */
-.content-auto { content-visibility: auto; contain-intrinsic-size: 200px; }
+.content-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: 200px;
+}
 
 /* ----------------------------------------------------------------------------
    字体工具
 ---------------------------------------------------------------------------- */
-.font-serif-cn { font-family: var(--serif); }
-.font-kai-cn { font-family: var(--kai); }
-.font-mono { font-family: var(--mono); }
+.font-serif-cn {
+  font-family: var(--serif);
+}
+.font-kai-cn {
+  font-family: var(--kai);
+}
+.font-mono {
+  font-family: var(--mono);
+}
 
 /* ----------------------------------------------------------------------------
    印章 (hanko) — 圆形朱红印 + 白字
@@ -183,11 +228,22 @@ body::after {
 
 /* 盖章动画 */
 @keyframes stamp-down {
-  0% { transform: rotate(-3deg) scale(1.6); opacity: 0; }
-  60% { transform: rotate(-3deg) scale(0.95); opacity: 1; }
-  100% { transform: rotate(-3deg) scale(1); opacity: 1; }
+  0% {
+    transform: rotate(-3deg) scale(1.6);
+    opacity: 0;
+  }
+  60% {
+    transform: rotate(-3deg) scale(0.95);
+    opacity: 1;
+  }
+  100% {
+    transform: rotate(-3deg) scale(1);
+    opacity: 1;
+  }
 }
-.stamp-anim { animation: stamp-down 0.45s cubic-bezier(0.22, 1, 0.36, 1) backwards; }
+.stamp-anim {
+  animation: stamp-down 0.45s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
 
 /* ----------------------------------------------------------------------------
    卡片 — 和纸浮起
@@ -197,7 +253,9 @@ body::after {
   background: linear-gradient(180deg, var(--washi) 0%, var(--washi-2) 100%);
   color: var(--ink);
   border-radius: 4px;
-  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.4s;
+  transition:
+    transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 0.4s;
   box-shadow: var(--shadow-paper);
   overflow: hidden;
   isolation: isolate;
@@ -219,17 +277,33 @@ body::after {
 .card-paper::after {
   content: '';
   position: absolute;
-  top: 0; left: 0; right: 0;
+  top: 0;
+  left: 0;
+  right: 0;
   height: 3px;
-  background: linear-gradient(90deg, var(--seal) 0%, var(--seal) 30%, transparent 30%, transparent 36%, var(--seal) 36%, var(--seal) 44%, transparent 44%);
+  background: linear-gradient(
+    90deg,
+    var(--seal) 0%,
+    var(--seal) 30%,
+    transparent 30%,
+    transparent 36%,
+    var(--seal) 36%,
+    var(--seal) 44%,
+    transparent 44%
+  );
   background-size: 12px 3px;
   z-index: 1;
 }
-.card-paper > * { position: relative; z-index: 2; }
+.card-paper > * {
+  position: relative;
+  z-index: 2;
+}
 
 .card-paper:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(26, 20, 16, 0.15), 0 2px 8px rgba(26, 20, 16, 0.08);
+  box-shadow:
+    0 8px 24px rgba(26, 20, 16, 0.15),
+    0 2px 8px rgba(26, 20, 16, 0.08);
 }
 
 .card-paper:active {
@@ -279,8 +353,14 @@ body::after {
 }
 
 @keyframes brush-stroke {
-  0% { stroke-dashoffset: 800; opacity: 0; }
-  100% { stroke-dashoffset: 0; opacity: 1; }
+  0% {
+    stroke-dashoffset: 800;
+    opacity: 0;
+  }
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
 }
 .brush-stroke {
   stroke-dasharray: 800;
@@ -402,30 +482,56 @@ body::after {
 
 /* 响应式：提升小屏触控与可读性 */
 @media (max-width: 640px) {
-  .subgroup__head { gap: 0.5rem; }
+  .subgroup__head {
+    gap: 0.5rem;
+  }
 }
 
 /* ----------------------------------------------------------------------------
    Modal — 屏风
 ---------------------------------------------------------------------------- */
 @keyframes screen-open {
-  0% { transform: scale(0.92) translateY(20px); opacity: 0; filter: blur(4px); }
-  100% { transform: scale(1) translateY(0); opacity: 1; filter: blur(0); }
+  0% {
+    transform: scale(0.92) translateY(20px);
+    opacity: 0;
+    filter: blur(4px);
+  }
+  100% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+    filter: blur(0);
+  }
 }
-.modal-screen { animation: screen-open 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) backwards; }
+.modal-screen {
+  animation: screen-open 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+}
 
 @keyframes backdrop-fade {
-  0% { opacity: 0; backdrop-filter: blur(0); }
-  100% { opacity: 1; backdrop-filter: blur(12px); }
+  0% {
+    opacity: 0;
+    backdrop-filter: blur(0);
+  }
+  100% {
+    opacity: 1;
+    backdrop-filter: blur(12px);
+  }
 }
-.modal-backdrop { animation: backdrop-fade 0.3s ease-out backwards; }
+.modal-backdrop {
+  animation: backdrop-fade 0.3s ease-out backwards;
+}
 
 /* ----------------------------------------------------------------------------
    卡片入场 — 分批浮起
 ---------------------------------------------------------------------------- */
 @keyframes card-rise {
-  0% { opacity: 0; transform: translateY(20px) scale(0.97); }
-  100% { opacity: 1; transform: translateY(0) scale(1); }
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.97);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 .card-rise {
   animation: card-rise 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
@@ -449,8 +555,12 @@ body::after {
   animation: ink-flow 2.5s ease-in-out infinite;
 }
 @keyframes ink-flow {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
 }
 
 /* ----------------------------------------------------------------------------
@@ -474,7 +584,9 @@ body::after {
    减少动效
 ---------------------------------------------------------------------------- */
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
@@ -485,11 +597,17 @@ body::after {
    响应式
 ---------------------------------------------------------------------------- */
 @media (max-width: 640px) {
-  .hero-kanji { font-size: clamp(3rem, 18vw, 5.5rem); }
-  .kanji-num { font-size: 2.5rem; }
+  .hero-kanji {
+    font-size: clamp(3rem, 18vw, 5.5rem);
+  }
+  .kanji-num {
+    font-size: 2.5rem;
+  }
 }
 @media (min-width: 641px) {
-  .hero-kanji { font-size: clamp(4rem, 12vw, 8.5rem); }
+  .hero-kanji {
+    font-size: clamp(4rem, 12vw, 8.5rem);
+  }
 }
 
 /* ----------------------------------------------------------------------------
@@ -504,10 +622,22 @@ body::after {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
-  body::before, body::after { display: none !important; }
-  .card-rise { animation: none; opacity: 1; }
-  .stamp-anim { animation: none; }
-  .ink-spread { animation: none; opacity: 1; transform: none; }
+  body::before,
+  body::after {
+    display: none !important;
+  }
+  .card-rise {
+    animation: none;
+    opacity: 1;
+  }
+  .stamp-anim {
+    animation: none;
+  }
+  .ink-spread {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
 }
 
 /* ----------------------------------------------------------------------------

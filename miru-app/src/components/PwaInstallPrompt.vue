@@ -4,17 +4,40 @@ import { ref, onMounted, onBeforeUnmount } from 'vue'
 const show = ref(false)
 const installed = ref(false)
 let deferredPrompt = null
+let dismissTimer = null
+
+const DISMISS_KEY = 'miru-pwa-dismissed'
+const DISMISS_TTL = 24 * 60 * 60 * 1000
+
+function isRecentlyDismissed() {
+  try {
+    const raw = localStorage.getItem(DISMISS_KEY)
+    if (!raw) return false
+    const ts = parseInt(raw, 10)
+    return !isNaN(ts) && Date.now() - ts < DISMISS_TTL
+  } catch {
+    return false
+  }
+}
 
 function onBeforeInstallPrompt(e) {
   e.preventDefault()
+  if (installed.value || isRecentlyDismissed()) return
   deferredPrompt = e
   // 延迟显示（避免首屏干扰）
-  setTimeout(() => { show.value = true }, 3000)
+  dismissTimer = setTimeout(() => {
+    show.value = true
+  }, 3000)
 }
 
 function onAppInstalled() {
   installed.value = true
   show.value = false
+  try {
+    localStorage.removeItem(DISMISS_KEY)
+  } catch {
+    /* 忽略存储错误 */
+  }
 }
 
 onMounted(() => {
@@ -29,6 +52,7 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
+  if (dismissTimer) clearTimeout(dismissTimer)
   window.removeEventListener('beforeinstallprompt', onBeforeInstallPrompt)
   window.removeEventListener('appinstalled', onAppInstalled)
 })
@@ -46,21 +70,22 @@ async function install() {
 function dismiss() {
   show.value = false
   // 24 小时内不再提示
-  try { localStorage.setItem('miru-pwa-dismissed', Date.now().toString()) } catch {}
+  try {
+    localStorage.setItem(DISMISS_KEY, Date.now().toString())
+  } catch {
+    /* 忽略存储错误 */
+  }
 }
 </script>
 
 <template>
   <Transition name="pwa-slide">
-    <div
-      v-if="show && !installed"
-      class="pwa-prompt"
-      role="status"
-      aria-live="polite"
-    >
+    <div v-if="show && !installed" class="pwa-prompt" role="status" aria-live="polite">
       <div class="pwa-prompt__icon" aria-hidden="true">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 2 L14.39 8.36 L21 9.27 L16 13.97 L17.18 20.55 L12 17.27 L6.82 20.55 L8 13.97 L3 9.27 L9.61 8.36 Z"/>
+          <path
+            d="M12 2 L14.39 8.36 L21 9.27 L16 13.97 L17.18 20.55 L12 17.27 L6.82 20.55 L8 13.97 L3 9.27 L9.61 8.36 Z"
+          />
         </svg>
       </div>
       <div class="pwa-prompt__content">
@@ -141,7 +166,9 @@ function dismiss() {
   transition: background 0.2s;
   min-height: 36px;
 }
-.pwa-prompt__install:hover { background: #a8161a; }
+.pwa-prompt__install:hover {
+  background: #a8161a;
+}
 .pwa-prompt__install:focus-visible {
   outline: 2px solid #c9a55c;
   outline-offset: 2px;
@@ -161,16 +188,26 @@ function dismiss() {
   align-items: center;
   justify-content: center;
 }
-.pwa-prompt__dismiss:hover { color: #f3ece0; background: rgba(255, 77, 79, 0.15); }
-
-.pwa-slide-enter-active, .pwa-slide-leave-active {
-  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.3s ease;
+.pwa-prompt__dismiss:hover {
+  color: #f3ece0;
+  background: rgba(255, 77, 79, 0.15);
 }
-.pwa-slide-enter-from, .pwa-slide-leave-to {
+
+.pwa-slide-enter-active,
+.pwa-slide-leave-active {
+  transition:
+    transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1),
+    opacity 0.3s ease;
+}
+.pwa-slide-enter-from,
+.pwa-slide-leave-to {
   opacity: 0;
   transform: translateY(20px);
 }
 @media (prefers-reduced-motion: reduce) {
-  .pwa-slide-enter-active, .pwa-slide-leave-active { transition: none; }
+  .pwa-slide-enter-active,
+  .pwa-slide-leave-active {
+    transition: none;
+  }
 }
 </style>
