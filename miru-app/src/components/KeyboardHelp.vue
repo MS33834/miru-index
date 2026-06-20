@@ -3,7 +3,7 @@ import { ref, onMounted, onBeforeUnmount, watch } from 'vue'
 import { useEventListener } from '../composables/useEventListener.js'
 
 const props = defineProps({
-  open: { type: Boolean, default: false }
+  open: { type: Boolean, default: false },
 })
 const emit = defineEmits(['close'])
 
@@ -59,15 +59,13 @@ const onBackdrop = (e) => {
       <div
         v-if="open"
         class="fixed inset-0 z-50 flex items-center justify-center p-4"
-        style="background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(8px);"
-        role="dialog" aria-modal="true" aria-labelledby="kb-title"
+        style="background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(8px)"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="kb-title"
         @click="onBackdrop"
       >
-        <div
-          ref="dialogRef"
-          tabindex="-1"
-          class="kb-panel"
-        >
+        <div ref="dialogRef" tabindex="-1" class="kb-panel">
           <div class="flex items-center justify-between mb-5">
             <h2 id="kb-title" class="font-serif-cn text-xl font-black text-[#1a1410]">
               <span class="text-[#a8161a]">⌨</span> 键 · 盤 · 速
@@ -76,10 +74,19 @@ const onBackdrop = (e) => {
               type="button"
               @click="emit('close')"
               class="w-9 h-9 rounded-full flex items-center justify-center transition"
-              style="background: rgba(184, 35, 31, 0.08); border: 1px solid rgba(184, 35, 31, 0.3); color: #a8161a;"
+              style="background: rgba(184, 35, 31, 0.08); border: 1px solid rgba(184, 35, 31, 0.3); color: #a8161a"
               aria-label="关闭"
             >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                aria-hidden="true"
+              >
                 <line x1="6" y1="6" x2="18" y2="18" />
                 <line x1="18" y1="6" x2="6" y2="18" />
               </svg>
@@ -95,7 +102,10 @@ const onBackdrop = (e) => {
             </li>
           </ul>
 
-          <p class="mt-5 pt-4 text-center font-kai-cn text-[#5a4a3a] text-xs" style="border-top: 1px solid rgba(168, 22, 26, 0.15);">
+          <p
+            class="mt-5 pt-4 text-center font-kai-cn text-[#5a4a3a] text-xs"
+            style="border-top: 1px solid rgba(168, 22, 26, 0.15)"
+          >
             按 <kbd class="kb-key">?</kbd> 再次唤出 · 按 <kbd class="kb-key">Esc</kbd> 关闭
           </p>
         </div>
@@ -160,13 +170,18 @@ const onBackdrop = (e) => {
   font-size: 0.9rem;
   color: #3a2e22;
 }
-.modal-fade-enter-active, .modal-fade-leave-active {
+.modal-fade-enter-active,
+.modal-fade-leave-active {
   transition: opacity 0.2s ease;
 }
-.modal-fade-enter-from, .modal-fade-leave-to {
+.modal-fade-enter-from,
+.modal-fade-leave-to {
   opacity: 0;
 }
 @media (prefers-reduced-motion: reduce) {
-  .modal-fade-enter-active, .modal-fade-leave-active { transition: none; }
+  .modal-fade-enter-active,
+  .modal-fade-leave-active {
+    transition: none;
+  }
 }
 </style>

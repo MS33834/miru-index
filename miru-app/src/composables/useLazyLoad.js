@@ -11,21 +11,24 @@ function getKey(options) {
 function getObserver(options) {
   const key = getKey(options)
   if (!observerCache.has(key)) {
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const state = targetMap.get(entry.target)
-          if (state) {
-            state.isVisible.value = true
-            observer.unobserve(entry.target)
-            targetMap.delete(entry.target)
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const state = targetMap.get(entry.target)
+            if (state) {
+              state.isVisible.value = true
+              observer.unobserve(entry.target)
+              targetMap.delete(entry.target)
+            }
           }
-        }
-      })
-    }, {
-      rootMargin: options.rootMargin || '100px',
-      threshold: options.threshold || 0.1
-    })
+        })
+      },
+      {
+        rootMargin: options.rootMargin || '100px',
+        threshold: options.threshold || 0.1,
+      }
+    )
     observerCache.set(key, observer)
   }
   return observerCache.get(key)
@@ -67,6 +70,6 @@ export function useLazyLoad(options = {}) {
 
   return {
     target,
-    isVisible
+    isVisible,
   }
 }

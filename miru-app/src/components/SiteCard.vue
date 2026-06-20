@@ -10,7 +10,7 @@ const props = defineProps({
   category: { type: Object, required: true },
   index: { type: Number, default: 0 },
   compact: { type: Boolean, default: false },
-  searchQuery: { type: String, default: '' }
+  searchQuery: { type: String, default: '' },
 })
 
 const emit = defineEmits(['open'])
@@ -35,7 +35,9 @@ function handleFavoriteClick(e) {
   e.preventDefault()
   toggleFavorite(props.item)
   favoriteAnimating.value = true
-  setTimeout(() => { favoriteAnimating.value = false }, 400)
+  setTimeout(() => {
+    favoriteAnimating.value = false
+  }, 400)
 }
 
 function handleFavoriteKeydown(e) {
@@ -51,11 +53,7 @@ const descParts = computed(() => getHighlightedParts(props.item.desc, props.sear
 </script>
 
 <template>
-  <div
-    ref="target"
-    class="card-paper-wrap"
-    :style="{ animationDelay: (Math.min(index, 24) * 0.04) + 's' }"
-  >
+  <div ref="target" class="card-paper-wrap" :style="{ animationDelay: Math.min(index, 24) * 0.04 + 's' }">
     <button
       type="button"
       @click="handleClick"
@@ -83,8 +81,11 @@ const descParts = computed(() => getHighlightedParts(props.item.desc, props.sear
           </div>
         </div>
 
-        <p v-if="item.desc" class="font-kai-cn text-[#3a2e22] leading-relaxed line-clamp-2 text-sm"
-           :class="compact ? 'text-[13px] sm:text-sm' : 'text-sm sm:text-base'">
+        <p
+          v-if="item.desc"
+          class="font-kai-cn text-[#3a2e22] leading-relaxed line-clamp-2 text-sm"
+          :class="compact ? 'text-[13px] sm:text-sm' : 'text-sm sm:text-base'"
+        >
           <template v-for="(part, idx) in descParts" :key="idx">
             <mark v-if="part.highlight" class="search-highlight">{{ part.text }}</mark>
             <template v-else>{{ part.text }}</template>
@@ -97,12 +98,14 @@ const descParts = computed(() => getHighlightedParts(props.item.desc, props.sear
             :key="t"
             class="tag-stamp"
             :class="compact ? 'tag-sm' : 'tag-normal'"
-          >#{{ t }}</span>
+            >#{{ t }}</span
+          >
           <span
             v-if="item.tags.length > (compact ? 2 : 3)"
             class="tag-stamp tag-extra"
             :class="compact ? 'tag-sm' : 'tag-normal'"
-          >+{{ item.tags.length - (compact ? 2 : 3) }}</span>
+            >+{{ item.tags.length - (compact ? 2 : 3) }}</span
+          >
         </div>
 
         <div class="flex items-center justify-between pt-3 border-t border-[#1a1410]/10">
@@ -135,16 +138,30 @@ const descParts = computed(() => getHighlightedParts(props.item.desc, props.sear
       :aria-pressed="isFavorite(item)"
       title="收藏"
     >
-      <svg width="14" height="14" viewBox="0 0 24 24" :fill="isFavorite(item) ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="2" aria-hidden="true">
-        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+      <svg
+        width="14"
+        height="14"
+        viewBox="0 0 24 24"
+        :fill="isFavorite(item) ? 'currentColor' : 'none'"
+        stroke="currentColor"
+        stroke-width="2"
+        aria-hidden="true"
+      >
+        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
       </svg>
     </div>
   </div>
 </template>
 
 <style scoped>
-.tag-sm { font-size: 0.65rem; padding: 0.1rem 0.4rem; }
-.tag-normal { font-size: 0.7rem; padding: 0.2rem 0.5rem; }
+.tag-sm {
+  font-size: 0.65rem;
+  padding: 0.1rem 0.4rem;
+}
+.tag-normal {
+  font-size: 0.7rem;
+  padding: 0.2rem 0.5rem;
+}
 .tag-stamp {
   background: rgba(168, 22, 26, 0.08);
   border: 1px solid rgba(168, 22, 26, 0.3);
@@ -199,8 +216,13 @@ const descParts = computed(() => getHighlightedParts(props.item.desc, props.sear
   animation: favorite-bounce 0.4s ease;
 }
 @keyframes favorite-bounce {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.4); }
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.4);
+  }
 }
 
 /* Skeleton 骨架屏 */
@@ -222,8 +244,12 @@ const descParts = computed(() => getHighlightedParts(props.item.desc, props.sear
   animation: skeleton-shimmer 1.5s infinite;
 }
 @keyframes skeleton-shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 .search-highlight {

@@ -13,13 +13,7 @@ class SearchIndex {
     return items.map((item, i) => {
       const cat = item._category || {}
       const tags = (item.tags || []).join(' ')
-      const haystack = [
-        item.name,
-        item.desc || '',
-        item.fullDesc || '',
-        cat.name || '',
-        tags
-      ].join(' ').toLowerCase()
+      const haystack = [item.name, item.desc || '', item.fullDesc || '', cat.name || '', tags].join(' ').toLowerCase()
       return { i, haystack }
     })
   }
@@ -40,13 +34,16 @@ class SearchIndex {
   // 多关键词 AND 搜索
   queryAll(keywords) {
     if (!keywords.length) return this.items
-    const needles = keywords.map(k => k.toLowerCase())
+    const needles = keywords.map((k) => k.toLowerCase())
     const results = []
     for (let k = 0; k < this.index.length; k++) {
       const hay = this.index[k].haystack
       let all = true
       for (const n of needles) {
-        if (!hay.includes(n)) { all = false; break }
+        if (!hay.includes(n)) {
+          all = false
+          break
+        }
       }
       if (all) results.push(this.items[this.index[k].i])
     }

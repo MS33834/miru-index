@@ -7,16 +7,16 @@
  * fmt='proxy' → 任意 GitHub URL 代理（gh-proxy 风格）：base + 原 URL
  */
 export const GH_MIRRORS = [
-  { id: 'jsdelivr', name: 'jsDelivr CDN',  fmt: 'raw'   },
-  { id: 'ghproxy',  name: 'GhProxy',        fmt: 'proxy' },
-  { id: 'ghps',     name: 'GhProxy.net',    fmt: 'proxy' },
-  { id: 'mirror',   name: 'GhProxy Mirror', fmt: 'proxy' },
+  { id: 'jsdelivr', name: 'jsDelivr CDN', fmt: 'raw' },
+  { id: 'ghproxy', name: 'GhProxy', fmt: 'proxy' },
+  { id: 'ghps', name: 'GhProxy.net', fmt: 'proxy' },
+  { id: 'mirror', name: 'GhProxy Mirror', fmt: 'proxy' },
 ]
 
 const GH_PROXY_BASES = {
   ghproxy: 'https://gh-proxy.com/',
-  ghps:    'https://ghps.cc/',
-  mirror:  'https://mirror.ghproxy.com/',
+  ghps: 'https://ghps.cc/',
+  mirror: 'https://mirror.ghproxy.com/',
 }
 
 const JSDELIVR_BASE = 'https://cdn.jsdelivr.net/gh/'
@@ -58,7 +58,7 @@ function extractGhPath(url) {
 export function ghMirror(url, mirrorId = 'jsdelivr') {
   if (!url || !url.includes('github.com')) return url
 
-  const m = GH_MIRRORS.find(x => x.id === mirrorId) || GH_MIRRORS[0]
+  const m = GH_MIRRORS.find((x) => x.id === mirrorId) || GH_MIRRORS[0]
 
   if (m.fmt === 'raw') {
     const path = extractGhPath(url)
@@ -77,9 +77,7 @@ export function ghMirror(url, mirrorId = 'jsdelivr') {
   }
 
   // raw/blob/tree: 转成 raw.githubusercontent.com 然后代理
-  const rawUrl = url
-    .replace('https://github.com/', 'https://raw.githubusercontent.com/')
-    .replace('/blob/', '/')
+  const rawUrl = url.replace('https://github.com/', 'https://raw.githubusercontent.com/').replace('/blob/', '/')
 
   return base + rawUrl
 }
@@ -88,10 +86,10 @@ export function ghMirror(url, mirrorId = 'jsdelivr') {
  * 健康状态 -> 颜色 + 中文标签 + 图标
  */
 export const HEALTH_MAP = {
-  ok:       { color: '#3a8a3a', bg: 'rgba(58, 138, 58, 0.12)',  label: '在线',   icon: '●' },
-  mirror:   { color: '#c9a55c', bg: 'rgba(201, 165, 92, 0.15)', label: '需镜像', icon: '◇' },
-  crawl:    { color: '#a4853e', bg: 'rgba(164, 133, 62, 0.15)', label: '反爬',   icon: '◐' },
-  unstable: { color: '#a8161a', bg: 'rgba(168, 22, 26, 0.12)',  label: '不稳定', icon: '○' },
+  ok: { color: '#3a8a3a', bg: 'rgba(58, 138, 58, 0.12)', label: '在线', icon: '●' },
+  mirror: { color: '#c9a55c', bg: 'rgba(201, 165, 92, 0.15)', label: '需镜像', icon: '◇' },
+  crawl: { color: '#a4853e', bg: 'rgba(164, 133, 62, 0.15)', label: '反爬', icon: '◐' },
+  unstable: { color: '#a8161a', bg: 'rgba(168, 22, 26, 0.12)', label: '不稳定', icon: '○' },
 }
 
 export function healthOf(item) {

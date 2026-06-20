@@ -9,9 +9,9 @@ const PRECACHE_ASSETS = [
   '/miru-index/manifest.json',
   '/miru-index/robots.txt',
   '/miru-index/sitemap.xml',
-  '/miru-index/favicon.svg',
-  '/miru-index/og-image.png'
+  '/miru-index/favicon.svg'
 ]
+// og-image.png 等大资源走运行时缓存，避免 install 阶段阻塞
 
 // 缓存策略配置
 const CACHE_STRATEGIES = {
