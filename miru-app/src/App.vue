@@ -382,6 +382,8 @@ onUnmounted(() => {
         />
       </div>
 
+      <a href="#main-content" class="skip-link">跳到主体内容</a>
+
       <!-- =================== 顶栏（平板/手机） =================== -->
       <header class="mobile-topbar lg:hidden">
         <div class="flex items-center gap-2">
@@ -1411,6 +1413,26 @@ onUnmounted(() => {
 .offline-banner svg {
   color: var(--seal);
   flex-shrink: 0;
+}
+
+/* ============== 跳过链接 ============== */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0.75rem;
+  z-index: 100;
+  padding: 0.5rem 0.75rem;
+  background: #c9a55c;
+  color: #1a1410;
+  font-family: var(--serif);
+  font-size: 0.8rem;
+  font-weight: 700;
+  border-radius: 0 0 2px 2px;
+  text-decoration: none;
+  transition: top 0.2s;
+}
+.skip-link:focus {
+  top: 0;
 }
 
 /* ============== PWA 更新提示 ============== */

@@ -21,6 +21,18 @@ let lastFocusedElement = null
 
 const health = computed(() => healthOf(props.item))
 const isGitHub = computed(() => Boolean(props.item.url?.includes('github.com')))
+
+// 安全的 dialog ID：用 URL 派生，避免 name 含空格或特殊字符导致 aria-labelledby 非法
+const safeId = computed(() => {
+  const base = props.item.url || props.item.name || 'item'
+  return (
+    'modal-' +
+    base
+      .replace(/[^a-zA-Z0-9]/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '')
+  )
+})
 const mirrorUrl = computed(() => {
   if (!isGitHub.value || !selectedMirror.value) return null
   return ghMirror(props.item.url, selectedMirror.value.id)
@@ -149,7 +161,7 @@ onBeforeUnmount(() => {
       style="background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(12px)"
       role="dialog"
       aria-modal="true"
-      :aria-labelledby="`modal-title-${item.name}`"
+      :aria-labelledby="`${safeId}-title`"
       @click="onBackdropClick"
     >
       <div
@@ -234,7 +246,7 @@ onBeforeUnmount(() => {
             </div>
 
             <h2
-              :id="`modal-title-${item.name}`"
+              :id="`${safeId}-title`"
               class="font-serif-cn text-3xl sm:text-4xl font-black text-[#1a1410] leading-tight pr-10 tracking-tight"
             >
               {{ item.name }}

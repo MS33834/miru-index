@@ -55,7 +55,7 @@ export const APP_CONFIG = {
 
   // 缓存配置（与 public/sw.js 保持一致）
   CACHE: {
-    VERSION: 'v3',
+    VERSION: 'v4',
     NAME_PREFIX: 'miru-index-',
     PRECACHE_ASSETS: [
       '/miru-index/',

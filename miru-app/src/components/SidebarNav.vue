@@ -323,7 +323,7 @@ watch(
             <div v-if="isExpanded(c.id)" class="sidebar-resources__group">
               <div class="sidebar-resources__title"><span class="ornament">❀</span> {{ c.name }} · 条目</div>
               <a
-                v-for="(item, i) in c.items.slice(0, 30)"
+                v-for="(item, i) in c.items"
                 :key="item.url || i"
                 @click.prevent="emit('select', c.id)"
                 :href="item.url"
@@ -334,7 +334,6 @@ watch(
                 <span class="sidebar-resources__num">{{ String(i + 1).padStart(2, '0') }}</span>
                 <span class="sidebar-resources__name">{{ item.name }}</span>
               </a>
-              <div v-if="c.items.length > 30" class="sidebar-resources__more">·· 还有 {{ c.items.length - 30 }} 条</div>
             </div>
           </template>
         </div>
