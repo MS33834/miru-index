@@ -1,0 +1,3 @@
+{
+  "__comment": "由 scripts/check-links.mjs 自动生成的链接健康状态映射。键为 url，值为 ok | dead。缺失的 url 将回退到 nav.js 中手动维护的 health 字段。"
+}

@@ -45,8 +45,21 @@ createApp(App).mount('#app')
 if (typeof navigator !== 'undefined' && 'serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     const swUrl = import.meta.env.BASE_URL + 'sw.js'
-    navigator.serviceWorker.register(swUrl).catch(() => {
-      // 静默失败，不影响应用功能
-    })
+    navigator.serviceWorker
+      .register(swUrl)
+      .then((reg) => {
+        reg.addEventListener('updatefound', () => {
+          const newWorker = reg.installing
+          if (!newWorker) return
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              window.dispatchEvent(new CustomEvent('sw-update-available'))
+            }
+          })
+        })
+      })
+      .catch(() => {
+        // 静默失败，不影响应用功能
+      })
   })
 }

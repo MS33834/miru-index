@@ -1,15 +1,22 @@
-import { ref, computed, shallowRef, watch } from 'vue'
+import { ref, computed, shallowRef } from 'vue'
 import { categories } from '../data/nav.js'
 import { APP_CONFIG } from '../config/constants.js'
 import { clearHighlightCache } from '../utils/highlight.js'
 import SearchIndex from '../utils/searchIndex.js'
 import { paginate, totalPages } from '../utils/paginate.js'
 import { useFavorites } from './useFavorites.js'
+import healthMap from '../data/health.json' with { type: 'json' }
 
 const PAGE_SIZE = APP_CONFIG.UI.PAGE_SIZE || 24
 
-// 预构建一次，避免重复 flatMap
-const allItems = categories.flatMap((c) => c.items.map((i) => ({ ...i, _category: c })))
+// 预构建一次，避免重复 flatMap；用 health.json 的自动检测结果覆盖手动标注
+const allItems = categories.flatMap((c) =>
+  c.items.map((i) => ({
+    ...i,
+    _category: c,
+    health: healthMap[i.url] ?? i.health ?? 'ok',
+  }))
+)
 const categoryIdSet = new Set(categories.map((c) => c.id))
 const searchIndex = new SearchIndex(allItems)
 
@@ -92,6 +99,8 @@ export function useAppState() {
 
   function setSearch(q) {
     searchQuery.value = q
+    resetPage()
+    clearHighlightCache()
   }
 
   function clearSearch() {
@@ -138,12 +147,6 @@ export function useAppState() {
       currentPage.value--
     }
   }
-
-  // 任一过滤条件变化都重置页码并清高亮缓存
-  watch([searchQuery, activeCategory, selectedTags, proxyFilter], () => {
-    resetPage()
-    clearHighlightCache()
-  })
 
   return {
     // 只读数据

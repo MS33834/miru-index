@@ -14,6 +14,8 @@ import { useAppState } from './composables/useAppState.js'
 import { useRecentSearches } from './composables/useRecentSearches.js'
 import { useViewMode } from './composables/useViewMode.js'
 import { useFavorites } from './composables/useFavorites.js'
+import { useUrlSync } from './composables/useUrlSync.js'
+import { useSwUpdate } from './composables/useSwUpdate.js'
 
 const modalItem = ref(null)
 const modalCategory = ref(null)
@@ -27,7 +29,29 @@ const sidebarCollapsed = ref(localStorage.getItem(SIDEBAR_KEY) === 'true')
 const appState = useAppState()
 const recent = useRecentSearches()
 const { viewMode, setMode, toggle: toggleViewMode } = useViewMode()
-const { favorites } = useFavorites()
+const { favorites, exportFavorites, importFavorites } = useFavorites()
+
+const importStatus = ref('')
+const importInputRef = ref(null)
+
+function onExportFavorites() {
+  exportFavorites()
+}
+
+async function onImportFile(event) {
+  const file = event.target.files?.[0]
+  if (!file) return
+  try {
+    const count = await importFavorites(file)
+    importStatus.value = `已导入 ${count} 条收藏`
+  } catch (err) {
+    importStatus.value = `导入失败：${err.message}`
+  }
+  event.target.value = ''
+  setTimeout(() => {
+    importStatus.value = ''
+  }, 3000)
+}
 
 const {
   searchQuery,
@@ -54,6 +78,18 @@ const {
 
 const totalCount = computed(() => allItems.value.length)
 const favoritesCount = computed(() => favorites.value.length)
+
+useUrlSync({
+  searchQuery,
+  activeCategory,
+  selectedTags,
+  proxyFilter,
+  showFavoritesOnly,
+  currentPage,
+  viewMode,
+})
+
+const { updateAvailable, refresh: refreshApp } = useSwUpdate()
 
 const { VOLUMES, CHINESE_NUMS, UI } = APP_CONFIG
 const { showBackToTop } = useScrollPosition({ threshold: UI.BACK_TO_TOP_THRESHOLD })
@@ -619,6 +655,27 @@ onUnmounted(() => {
               </svg>
             </button>
           </div>
+
+          <div class="filter-bar__group">
+            <button
+              type="button"
+              class="filter-chip filter-chip--action"
+              @click="onExportFavorites"
+              title="导出收藏为 JSON"
+            >
+              导出收藏
+            </button>
+            <button
+              type="button"
+              class="filter-chip filter-chip--action"
+              @click="importInputRef?.click()"
+              title="从 JSON 文件导入收藏"
+            >
+              导入收藏
+            </button>
+            <input ref="importInputRef" type="file" accept="application/json" class="hidden" @change="onImportFile" />
+            <span v-if="importStatus" class="filter-chip__status">{{ importStatus }}</span>
+          </div>
         </div>
 
         <!-- 已选标签 -->
@@ -839,6 +896,14 @@ onUnmounted(() => {
             <line x1="12" y1="20" x2="12.01" y2="20"></line>
           </svg>
           <span>离线模式 - 部分功能可能受限</span>
+        </div>
+      </Transition>
+
+      <!-- PWA 更新提示 -->
+      <Transition name="fade">
+        <div v-if="updateAvailable" class="update-banner" role="status" aria-live="polite">
+          <span>新版本已就绪，刷新即可体验</span>
+          <button type="button" class="update-banner__btn" @click="refreshApp">立即刷新</button>
         </div>
       </Transition>
 
@@ -1174,6 +1239,11 @@ onUnmounted(() => {
   background: rgba(201, 165, 92, 0.1);
   border-color: #c9a55c;
 }
+.filter-chip__status {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: #c9a55c;
+}
 
 .view-toggle {
   display: inline-flex;
@@ -1341,5 +1411,41 @@ onUnmounted(() => {
 .offline-banner svg {
   color: var(--seal);
   flex-shrink: 0;
+}
+
+/* ============== PWA 更新提示 ============== */
+.update-banner {
+  position: fixed;
+  bottom: calc(5.5rem + env(safe-area-inset-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1.25rem;
+  background: rgba(26, 20, 16, 0.95);
+  color: var(--washi);
+  border: 1px solid rgba(201, 165, 92, 0.4);
+  border-radius: 4px;
+  font-family: var(--kai);
+  font-size: 0.875rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  z-index: 50;
+  backdrop-filter: blur(8px);
+}
+.update-banner__btn {
+  font-family: var(--serif);
+  font-size: 0.8rem;
+  padding: 0.35rem 0.75rem;
+  background: #c9a55c;
+  color: #1a1410;
+  border: none;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.update-banner__btn:hover {
+  background: #ff4d4f;
+  color: #f3ece0;
 }
 </style>

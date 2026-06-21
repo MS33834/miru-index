@@ -72,12 +72,15 @@ const descParts = computed(() => getHighlightedParts(props.item.desc, props.sear
           </h4>
           <div class="flex items-center gap-2 shrink-0">
             <span
-              v-if="item.health && item.health !== 'ok'"
+              v-if="item.health"
               :title="`健康: ${healthOf(item).label}`"
-              class="rounded-full w-2.5 h-2.5"
-              :style="{ background: healthOf(item).color, boxShadow: `0 0 8px ${healthOf(item).color}88` }"
+              class="health-badge"
+              :style="{ color: healthOf(item).color, background: healthOf(item).bg }"
               aria-hidden="true"
-            ></span>
+            >
+              <span class="health-badge__dot" :style="{ background: healthOf(item).color }"></span>
+              {{ healthOf(item).label }}
+            </span>
           </div>
         </div>
 
@@ -258,5 +261,22 @@ const descParts = computed(() => getHighlightedParts(props.item.desc, props.sear
   padding: 0 2px;
   border-radius: 2px;
   font-weight: 700;
+}
+
+.health-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 999px;
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  line-height: 1;
+  white-space: nowrap;
+}
+.health-badge__dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
 }
 </style>

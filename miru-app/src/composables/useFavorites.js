@@ -55,11 +55,46 @@ function clearFavorites() {
   state.value = []
 }
 
+function exportFavorites() {
+  if (typeof document === 'undefined') return
+  const data = JSON.stringify(state.value, null, 2)
+  const blob = new Blob([data], { type: 'application/json' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = `miru-favorites-${new Date().toISOString().slice(0, 10)}.json`
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
+  URL.revokeObjectURL(url)
+}
+
+function importFavorites(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      try {
+        const arr = JSON.parse(e.target.result)
+        if (!Array.isArray(arr)) throw new Error('收藏夹格式错误：应为数组')
+        const valid = arr.filter((i) => i && typeof i.url === 'string' && typeof i.name === 'string')
+        state.value = valid
+        resolve(valid.length)
+      } catch (err) {
+        reject(err)
+      }
+    }
+    reader.onerror = () => reject(new Error('文件读取失败'))
+    reader.readAsText(file)
+  })
+}
+
 export function useFavorites() {
   return {
     favorites: readonly(state),
     isFavorite,
     toggleFavorite,
     clearFavorites,
+    exportFavorites,
+    importFavorites,
   }
 }
