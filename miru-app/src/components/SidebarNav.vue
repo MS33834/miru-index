@@ -23,7 +23,6 @@ const emit = defineEmits([
   'toggle-favorites-only',
 ])
 
-const expanded = ref(new Set(['all'])) // 默认展开"全部"
 const allCount = computed(() => categories.reduce((a, c) => a + c.items.length, 0))
 const showFilters = ref(true)
 const showTags = ref(false)
@@ -78,31 +77,10 @@ watch(
     localSearchQuery.value = newVal
   }
 )
-
-function toggle(id) {
-  const s = new Set(expanded.value)
-  if (s.has(id)) s.delete(id)
-  else s.add(id)
-  expanded.value = s
-}
-function isExpanded(id) {
-  return expanded.value.has(id)
-}
-
-// 选中分类时自动展开
-watch(
-  () => props.activeCategory,
-  (id) => {
-    if (id && id !== 'all') {
-      expanded.value = new Set([id])
-    }
-  },
-  { immediate: true }
-)
 </script>
 
 <template>
-  <aside class="sidebar h-full flex flex-col" :class="collapsed ? 'sidebar--collapsed' : ''">
+  <aside data-testid="sidebar-nav" class="sidebar h-full flex flex-col" :class="collapsed ? 'sidebar--collapsed' : ''">
     <!-- 头部：标题 + 折叠 -->
     <div class="px-4 pt-5 pb-4 border-b border-[#ff4d4f]/15">
       <div class="flex items-center justify-between mb-3">
@@ -167,6 +145,7 @@ watch(
             class="scroll-input flex-1 px-3 py-1.5 text-[13px]"
             style="border-radius: 0 2px 2px 0"
             aria-label="搜索"
+            data-testid="sidebar-search"
             autocomplete="off"
             autocapitalize="off"
             autocorrect="off"
@@ -235,6 +214,7 @@ watch(
             :class="{ 'is-active': showFavoritesOnly }"
             @click="emit('toggle-favorites-only')"
             :aria-pressed="showFavoritesOnly"
+            data-testid="filter-favorites"
           >
             <span>★ 收藏</span>
             <span v-if="favoritesCount > 0" class="filter-section__count">{{ favoritesCount }}</span>
@@ -245,8 +225,10 @@ watch(
             :class="{ 'is-active': proxyFilter === 'direct' }"
             @click="emit('set-proxy-filter', proxyFilter === 'direct' ? 'all' : 'direct')"
             :aria-pressed="proxyFilter === 'direct'"
+            title="仅显示国内可直接访问的站点"
+            data-testid="filter-direct"
           >
-            <span>◯ 直连</span>
+            <span>直连</span>
           </button>
           <button
             type="button"
@@ -254,15 +236,17 @@ watch(
             :class="{ 'is-active': proxyFilter === 'proxy' }"
             @click="emit('set-proxy-filter', proxyFilter === 'proxy' ? 'all' : 'proxy')"
             :aria-pressed="proxyFilter === 'proxy'"
+            title="仅显示需要代理/梯子访问的站点"
+            data-testid="filter-proxy"
           >
-            <span>◎ 需梯</span>
+            <span>需梯</span>
           </button>
         </div>
       </div>
 
       <!-- 标签云 -->
       <div v-if="!collapsed" class="filter-section">
-        <button type="button" class="filter-section__title" @click="showTags = !showTags">
+        <button type="button" class="filter-section__title" @click="showTags = !showTags" data-testid="tags-toggle">
           <span>标签云</span>
           <span class="filter-section__chevron" :class="{ 'is-open': showTags }">▾</span>
         </button>
@@ -276,6 +260,7 @@ watch(
             @click="emit('toggle-tag', t.name)"
             :aria-pressed="selectedTags.has(t.name)"
             :title="`出现 ${t.count} 次`"
+            data-testid="tag-chip"
           >
             <span>#{{ t.name }}</span>
             <span class="filter-section__count">{{ t.count }}</span>
@@ -283,7 +268,7 @@ watch(
         </div>
       </div>
 
-      <!-- 各分类 -->
+      <!-- 各分类：点击即切换分类，不再展开混淆的手风琴资源列表 -->
       <button
         v-for="c in categories"
         :key="c.id"
@@ -299,45 +284,9 @@ watch(
         </div>
         <div v-if="!collapsed" class="sidebar-item__trail">
           <span class="sidebar-item__count">{{ c.items.length }}</span>
-          <span class="sidebar-item__chevron" :class="{ 'is-open': isExpanded(c.id) }" @click.stop="toggle(c.id)">
-            <svg
-              width="10"
-              height="10"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2.5"
-              stroke-linecap="round"
-            >
-              <polyline points="6 9 12 15 18 9" />
-            </svg>
-          </span>
         </div>
         <span v-if="activeCategory === c.id" class="sidebar-item__indicator"></span>
       </button>
-
-      <!-- 展开的资源列表（手风琴） -->
-      <Transition name="expand">
-        <div v-if="!collapsed && expanded.size > 0" class="sidebar-resources">
-          <template v-for="c in categories" :key="`res-${c.id}`">
-            <div v-if="isExpanded(c.id)" class="sidebar-resources__group">
-              <div class="sidebar-resources__title"><span class="ornament">❀</span> {{ c.name }} · 条目</div>
-              <a
-                v-for="(item, i) in c.items"
-                :key="item.url || i"
-                @click.prevent="emit('select', c.id)"
-                :href="item.url"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="sidebar-resources__item"
-              >
-                <span class="sidebar-resources__num">{{ String(i + 1).padStart(2, '0') }}</span>
-                <span class="sidebar-resources__name">{{ item.name }}</span>
-              </a>
-            </div>
-          </template>
-        </div>
-      </Transition>
     </nav>
 
     <!-- 底部：统计 + 印章 -->
@@ -454,26 +403,6 @@ watch(
   color: #ff4d4f;
   background: rgba(255, 77, 79, 0.15);
 }
-.sidebar-item__chevron {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  color: #8a7a68;
-  border-radius: 2px;
-  transition: all 0.2s;
-}
-.sidebar-item__chevron:hover {
-  color: #ff4d4f;
-  background: rgba(255, 77, 79, 0.1);
-}
-.sidebar-item__chevron.is-open svg {
-  transform: rotate(180deg);
-}
-.sidebar-item__chevron svg {
-  transition: transform 0.2s;
-}
 .sidebar-item__indicator {
   position: absolute;
   right: 4px;
@@ -509,65 +438,6 @@ watch(
   color: #c4bba8;
 }
 
-/* 展开的资源列表（手风琴） */
-.sidebar-resources {
-  max-height: 60vh;
-  overflow-y: auto;
-  padding: 0 0 0.5rem;
-  border-top: 1px solid rgba(255, 77, 79, 0.1);
-  margin-top: 0.25rem;
-}
-.sidebar-resources__group {
-  padding: 0.5rem 0.6rem 0.4rem;
-}
-.sidebar-resources__title {
-  font-family: var(--serif);
-  font-size: 10px;
-  color: #c9a55c;
-  padding: 0.3rem 0.4rem 0.4rem;
-  letter-spacing: 0.08em;
-}
-.sidebar-resources__title .ornament {
-  color: #ff4d4f;
-  margin-right: 4px;
-}
-.sidebar-resources__item {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.25rem 0.4rem;
-  font-family: var(--kai);
-  font-size: 12px;
-  color: #c4bba8;
-  border-radius: 2px;
-  text-decoration: none;
-  transition: all 0.15s;
-}
-.sidebar-resources__item:hover {
-  color: #f3ece0;
-  background: rgba(201, 165, 92, 0.08);
-  padding-left: 0.7rem;
-}
-.sidebar-resources__num {
-  font-family: var(--mono);
-  font-size: 10px;
-  color: #8a7a68;
-  width: 16px;
-  flex-shrink: 0;
-}
-.sidebar-resources__name {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.sidebar-resources__more {
-  padding: 0.2rem 0.4rem;
-  font-family: var(--mono);
-  font-size: 10px;
-  color: #8a7a68;
-  letter-spacing: 0.1em;
-}
-
 /* 滚动条 */
 .scrollbar-thin::-webkit-scrollbar {
   width: 4px;
@@ -585,25 +455,6 @@ watch(
 .scrollbar-thin {
   scrollbar-width: thin;
   scrollbar-color: #2a1e16 transparent;
-}
-
-/* 展开动画 */
-.expand-enter-active,
-.expand-leave-active {
-  transition:
-    max-height 0.35s cubic-bezier(0.2, 0.8, 0.2, 1),
-    opacity 0.25s;
-  overflow: hidden;
-}
-.expand-enter-from,
-.expand-leave-to {
-  max-height: 0;
-  opacity: 0;
-}
-.expand-enter-to,
-.expand-leave-from {
-  max-height: 70vh;
-  opacity: 1;
 }
 
 /* 最近搜索 */

@@ -53,7 +53,12 @@ const descParts = computed(() => getHighlightedParts(props.item.desc, props.sear
 </script>
 
 <template>
-  <div ref="target" class="card-paper-wrap" :style="{ animationDelay: Math.min(index, 24) * 0.04 + 's' }">
+  <div
+    ref="target"
+    class="card-paper-wrap"
+    :data-url="item.url"
+    :style="{ animationDelay: Math.min(index, 24) * 0.04 + 's' }"
+  >
     <button
       type="button"
       @click="handleClick"
@@ -137,10 +142,9 @@ const descParts = computed(() => getHighlightedParts(props.item.desc, props.sear
       </div>
     </button>
 
-    <!-- 收藏按钮：移出 button 嵌套，使用独立 div + role -->
-    <div
-      role="button"
-      tabindex="0"
+    <!-- 收藏按钮：移出卡片主 button，使用独立原生 button，避免嵌套 -->
+    <button
+      type="button"
       @click="handleFavoriteClick"
       @keydown="handleFavoriteKeydown"
       class="favorite-btn-floating"
@@ -160,7 +164,7 @@ const descParts = computed(() => getHighlightedParts(props.item.desc, props.sear
       >
         <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
       </svg>
-    </div>
+    </button>
   </div>
 </template>
 
@@ -208,6 +212,9 @@ const descParts = computed(() => getHighlightedParts(props.item.desc, props.sear
   transition: all 0.2s;
   z-index: 2;
   user-select: none;
+  padding: 0;
+  appearance: none;
+  -webkit-appearance: none;
 }
 .favorite-btn-floating:hover {
   background: rgba(243, 236, 224, 0.95);

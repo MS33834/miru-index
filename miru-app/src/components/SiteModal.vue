@@ -12,7 +12,6 @@ const emit = defineEmits(['close'])
 const dialogRef = ref(null)
 const enterBtnRef = ref(null)
 const copied = ref(false)
-const copiedMirror = ref(false)
 const mirrorOpen = ref(false)
 const selectedMirror = ref(GH_MIRRORS[0] || null)
 
@@ -37,6 +36,8 @@ const mirrorUrl = computed(() => {
   if (!isGitHub.value || !selectedMirror.value) return null
   return ghMirror(props.item.url, selectedMirror.value.id)
 })
+// 当前实际要打开/复制的 URL：GitHub 使用镜像，其它使用原链
+const effectiveUrl = computed(() => (isGitHub.value ? mirrorUrl.value : props.item.url))
 
 function onBackdropClick(e) {
   if (e.target === e.currentTarget) emit('close')
@@ -106,10 +107,7 @@ async function doCopy(text, flagRef) {
 }
 
 async function copyUrl() {
-  await doCopy(props.item.url, copied)
-}
-async function copyMirror() {
-  await doCopy(mirrorUrl.value, copiedMirror)
+  await doCopy(effectiveUrl.value, copied)
 }
 
 function isValidUrl(url) {
@@ -118,11 +116,10 @@ function isValidUrl(url) {
 }
 
 function openInNewTab() {
-  const target = isGitHub.value ? mirrorUrl.value : props.item.url
-  if (!isValidUrl(target)) return
-  const w = window.open(target, '_blank')
+  if (!isValidUrl(effectiveUrl.value)) return
+  const w = window.open(effectiveUrl.value, '_blank')
   if (w) w.opener = null
-  else window.location.href = target
+  else window.location.href = effectiveUrl.value
 }
 
 function openOriginal() {
@@ -218,7 +215,7 @@ onBeforeUnmount(() => {
             </svg>
           </button>
 
-          <header class="px-6 sm:px-10 pt-10 sm:pt-12 pb-5 border-b border-[#1a1410]/10">
+          <div class="modal-header px-6 sm:px-10 pt-10 sm:pt-12 pb-5 border-b border-[#1a1410]/10">
             <div class="flex items-center gap-2 mb-5 flex-wrap">
               <div class="hanko text-xs px-2.5 py-1 stamp-anim" v-if="category">
                 <span class="mr-1">{{ category.icon }}</span
@@ -254,7 +251,7 @@ onBeforeUnmount(() => {
             <p v-if="item.desc" class="mt-3 font-kai-cn text-[#3a2e22] text-base sm:text-lg leading-relaxed">
               {{ item.desc }}
             </p>
-          </header>
+          </div>
 
           <div class="px-6 sm:px-10 py-6 sm:py-8 space-y-7">
             <section v-if="item.tags?.length">
@@ -369,23 +366,32 @@ onBeforeUnmount(() => {
                     <span class="flex-1">{{ m.name }}</span>
                     <span class="opacity-50 text-[10px]">{{ m.id }}</span>
                   </div>
-                  <code
-                    class="block px-4 py-2 text-[10px] sm:text-[11px] break-all font-mono"
+                  <div
+                    class="flex items-center justify-between gap-2 px-4 py-2 text-[10px] sm:text-[11px] break-all font-mono"
                     style="
                       background: rgba(0, 0, 0, 0.05);
                       color: #5a4a3a;
                       border-top: 1px dashed rgba(201, 165, 92, 0.3);
                     "
                   >
-                    {{ mirrorUrl }}
-                  </code>
+                    <code class="flex-1 break-all">{{ mirrorUrl }}</code>
+                    <button
+                      type="button"
+                      @click="openOriginal"
+                      class="shrink-0 px-2 py-1 rounded-sm font-serif-cn transition"
+                      style="color: #a4853e; border: 1px solid rgba(164, 133, 62, 0.4)"
+                      title="打开 GitHub 原链（需梯子）"
+                    >
+                      原链
+                    </button>
+                  </div>
                 </div>
               </div>
             </section>
           </div>
 
-          <footer
-            class="px-6 sm:px-10 py-6 sm:py-8 border-t border-[#1a1410]/10 flex flex-col sm:flex-row flex-wrap gap-3"
+          <div
+            class="modal-footer px-6 sm:px-10 py-6 sm:py-8 border-t border-[#1a1410]/10 flex flex-col sm:flex-row flex-wrap gap-3"
           >
             <button
               ref="enterBtnRef"
@@ -406,39 +412,18 @@ onBeforeUnmount(() => {
             >
               <span>入</span>
               <span class="text-sm opacity-80" aria-hidden="true">→</span>
-              <span>{{ isGitHub ? '覌镜像' : '覌' }}</span>
-            </button>
-            <button
-              v-if="isGitHub"
-              type="button"
-              @click="openOriginal"
-              class="btn-mute px-5 py-3.5 font-serif-cn font-bold text-sm transition flex items-center justify-center gap-2"
-              title="打开 GitHub 原始链接（需梯子）"
-            >
-              <span class="text-[10px]">原</span>
-            </button>
-            <button
-              v-if="isGitHub"
-              type="button"
-              @click="copyMirror"
-              class="btn-gold px-5 py-3.5 font-serif-cn font-bold text-sm transition flex items-center justify-center gap-2"
-              :title="`复制 ${selectedMirror?.name || '镜像'} URL`"
-            >
-              <span v-if="!copiedMirror">抄 · 镜</span>
-              <span v-else class="text-[#a8161a]">已抄 ✓</span>
+              <span>覌</span>
             </button>
             <button
               type="button"
               @click="copyUrl"
               class="btn-dark px-6 py-3.5 font-serif-cn font-bold text-base transition flex items-center justify-center gap-2"
+              :title="isGitHub ? '复制当前镜像 URL' : '复制站点 URL'"
             >
               <span v-if="!copied">抄 · 录</span>
               <span v-else class="text-[#a8161a]">已抄 ✓</span>
             </button>
-            <button type="button" @click="emit('close')" class="btn-text px-6 py-3.5 font-kai-cn text-base transition">
-              闭
-            </button>
-          </footer>
+          </div>
         </div>
       </div>
     </div>
@@ -480,28 +465,6 @@ onBeforeUnmount(() => {
   background: rgba(201, 165, 92, 0.18);
   color: #a8161a;
 }
-.btn-mute {
-  background: transparent;
-  color: #5a4a3a;
-  border: 1px solid rgba(90, 74, 58, 0.33);
-  border-radius: 2px;
-  letter-spacing: 0.05em;
-}
-.btn-mute:hover {
-  background: rgba(0, 0, 0, 0.05);
-  color: #1a1410;
-}
-.btn-gold {
-  background: transparent;
-  color: #a4853e;
-  border: 1px solid rgba(164, 133, 62, 0.33);
-  border-radius: 2px;
-  letter-spacing: 0.05em;
-}
-.btn-gold:hover {
-  background: rgba(201, 165, 92, 0.1);
-  color: #1a1410;
-}
 .btn-dark {
   background: transparent;
   color: #1a1410;
@@ -511,13 +474,5 @@ onBeforeUnmount(() => {
 }
 .btn-dark:hover {
   background: rgba(0, 0, 0, 0.05);
-}
-.btn-text {
-  background: transparent;
-  color: #5a4a3a;
-  letter-spacing: 0.1em;
-}
-.btn-text:hover {
-  color: #1a1410;
 }
 </style>

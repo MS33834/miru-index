@@ -10,7 +10,10 @@ import AppSkeleton from './components/AppSkeleton.vue'
 const asyncOptions = { loadingComponent: AppSkeleton }
 const SiteModal = defineAsyncComponent({ ...asyncOptions, loader: () => import('./components/SiteModal.vue') })
 const KeyboardHelp = defineAsyncComponent({ ...asyncOptions, loader: () => import('./components/KeyboardHelp.vue') })
-const PwaInstallPrompt = defineAsyncComponent({ ...asyncOptions, loader: () => import('./components/PwaInstallPrompt.vue') })
+const PwaInstallPrompt = defineAsyncComponent({
+  ...asyncOptions,
+  loader: () => import('./components/PwaInstallPrompt.vue'),
+})
 import { isOffline } from './main.js'
 import { APP_CONFIG } from './config/constants.js'
 import { useScrollPosition } from './composables/useScrollPosition.js'
@@ -180,6 +183,13 @@ const singleCategory = computed(() => {
   const cat = currentCategory.value
   if (!cat) return null
   return [{ ...cat, items: paginatedItems.value }]
+})
+
+const isEmpty = computed(() => {
+  if (activeCategory.value === 'all') {
+    return !groupedByVolume.value?.length
+  }
+  return !singleCategory.value?.[0]?.items?.length
 })
 
 function openModal(item, category) {
@@ -435,7 +445,14 @@ onUnmounted(() => {
             aria-modal="true"
             aria-label="导航目录"
           >
-            <div ref="drawerPanelRef" class="drawer-panel" tabindex="-1" @click.stop @keydown="handleDrawerKeydown">
+            <div
+              ref="drawerPanelRef"
+              data-testid="drawer-panel"
+              class="drawer-panel"
+              tabindex="-1"
+              @click.stop
+              @keydown="handleDrawerKeydown"
+            >
               <SidebarNav
                 :active-category="activeCategory"
                 :search-query="searchQuery"
@@ -548,46 +565,9 @@ onUnmounted(() => {
           </div>
         </div>
 
-        <!-- 过滤与视图工具条 -->
+        <!-- 过滤与视图工具条：收藏/直连/需梯过滤已集中到侧边栏“快速过滤”，此处保留视图切换与批量操作 -->
         <div class="filter-bar">
           <div class="filter-bar__group">
-            <button
-              type="button"
-              class="filter-chip"
-              :class="{ 'is-active': showFavoritesOnly }"
-              @click="toggleFavoritesOnly"
-              :aria-pressed="showFavoritesOnly"
-              title="仅显示收藏（快捷键 F）"
-            >
-              <span>★</span>
-              <span>收藏</span>
-              <span v-if="favoritesCount > 0" class="filter-chip__count">{{ favoritesCount }}</span>
-            </button>
-
-            <button
-              type="button"
-              class="filter-chip"
-              :class="{ 'is-active': proxyFilter === 'direct' }"
-              @click="setProxyFilter(proxyFilter === 'direct' ? 'all' : 'direct')"
-              :aria-pressed="proxyFilter === 'direct'"
-              title="仅显示直连"
-            >
-              <span>◯</span>
-              <span>直连</span>
-            </button>
-
-            <button
-              type="button"
-              class="filter-chip"
-              :class="{ 'is-active': proxyFilter === 'proxy' }"
-              @click="setProxyFilter(proxyFilter === 'proxy' ? 'all' : 'proxy')"
-              :aria-pressed="proxyFilter === 'proxy'"
-              title="仅显示需梯子"
-            >
-              <span>◎</span>
-              <span>需梯</span>
-            </button>
-
             <button
               v-if="selectedTags.size > 0"
               type="button"
@@ -781,7 +761,7 @@ onUnmounted(() => {
                     >{{ group.name }}
                   </h2>
                   <div class="mt-1.5 text-[#8a7a68] font-mono text-[10px] tracking-[0.2em]">
-                    {{ group.items.length }} 帖 · 共 {{ group.items.length }} 卷
+                    共 {{ group.items.length }} 帖
                   </div>
                 </div>
                 <div class="hidden sm:flex items-center gap-2 pb-1">
@@ -808,7 +788,7 @@ onUnmounted(() => {
           </article>
         </div>
 
-        <div v-if="!groupedByVolume && !singleCategory" class="empty">
+        <div v-if="isEmpty" class="empty">
           <div class="hanko-circle w-20 h-20 mx-auto mb-6 text-2xl">空</div>
           <p class="font-kai-cn text-[#8a7a68] text-lg">卷帙浩繁，未寻得所求之物……</p>
         </div>
