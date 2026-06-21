@@ -57,9 +57,90 @@
     <!-- 字体：国内 jsDelivr CDN，preconnect 预连接；实际加载由 main.js 异步完成，避免 CSP 内联事件 -->
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
     <link rel="dns-prefetch" href="https://cdn.jsdelivr.net" />
+    <link rel="dns-prefetch" href="https://unpkg.com" />
     <noscript>
       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-screen-webfont@1.7.0/style.css" />
     </noscript>
+
+    <!-- 首屏加载器样式：Vue 挂载前显示，避免白屏 -->
+    <style>
+      #app:empty::before,
+      .app-loader {
+        display: none;
+      }
+      .app-loader {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 1.25rem;
+        background: #0a0a0a;
+        color: #f3ece0;
+        z-index: 9999;
+        font-family: serif;
+      }
+      .app-loader__seal {
+        width: 64px;
+        height: 64px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid #ff4d4f;
+        border-radius: 4px;
+        font-size: 32px;
+        font-weight: 900;
+        color: #ff4d4f;
+        box-shadow: 0 0 24px rgba(255, 77, 79, 0.18);
+        animation: loader-pulse 2s ease-in-out infinite;
+      }
+      .app-loader__title {
+        font-size: 1rem;
+        letter-spacing: 0.2em;
+        color: #c4bba8;
+      }
+      .app-loader__ink {
+        width: 120px;
+        height: 2px;
+        background: rgba(201, 165, 92, 0.2);
+        border-radius: 1px;
+        overflow: hidden;
+      }
+      .app-loader__ink::after {
+        content: '';
+        display: block;
+        width: 40%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, #c9a55c, transparent);
+        animation: loader-flow 1.4s ease-in-out infinite;
+      }
+      @keyframes loader-pulse {
+        0%,
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+        50% {
+          transform: scale(1.05);
+          opacity: 0.85;
+        }
+      }
+      @keyframes loader-flow {
+        0% {
+          transform: translateX(-150%);
+        }
+        100% {
+          transform: translateX(350%);
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .app-loader__seal,
+        .app-loader__ink::after {
+          animation: none;
+        }
+      }
+    </style>
 
     <!-- 印章风 favicon -->
     <link
@@ -67,12 +148,18 @@
       type="image/svg+xml"
       href="data:image/svg+xml;utf8,%3Csvg xmlns='http%3A//www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='6' fill='%23f3ece0'/%3E%3Crect x='6' y='6' width='88' height='88' fill='none' stroke='%23ff4d4f' stroke-width='4' rx='2'/%3E%3Ctext x='50' y='40' text-anchor='middle' fill='%23ff4d4f' font-family='serif' font-size='34' font-weight='900'%3E漫%3C/text%3E%3Ctext x='50' y='78' text-anchor='middle' fill='%23ff4d4f' font-family='serif' font-size='34' font-weight='900'%3E藏%3C/text%3E%3C/svg%3E"
     />
-    <script type="module" crossorigin src="/miru-index/assets/js/index-DHOCb4Oe.js"></script>
+    <script type="module" crossorigin src="/miru-index/assets/js/index-CKFxBQE3.js"></script>
     <link rel="modulepreload" crossorigin href="/miru-index/assets/js/vue-vendor-BM_nB6Tp.js">
     <link rel="modulepreload" crossorigin href="/miru-index/assets/js/site-data-CRjH2ahY.js">
-    <link rel="stylesheet" crossorigin href="/miru-index/assets/css/index-svSN6geh.css">
+    <link rel="stylesheet" crossorigin href="/miru-index/assets/css/index-Cc3vHlQ2.css">
   </head>
   <body class="bg-[#0a0a0a] text-[#f3ece0] min-h-screen antialiased">
-    <div id="app"></div>
+    <div id="app">
+      <div class="app-loader" aria-label="漫藏阁加载中">
+        <div class="app-loader__seal">藏</div>
+        <div class="app-loader__title">MIRU INDEX</div>
+        <div class="app-loader__ink" aria-hidden="true"></div>
+      </div>
+    </div>
   </body>
 </html>

@@ -119,12 +119,20 @@ const descParts = computed(() => getHighlightedParts(props.item.desc, props.sear
         </div>
       </div>
       <div v-else class="card-skeleton" aria-hidden="true">
-        <div class="skeleton-line w-3/4 h-5"></div>
-        <div class="skeleton-line w-full h-3"></div>
-        <div class="skeleton-line w-5/6 h-3"></div>
-        <div class="flex gap-2 mt-2">
-          <div class="skeleton-line w-12 h-4"></div>
-          <div class="skeleton-line w-16 h-4"></div>
+        <div class="flex items-start justify-between gap-3">
+          <div class="skeleton-line skeleton-title"></div>
+          <div class="skeleton-badge"></div>
+        </div>
+        <div class="skeleton-line skeleton-desc skeleton-desc--1"></div>
+        <div class="skeleton-line skeleton-desc skeleton-desc--2"></div>
+        <div class="flex flex-wrap gap-1.5 sm:gap-2 mt-1">
+          <div class="skeleton-tag"></div>
+          <div class="skeleton-tag"></div>
+          <div class="skeleton-tag skeleton-tag--short"></div>
+        </div>
+        <div class="skeleton-footer">
+          <div class="skeleton-line skeleton-footer__text"></div>
+          <div class="skeleton-line skeleton-footer__arrow"></div>
         </div>
       </div>
     </button>
@@ -228,23 +236,67 @@ const descParts = computed(() => getHighlightedParts(props.item.desc, props.sear
   }
 }
 
-/* Skeleton 骨架屏 */
 .card-skeleton {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.6rem;
   min-height: 120px;
 }
 .skeleton-line {
   background: linear-gradient(
     90deg,
     rgba(168, 22, 26, 0.04) 0%,
-    rgba(168, 22, 26, 0.08) 50%,
+    rgba(168, 22, 26, 0.1) 50%,
     rgba(168, 22, 26, 0.04) 100%
   );
   background-size: 200% 100%;
   border-radius: 2px;
-  animation: skeleton-shimmer 1.5s infinite;
+  animation: skeleton-shimmer 1.6s infinite;
+}
+.skeleton-title {
+  height: 1.25rem;
+  width: 70%;
+  margin-top: 0.15rem;
+}
+.skeleton-badge {
+  width: 3rem;
+  height: 1rem;
+  border-radius: 999px;
+  background: rgba(168, 22, 26, 0.08);
+}
+.skeleton-desc {
+  height: 0.75rem;
+}
+.skeleton-desc--1 {
+  width: 100%;
+}
+.skeleton-desc--2 {
+  width: 85%;
+}
+.skeleton-tag {
+  width: 3rem;
+  height: 1.25rem;
+  border-radius: 2px;
+  background: rgba(168, 22, 26, 0.07);
+}
+.skeleton-tag--short {
+  width: 2rem;
+}
+.skeleton-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 0.75rem;
+  margin-top: auto;
+  border-top: 1px solid rgba(26, 20, 16, 0.06);
+}
+.skeleton-footer__text {
+  width: 4rem;
+  height: 0.65rem;
+}
+.skeleton-footer__arrow {
+  width: 2rem;
+  height: 0.8rem;
 }
 @keyframes skeleton-shimmer {
   0% {
