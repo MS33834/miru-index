@@ -20,6 +20,10 @@ export default defineConfig({
       output: {
         // 代码分割配置
         manualChunks(id) {
+          // 站点数据独立成块：内容更新频繁时可单独缓存，主包更小
+          if (id.includes('/src/data/')) {
+            return 'site-data'
+          }
           if (id.includes('node_modules')) {
             // Vue 相关依赖单独打包
             if (id.includes('/vue/') || id.includes('/@vue/')) {

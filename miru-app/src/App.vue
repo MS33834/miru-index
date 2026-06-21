@@ -1,12 +1,14 @@
 <script setup>
-import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch, nextTick, defineAsyncComponent } from 'vue'
 import { categories } from './data/nav.js'
-import SiteModal from './components/SiteModal.vue'
 import SidebarNav from './components/SidebarNav.vue'
 import SiteCard from './components/SiteCard.vue'
 import ErrorBoundary from './components/ErrorBoundary.vue'
-import KeyboardHelp from './components/KeyboardHelp.vue'
-import PwaInstallPrompt from './components/PwaInstallPrompt.vue'
+
+// 重型组件按需异步加载，减少首屏 JS 体积
+const SiteModal = defineAsyncComponent(() => import('./components/SiteModal.vue'))
+const KeyboardHelp = defineAsyncComponent(() => import('./components/KeyboardHelp.vue'))
+const PwaInstallPrompt = defineAsyncComponent(() => import('./components/PwaInstallPrompt.vue'))
 import { isOffline } from './main.js'
 import { APP_CONFIG } from './config/constants.js'
 import { useScrollPosition } from './composables/useScrollPosition.js'
