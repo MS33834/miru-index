@@ -1,5 +1,5 @@
 <script setup>
-import { ref, shallowRef, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { categories } from './data/nav.js'
 import SiteModal from './components/SiteModal.vue'
 import SidebarNav from './components/SidebarNav.vue'
@@ -10,58 +10,50 @@ import PwaInstallPrompt from './components/PwaInstallPrompt.vue'
 import { isOffline } from './main.js'
 import { APP_CONFIG } from './config/constants.js'
 import { useScrollPosition } from './composables/useScrollPosition.js'
-import { paginate, totalPages } from './utils/paginate.js'
-import { clearHighlightCache } from './utils/highlight.js'
-import SearchIndex from './utils/searchIndex.js'
+import { useAppState } from './composables/useAppState.js'
+import { useRecentSearches } from './composables/useRecentSearches.js'
+import { useViewMode } from './composables/useViewMode.js'
+import { useFavorites } from './composables/useFavorites.js'
 
-const PAGE_SIZE = 24
-
-const searchQuery = ref('')
-const activeCategory = ref('all')
 const modalItem = ref(null)
 const modalCategory = ref(null)
 const drawerOpen = ref(false)
-const currentPage = ref(1)
 const helpOpen = ref(false)
+const loaded = ref(false)
 
 const SIDEBAR_KEY = 'miru-sidebar-collapsed'
 const sidebarCollapsed = ref(localStorage.getItem(SIDEBAR_KEY) === 'true')
-const loaded = ref(false)
 
-// 预构建扁平数据 + 搜索索引
-const allItems = shallowRef(categories.flatMap((c) => c.items.map((i) => ({ ...i, _category: c }))))
-const searchIndex = new SearchIndex(allItems.value)
+const appState = useAppState()
+const recent = useRecentSearches()
+const { viewMode, setMode, toggle: toggleViewMode } = useViewMode()
+const { favorites } = useFavorites()
 
-// 分类 ID 集合（Set 查找 O(1) 替代 includes）
-const categoryIdSet = new Set(categories.map((c) => c.id))
-
-const filteredItems = computed(() => {
-  const q = searchQuery.value.trim()
-  // 单分类过滤
-  const list =
-    activeCategory.value === 'all' || !categoryIdSet.has(activeCategory.value)
-      ? allItems.value
-      : allItems.value.filter((i) => i._category.id === activeCategory.value)
-  // 搜索（O(n) 索引查询，166 项实测 < 1ms）
-  return q
-    ? searchIndex.query(q).filter((i) => activeCategory.value === 'all' || i._category.id === activeCategory.value)
-    : list
-})
+const {
+  searchQuery,
+  activeCategory,
+  selectedTags,
+  proxyFilter,
+  showFavoritesOnly,
+  currentPage,
+  filteredCount,
+  totalPageCount,
+  paginatedItems,
+  currentCategory,
+  allItems,
+  setSearch,
+  clearSearch,
+  selectCategory,
+  toggleTag,
+  clearTags,
+  setProxyFilter,
+  toggleFavoritesOnly,
+  nextPage,
+  prevPage,
+} = appState
 
 const totalCount = computed(() => allItems.value.length)
-const filteredCount = computed(() => filteredItems.value.length)
-const totalPageCount = computed(() => totalPages(filteredItems.value.length, PAGE_SIZE))
-
-// 分页：单分类时不分页
-const paginatedItems = computed(() => {
-  if (activeCategory.value !== 'all') return filteredItems.value
-  return paginate(filteredItems.value, currentPage.value, PAGE_SIZE)
-})
-
-const currentCategory = computed(() => {
-  if (activeCategory.value === 'all') return null
-  return categories.find((c) => c.id === activeCategory.value)
-})
+const favoritesCount = computed(() => favorites.value.length)
 
 const { VOLUMES, CHINESE_NUMS, UI } = APP_CONFIG
 const { showBackToTop } = useScrollPosition({ threshold: UI.BACK_TO_TOP_THRESHOLD })
@@ -85,11 +77,14 @@ watch(
   { flush: 'post' }
 )
 
+// 搜索提交时记录到最近搜索
+function onSearchCommit(q) {
+  setSearch(q)
+  recent.add(q)
+}
+
 // 切换时重置 + 清缓存 + 更新页面标题
 watch([searchQuery, activeCategory], () => {
-  currentPage.value = 1
-  clearHighlightCache()
-
   if (searchQuery.value) {
     document.title = `搜索: ${searchQuery.value} - 漫藏阁`
   } else if (activeCategory.value !== 'all') {
@@ -155,29 +150,28 @@ function closeModal() {
   modalItem.value = null
   modalCategory.value = null
 }
-function selectCategory(id) {
-  activeCategory.value = id
+function onSelectCategory(id) {
+  selectCategory(id)
   drawerOpen.value = false
   if (typeof window !== 'undefined') {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 }
-function onSearch(q) {
-  searchQuery.value = q
-}
-function clearSearch() {
-  searchQuery.value = ''
-  clearHighlightCache()
-}
-function nextPage() {
-  if (currentPage.value < totalPageCount.value) {
-    currentPage.value++
+function onClearSearch() {
+  clearSearch()
+  if (typeof window !== 'undefined') {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 }
-function prevPage() {
-  if (currentPage.value > 1) {
-    currentPage.value--
+function onNextPage() {
+  nextPage()
+  if (typeof window !== 'undefined') {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+}
+function onPrevPage() {
+  prevPage()
+  if (typeof window !== 'undefined') {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 }
@@ -276,6 +270,20 @@ function handleKeydown(e) {
     return
   }
 
+  // v 切换视图
+  if ((e.key === 'v' || e.key === 'V') && !inInput) {
+    e.preventDefault()
+    toggleViewMode()
+    return
+  }
+
+  // f 切换仅收藏
+  if ((e.key === 'f' || e.key === 'F') && !inInput) {
+    e.preventDefault()
+    toggleFavoritesOnly()
+    return
+  }
+
   // 上下方向键在分类间切换
   if (e.key === 'ArrowDown' && !inInput && activeCategory.value === 'all') {
     // 滚到下一卷
@@ -324,10 +332,17 @@ onUnmounted(() => {
           :active-category="activeCategory"
           :search-query="searchQuery"
           :collapsed="sidebarCollapsed"
-          @select="selectCategory"
-          @search="onSearch"
+          :selected-tags="selectedTags"
+          :proxy-filter="proxyFilter"
+          :show-favorites-only="showFavoritesOnly"
+          :favorites-count="favoritesCount"
+          @select="onSelectCategory"
+          @search="onSearchCommit"
           @toggle="sidebarCollapsed = !sidebarCollapsed"
           @search-focus="focusSearch"
+          @toggle-tag="toggleTag"
+          @set-proxy-filter="setProxyFilter"
+          @toggle-favorites-only="toggleFavoritesOnly"
         />
       </div>
 
@@ -383,9 +398,16 @@ onUnmounted(() => {
                 :active-category="activeCategory"
                 :search-query="searchQuery"
                 :collapsed="false"
-                @select="selectCategory"
-                @search="onSearch"
+                :selected-tags="selectedTags"
+                :proxy-filter="proxyFilter"
+                :show-favorites-only="showFavoritesOnly"
+                :favorites-count="favoritesCount"
+                @select="onSelectCategory"
+                @search="onSearchCommit"
                 @toggle="drawerOpen = false"
+                @toggle-tag="toggleTag"
+                @set-proxy-filter="setProxyFilter"
+                @toggle-favorites-only="toggleFavoritesOnly"
               />
             </div>
           </div>
@@ -439,7 +461,7 @@ onUnmounted(() => {
         <div v-if="!searchQuery" class="breadcrumb">
           <button
             type="button"
-            @click="selectCategory('all')"
+            @click="onSelectCategory('all')"
             class="breadcrumb__item"
             :class="{ 'is-current': activeCategory === 'all' }"
           >
@@ -465,7 +487,7 @@ onUnmounted(() => {
                 得 <span class="text-[#c9a55c] font-serif-cn text-lg mx-1">{{ filteredCount }}</span> 条结果
               </div>
             </div>
-            <button type="button" @click="clearSearch" class="search-clear-btn" aria-label="清空搜索">
+            <button type="button" @click="onClearSearch" class="search-clear-btn" aria-label="清空搜索">
               <span>清空</span>
               <svg
                 width="12"
@@ -482,6 +504,149 @@ onUnmounted(() => {
               </svg>
             </button>
           </div>
+        </div>
+
+        <!-- 过滤与视图工具条 -->
+        <div class="filter-bar">
+          <div class="filter-bar__group">
+            <button
+              type="button"
+              class="filter-chip"
+              :class="{ 'is-active': showFavoritesOnly }"
+              @click="toggleFavoritesOnly"
+              :aria-pressed="showFavoritesOnly"
+              title="仅显示收藏（快捷键 F）"
+            >
+              <span>★</span>
+              <span>收藏</span>
+              <span v-if="favoritesCount > 0" class="filter-chip__count">{{ favoritesCount }}</span>
+            </button>
+
+            <button
+              type="button"
+              class="filter-chip"
+              :class="{ 'is-active': proxyFilter === 'direct' }"
+              @click="setProxyFilter(proxyFilter === 'direct' ? 'all' : 'direct')"
+              :aria-pressed="proxyFilter === 'direct'"
+              title="仅显示直连"
+            >
+              <span>◯</span>
+              <span>直连</span>
+            </button>
+
+            <button
+              type="button"
+              class="filter-chip"
+              :class="{ 'is-active': proxyFilter === 'proxy' }"
+              @click="setProxyFilter(proxyFilter === 'proxy' ? 'all' : 'proxy')"
+              :aria-pressed="proxyFilter === 'proxy'"
+              title="仅显示需梯子"
+            >
+              <span>◎</span>
+              <span>需梯</span>
+            </button>
+
+            <button
+              v-if="selectedTags.size > 0"
+              type="button"
+              class="filter-chip filter-chip--action"
+              @click="clearTags"
+              title="清除标签筛选"
+            >
+              <span>清除标签</span>
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                aria-hidden="true"
+              >
+                <line x1="6" y1="6" x2="18" y2="18" />
+                <line x1="18" y1="6" x2="6" y2="18" />
+              </svg>
+            </button>
+          </div>
+
+          <div class="filter-bar__group">
+            <button
+              type="button"
+              class="view-toggle"
+              :class="{ 'is-active': viewMode === 'grid' }"
+              @click="setMode('grid')"
+              aria-label="网格视图"
+              title="网格视图"
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                aria-hidden="true"
+              >
+                <rect x="3" y="3" width="7" height="7" />
+                <rect x="14" y="3" width="7" height="7" />
+                <rect x="3" y="14" width="7" height="7" />
+                <rect x="14" y="14" width="7" height="7" />
+              </svg>
+            </button>
+            <button
+              type="button"
+              class="view-toggle"
+              :class="{ 'is-active': viewMode === 'list' }"
+              @click="setMode('list')"
+              aria-label="列表视图"
+              title="列表视图"
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                aria-hidden="true"
+              >
+                <line x1="3" y1="6" x2="21" y2="6" />
+                <line x1="3" y1="12" x2="21" y2="12" />
+                <line x1="3" y1="18" x2="21" y2="18" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- 已选标签 -->
+        <div v-if="selectedTags.size > 0" class="selected-tags">
+          <span class="selected-tags__label">已选标签</span>
+          <button
+            v-for="tag in selectedTags"
+            :key="tag"
+            type="button"
+            class="selected-tags__item"
+            @click="toggleTag(tag)"
+            :aria-label="`移除标签 ${tag}`"
+          >
+            <span>#{{ tag }}</span>
+            <svg
+              width="10"
+              height="10"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              aria-hidden="true"
+            >
+              <line x1="6" y1="6" x2="18" y2="18" />
+              <line x1="18" y1="6" x2="6" y2="18" />
+            </svg>
+          </button>
         </div>
 
         <!-- 主体：分卷 OR 单一分类 -->
@@ -521,9 +686,9 @@ onUnmounted(() => {
                     {{ cat.name }}
                   </h3>
                   <span class="ink-bar flex-1 min-w-[40px]"></span>
-                  <button type="button" @click="selectCategory(cat.id)" class="subgroup__more">全卷 →</button>
+                  <button type="button" @click="onSelectCategory(cat.id)" class="subgroup__more">全卷 →</button>
                 </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
+                <div class="site-grid" :class="viewMode === 'list' ? 'site-grid--list' : 'site-grid--grid'">
                   <SiteCard
                     v-for="(item, idx) in cat.items"
                     :key="item.name + (item.url || '')"
@@ -532,6 +697,7 @@ onUnmounted(() => {
                     :index="idx"
                     :compact="true"
                     :search-query="searchQuery"
+                    :view-mode="viewMode"
                     @open="openModal"
                   />
                 </div>
@@ -564,7 +730,7 @@ onUnmounted(() => {
               </div>
             </header>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
+            <div class="site-grid" :class="viewMode === 'list' ? 'site-grid--list' : 'site-grid--grid'">
               <SiteCard
                 v-for="(item, idx) in group.items"
                 :key="item.name + (item.url || '')"
@@ -572,6 +738,7 @@ onUnmounted(() => {
                 :category="group"
                 :index="idx"
                 :search-query="searchQuery"
+                :view-mode="viewMode"
                 @open="openModal"
               />
             </div>
@@ -587,7 +754,7 @@ onUnmounted(() => {
         <nav v-if="activeCategory === 'all' && totalPageCount > 1" class="pagination" aria-label="分页导航">
           <button
             type="button"
-            @click="prevPage"
+            @click="onPrevPage"
             :disabled="currentPage === 1"
             class="pagination__btn"
             aria-label="上一页"
@@ -601,7 +768,7 @@ onUnmounted(() => {
           </div>
           <button
             type="button"
-            @click="nextPage"
+            @click="onNextPage"
             :disabled="currentPage === totalPageCount"
             class="pagination__btn"
             aria-label="下一页"
@@ -948,6 +1115,146 @@ onUnmounted(() => {
   .subgroup__head {
     gap: 0.6rem;
   }
+}
+
+/* ============== 过滤与视图工具条 ============== */
+.filter-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  padding: 0.75rem 0;
+  margin-bottom: 0.5rem;
+  border-bottom: 1px dashed rgba(255, 77, 79, 0.12);
+}
+.filter-bar__group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.7rem;
+  font-family: var(--serif);
+  font-size: 0.8rem;
+  color: #c4bba8;
+  background: rgba(243, 236, 224, 0.04);
+  border: 1px solid rgba(255, 77, 79, 0.15);
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.filter-chip:hover {
+  background: rgba(255, 77, 79, 0.08);
+  border-color: rgba(255, 77, 79, 0.35);
+}
+.filter-chip.is-active {
+  color: #f3ece0;
+  background: rgba(255, 77, 79, 0.18);
+  border-color: #ff4d4f;
+}
+.filter-chip__count {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  padding: 0 0.35rem;
+  background: rgba(255, 77, 79, 0.2);
+  color: #f3ece0;
+  border-radius: 2px;
+}
+.filter-chip--action {
+  border-style: dashed;
+  color: #c9a55c;
+  border-color: rgba(201, 165, 92, 0.35);
+}
+.filter-chip--action:hover {
+  background: rgba(201, 165, 92, 0.1);
+  border-color: #c9a55c;
+}
+
+.view-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  color: #8a7a68;
+  background: rgba(243, 236, 224, 0.04);
+  border: 1px solid rgba(255, 77, 79, 0.15);
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.view-toggle:hover {
+  color: #f3ece0;
+  background: rgba(255, 77, 79, 0.08);
+}
+.view-toggle.is-active {
+  color: #f3ece0;
+  background: rgba(255, 77, 79, 0.18);
+  border-color: #ff4d4f;
+}
+
+.selected-tags {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+  padding: 0.25rem 0;
+}
+.selected-tags__label {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  color: #8a7a68;
+  letter-spacing: 0.15em;
+}
+.selected-tags__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.55rem;
+  font-family: var(--kai);
+  font-size: 0.78rem;
+  color: #f3ece0;
+  background: rgba(201, 165, 92, 0.18);
+  border: 1px solid rgba(201, 165, 92, 0.4);
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.selected-tags__item:hover {
+  background: rgba(201, 165, 92, 0.28);
+}
+
+/* ============== 站点网格 / 列表 ============== */
+.site-grid {
+  display: grid;
+  gap: 0.75rem;
+}
+.site-grid--grid {
+  grid-template-columns: 1fr;
+}
+@media (min-width: 640px) {
+  .site-grid--grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (min-width: 1024px) {
+  .site-grid--grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+@media (min-width: 1280px) {
+  .site-grid--grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+.site-grid--list {
+  grid-template-columns: 1fr;
 }
 
 /* ============== Footer ============== */

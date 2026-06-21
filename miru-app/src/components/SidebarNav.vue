@@ -2,20 +2,58 @@
 import { ref, computed, watch } from 'vue'
 import { categories } from '../data/nav.js'
 import { useDebounce } from '../composables/useDebounce.js'
+import { useRecentSearches } from '../composables/useRecentSearches.js'
 
 const props = defineProps({
   activeCategory: { type: String, required: true },
   searchQuery: { type: String, default: '' },
   collapsed: { type: Boolean, default: false },
+  selectedTags: { type: Set, default: () => new Set() },
+  proxyFilter: { type: String, default: 'all' },
+  showFavoritesOnly: { type: Boolean, default: false },
+  favoritesCount: { type: Number, default: 0 },
 })
-const emit = defineEmits(['select', 'search', 'toggle', 'search-focus'])
+const emit = defineEmits([
+  'select',
+  'search',
+  'toggle',
+  'search-focus',
+  'toggle-tag',
+  'set-proxy-filter',
+  'toggle-favorites-only',
+])
 
 const expanded = ref(new Set(['all'])) // 默认展开"全部"
 const allCount = computed(() => categories.reduce((a, c) => a + c.items.length, 0))
+const showFilters = ref(true)
+const showTags = ref(false)
+
+const { recentSearches, add: addRecent, clear: clearRecent } = useRecentSearches()
+
+// 热门标签
+const topTags = computed(() => {
+  const map = new Map()
+  for (const c of categories) {
+    for (const item of c.items) {
+      for (const tag of item.tags || []) {
+        map.set(tag, (map.get(tag) || 0) + 1)
+      }
+    }
+  }
+  return [...map.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 24)
+    .map(([name, count]) => ({ name, count }))
+})
 
 // 使用防抖 composable
 const { debouncedValue, setDebouncedValue } = useDebounce(300)
 const localSearchQuery = ref(props.searchQuery)
+
+function commitSearch(value) {
+  addRecent(value)
+  emit('search', value)
+}
 
 function handleSearchInput(e) {
   const value = e.target.value
@@ -23,7 +61,13 @@ function handleSearchInput(e) {
   setDebouncedValue(value)
 }
 
-// 监听防抖后的值并触发搜索
+function handleSearchKeydown(e) {
+  if (e.key === 'Enter') {
+    commitSearch(localSearchQuery.value)
+  }
+}
+
+// 监听防抖后的值并触发搜索（不重复记录）
 watch(debouncedValue, (newVal) => {
   emit('search', newVal)
 })
@@ -117,6 +161,7 @@ watch(
           <input
             :value="localSearchQuery"
             @input="handleSearchInput"
+            @keydown="handleSearchKeydown"
             type="search"
             placeholder="以名索物…"
             class="scroll-input flex-1 px-3 py-1.5 text-[13px]"
@@ -129,6 +174,26 @@ watch(
             inputmode="search"
             enterkeyhint="search"
           />
+        </div>
+      </div>
+
+      <!-- 最近搜索 -->
+      <div v-if="!collapsed && recentSearches.length > 0" class="mt-3">
+        <div class="flex items-center justify-between mb-1.5">
+          <span class="sidebar-section-title">最近搜索</span>
+          <button type="button" class="sidebar-text-btn" @click="clearRecent">清空</button>
+        </div>
+        <div class="flex flex-wrap gap-1.5">
+          <button
+            v-for="q in recentSearches"
+            :key="q"
+            type="button"
+            class="recent-tag"
+            @click="commitSearch(q)"
+            :title="`搜索 ${q}`"
+          >
+            {{ q }}
+          </button>
         </div>
       </div>
     </div>
@@ -155,6 +220,67 @@ watch(
 
       <div v-if="!collapsed" class="sidebar-divider">
         <span class="ornament">· 分卷目录 ·</span>
+      </div>
+
+      <!-- 快速过滤 -->
+      <div v-if="!collapsed" class="filter-section">
+        <button type="button" class="filter-section__title" @click="showFilters = !showFilters">
+          <span>快速过滤</span>
+          <span class="filter-section__chevron" :class="{ 'is-open': showFilters }">▾</span>
+        </button>
+        <div v-if="showFilters" class="filter-section__body">
+          <button
+            type="button"
+            class="filter-section__chip"
+            :class="{ 'is-active': showFavoritesOnly }"
+            @click="emit('toggle-favorites-only')"
+            :aria-pressed="showFavoritesOnly"
+          >
+            <span>★ 收藏</span>
+            <span v-if="favoritesCount > 0" class="filter-section__count">{{ favoritesCount }}</span>
+          </button>
+          <button
+            type="button"
+            class="filter-section__chip"
+            :class="{ 'is-active': proxyFilter === 'direct' }"
+            @click="emit('set-proxy-filter', proxyFilter === 'direct' ? 'all' : 'direct')"
+            :aria-pressed="proxyFilter === 'direct'"
+          >
+            <span>◯ 直连</span>
+          </button>
+          <button
+            type="button"
+            class="filter-section__chip"
+            :class="{ 'is-active': proxyFilter === 'proxy' }"
+            @click="emit('set-proxy-filter', proxyFilter === 'proxy' ? 'all' : 'proxy')"
+            :aria-pressed="proxyFilter === 'proxy'"
+          >
+            <span>◎ 需梯</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 标签云 -->
+      <div v-if="!collapsed" class="filter-section">
+        <button type="button" class="filter-section__title" @click="showTags = !showTags">
+          <span>标签云</span>
+          <span class="filter-section__chevron" :class="{ 'is-open': showTags }">▾</span>
+        </button>
+        <div v-if="showTags" class="filter-section__body filter-section__body--tags">
+          <button
+            v-for="t in topTags"
+            :key="t.name"
+            type="button"
+            class="filter-section__chip filter-section__chip--tag"
+            :class="{ 'is-active': selectedTags.has(t.name) }"
+            @click="emit('toggle-tag', t.name)"
+            :aria-pressed="selectedTags.has(t.name)"
+            :title="`出现 ${t.count} 次`"
+          >
+            <span>#{{ t.name }}</span>
+            <span class="filter-section__count">{{ t.count }}</span>
+          </button>
+        </div>
       </div>
 
       <!-- 各分类 -->
@@ -479,6 +605,121 @@ watch(
 .expand-leave-from {
   max-height: 70vh;
   opacity: 1;
+}
+
+/* 最近搜索 */
+.sidebar-section-title {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: #8a7a68;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+.sidebar-text-btn {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: #c9a55c;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  padding: 0.1rem 0.3rem;
+}
+.sidebar-text-btn:hover {
+  color: #ff4d4f;
+}
+.recent-tag {
+  font-family: var(--kai);
+  font-size: 11px;
+  color: #c4bba8;
+  background: rgba(243, 236, 224, 0.05);
+  border: 1px solid rgba(201, 165, 92, 0.2);
+  border-radius: 2px;
+  padding: 0.15rem 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.recent-tag:hover {
+  background: rgba(201, 165, 92, 0.1);
+  border-color: rgba(201, 165, 92, 0.4);
+  color: #f3ece0;
+}
+
+/* 过滤区 */
+.filter-section {
+  padding: 0.5rem 0.9rem;
+  border-bottom: 1px solid rgba(255, 77, 79, 0.08);
+}
+.filter-section__title {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: #8a7a68;
+  letter-spacing: 0.2em;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  padding: 0.35rem 0;
+}
+.filter-section__chevron {
+  transition: transform 0.2s;
+  font-size: 9px;
+}
+.filter-section__chevron.is-open {
+  transform: rotate(180deg);
+}
+.filter-section__body {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  padding: 0.35rem 0 0.5rem;
+}
+.filter-section__body--tags {
+  max-height: 160px;
+  overflow-y: auto;
+}
+.filter-section__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.25rem 0.55rem;
+  font-family: var(--serif);
+  font-size: 11px;
+  color: #c4bba8;
+  background: rgba(243, 236, 224, 0.04);
+  border: 1px solid rgba(255, 77, 79, 0.12);
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.filter-section__chip:hover {
+  background: rgba(255, 77, 79, 0.08);
+  border-color: rgba(255, 77, 79, 0.3);
+}
+.filter-section__chip.is-active {
+  color: #f3ece0;
+  background: rgba(255, 77, 79, 0.18);
+  border-color: #ff4d4f;
+}
+.filter-section__chip--tag {
+  font-family: var(--kai);
+}
+.filter-section__count {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: #8a7a68;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 0 0.25rem;
+  border-radius: 2px;
+}
+.filter-section__chip.is-active .filter-section__count {
+  color: #f3ece0;
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -50,6 +50,7 @@ export const APP_CONFIG = {
     LAZY_LOAD_MARGIN: 100,
     ANIMATION_DELAY_STEP: 0.04,
     MAX_ANIMATION_DELAY: 24,
+    PAGE_SIZE: 24,
   },
 
   // 缓存配置（与 public/sw.js 保持一致）
