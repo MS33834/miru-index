@@ -10,7 +10,7 @@ const props = defineProps({
 const emit = defineEmits(['close'])
 
 const dialogRef = ref(null)
-const enterBtnRef = ref(null)
+const closeBtnRef = ref(null)
 const copied = ref(false)
 const mirrorOpen = ref(false)
 const selectedMirror = ref(GH_MIRRORS[0] || null)
@@ -137,7 +137,11 @@ function selectMirror(m) {
 onMounted(() => {
   // 保存当前焦点以便关闭时恢复
   lastFocusedElement = document.activeElement
-  nextTick(() => enterBtnRef.value?.focus())
+  nextTick(() => {
+    // 弹窗打开时回到顶部，避免底部按钮聚焦导致标题被卷走
+    if (dialogRef.value) dialogRef.value.scrollTop = 0
+    closeBtnRef.value?.focus()
+  })
 })
 
 // 改用 useEventListener 避免手动 cleanup
@@ -195,6 +199,7 @@ onBeforeUnmount(() => {
 
         <div class="relative">
           <button
+            ref="closeBtnRef"
             type="button"
             @click="emit('close')"
             aria-label="关闭对话框（按 Esc 退出）"
@@ -394,7 +399,6 @@ onBeforeUnmount(() => {
             class="modal-footer px-6 sm:px-10 py-6 sm:py-8 border-t border-[#1a1410]/10 flex flex-col sm:flex-row flex-wrap gap-3"
           >
             <button
-              ref="enterBtnRef"
               type="button"
               @click="openInNewTab"
               class="flex-1 text-center px-6 py-3.5 font-serif-cn font-bold text-base transition stamp-anim flex items-center justify-center gap-2"
@@ -440,12 +444,13 @@ onBeforeUnmount(() => {
   opacity: 0.85;
 }
 .modal-close {
-  background: rgba(184, 35, 31, 0.08);
-  border: 1px solid rgba(184, 35, 31, 0.3);
+  background: rgba(168, 22, 26, 0.12);
+  border: 1px solid rgba(168, 22, 26, 0.5);
   color: #a8161a;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 }
 .modal-close:hover {
-  background: rgba(184, 35, 31, 0.18);
+  background: rgba(168, 22, 26, 0.22);
 }
 .mirror-toggle {
   color: #a4853e;

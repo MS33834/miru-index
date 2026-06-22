@@ -276,6 +276,14 @@ const descParts = computed(() => getHighlightedParts(props.item.desc, props.sear
 .favorite-btn-floating.is-animating {
   animation: favorite-bounce 0.4s ease;
 }
+@media (max-width: 640px) {
+  .favorite-btn-floating {
+    top: 0.5rem;
+    right: 0.5rem;
+    width: 34px;
+    height: 34px;
+  }
+}
 @keyframes favorite-bounce {
   0%,
   100% {

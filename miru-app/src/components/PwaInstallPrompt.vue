@@ -103,16 +103,16 @@ function dismiss() {
 <style scoped>
 .pwa-prompt {
   position: fixed;
-  bottom: calc(5.5rem + env(safe-area-inset-bottom));
-  left: 1rem;
-  right: 1rem;
-  max-width: 380px;
-  margin: 0 auto;
+  top: calc(0.75rem + env(safe-area-inset-top));
+  right: calc(0.75rem + env(safe-area-inset-right));
+  left: auto;
+  max-width: min(360px, calc(100vw - 1.5rem));
+  margin: 0;
   z-index: 45;
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.85rem 1rem;
+  padding: 0.65rem 0.85rem;
   background: linear-gradient(180deg, #1a1410 0%, #0a0a0a 100%);
   border: 1px solid rgba(255, 77, 79, 0.4);
   border-radius: 4px;
@@ -122,8 +122,8 @@ function dismiss() {
   color: #f3ece0;
 }
 .pwa-prompt__icon {
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
