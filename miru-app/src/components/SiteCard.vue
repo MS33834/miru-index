@@ -3,7 +3,6 @@ import { computed, ref } from 'vue'
 import { healthOf } from '../utils/mirror.js'
 import { getHighlightedParts } from '../utils/highlight.js'
 import { useFavorites } from '../composables/useFavorites.js'
-import { useLazyLoad } from '../composables/useLazyLoad.js'
 
 const props = defineProps({
   item: { type: Object, required: true },
@@ -16,7 +15,6 @@ const props = defineProps({
 const emit = defineEmits(['open'])
 
 const { isFavorite, toggleFavorite } = useFavorites()
-const { target, isVisible } = useLazyLoad()
 const favoriteAnimating = ref(false)
 
 function handleClick() {
@@ -54,7 +52,6 @@ const descParts = computed(() => getHighlightedParts(props.item.desc, props.sear
 
 <template>
   <div
-    ref="target"
     class="card-paper-wrap"
     :data-url="item.url"
     :style="{ animationDelay: Math.min(index, 24) * 0.04 + 's' }"
@@ -67,15 +64,19 @@ const descParts = computed(() => getHighlightedParts(props.item.desc, props.sear
       :class="compact ? 'p-4 sm:p-5' : 'p-5 sm:p-6'"
       :aria-label="item.desc ? `${item.name} — ${item.desc}` : item.name"
     >
-      <div v-if="isVisible" class="flex flex-col gap-3">
-        <div class="flex items-start justify-between gap-3">
+      <div class="flex flex-col gap-3">
+        <div class="flex items-start justify-between gap-3 pr-10">
           <h4 class="font-serif-cn text-lg sm:text-xl font-bold text-[#1a1410] leading-tight line-clamp-1 flex-1">
             <template v-for="(part, idx) in nameParts" :key="idx">
               <mark v-if="part.highlight" class="search-highlight">{{ part.text }}</mark>
               <template v-else>{{ part.text }}</template>
             </template>
           </h4>
-          <div class="flex items-center gap-2 shrink-0">
+          <div class="flex items-center gap-1.5 shrink-0">
+            <span v-if="category" class="cat-badge" :title="category.name">
+              <span class="cat-badge__icon">{{ category.icon }}</span>
+              <span class="cat-badge__name">{{ category.name }}</span>
+            </span>
             <span
               v-if="item.health"
               :title="`健康: ${healthOf(item).label}`"
@@ -100,44 +101,25 @@ const descParts = computed(() => getHighlightedParts(props.item.desc, props.sear
           </template>
         </p>
 
-        <div v-if="item.tags?.length" class="flex flex-wrap gap-1.5 sm:gap-2">
-          <span
-            v-for="t in item.tags.slice(0, compact ? 2 : 3)"
-            :key="t"
-            class="tag-stamp"
-            :class="compact ? 'tag-sm' : 'tag-normal'"
-            >#{{ t }}</span
-          >
-          <span
-            v-if="item.tags.length > (compact ? 2 : 3)"
-            class="tag-stamp tag-extra"
-            :class="compact ? 'tag-sm' : 'tag-normal'"
-            >+{{ item.tags.length - (compact ? 2 : 3) }}</span
-          >
+        <div v-if="item.features?.length" class="card-features">
+          <span v-for="f in item.features.slice(0, compact ? 2 : 3)" :key="f" class="card-features__item">
+            {{ f }}
+          </span>
         </div>
 
         <div class="flex items-center justify-between pt-3 border-t border-[#1a1410]/10">
-          <div class="font-mono text-[#5a4a3a] tracking-wider line-clamp-1 flex-1 text-xs">
-            {{ item.proxy ? '◯ 需梯子' : '◯ 直连' }}
+          <div class="flex items-center gap-1.5 flex-1 min-w-0">
+            <span v-if="item.tags?.length" class="tag-stamp" :class="compact ? 'tag-sm' : 'tag-normal'">
+              #{{ item.tags[0] }}
+            </span>
+            <span v-if="item.tags?.length > 1" class="tag-stamp tag-extra" :class="compact ? 'tag-sm' : 'tag-normal'">
+              +{{ item.tags.length - 1 }}
+            </span>
+            <span class="card-proxy" :class="{ 'is-proxy': item.proxy }">
+              {{ item.proxy ? '需梯' : '直连' }}
+            </span>
           </div>
           <div class="text-[#a8161a] font-serif-cn tracking-wider text-sm font-bold">覌 →</div>
-        </div>
-      </div>
-      <div v-else class="card-skeleton" aria-hidden="true">
-        <div class="flex items-start justify-between gap-3">
-          <div class="skeleton-line skeleton-title"></div>
-          <div class="skeleton-badge"></div>
-        </div>
-        <div class="skeleton-line skeleton-desc skeleton-desc--1"></div>
-        <div class="skeleton-line skeleton-desc skeleton-desc--2"></div>
-        <div class="flex flex-wrap gap-1.5 sm:gap-2 mt-1">
-          <div class="skeleton-tag"></div>
-          <div class="skeleton-tag"></div>
-          <div class="skeleton-tag skeleton-tag--short"></div>
-        </div>
-        <div class="skeleton-footer">
-          <div class="skeleton-line skeleton-footer__text"></div>
-          <div class="skeleton-line skeleton-footer__arrow"></div>
         </div>
       </div>
     </button>
@@ -188,7 +170,68 @@ const descParts = computed(() => getHighlightedParts(props.item.desc, props.sear
   color: #a4853e;
 }
 
-/* 卡片包装器 - 支持悬浮收藏按钮 */
+.cat-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.1rem 0.45rem;
+  background: rgba(26, 20, 16, 0.06);
+  border: 1px solid rgba(26, 20, 16, 0.12);
+  border-radius: 999px;
+  color: #5a4a3a;
+  font-family: var(--serif);
+  font-size: 0.65rem;
+  white-space: nowrap;
+}
+.cat-badge__icon {
+  font-size: 0.75rem;
+  line-height: 1;
+}
+.cat-badge__name {
+  display: none;
+}
+@media (min-width: 640px) {
+  .cat-badge__name {
+    display: inline;
+  }
+}
+
+.card-features {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.card-features__item {
+  font-family: var(--kai);
+  font-size: 0.72rem;
+  color: #5a4a3a;
+  background: rgba(201, 165, 92, 0.08);
+  border: 1px solid rgba(201, 165, 92, 0.2);
+  border-radius: 2px;
+  padding: 0.15rem 0.45rem;
+  white-space: nowrap;
+}
+
+.card-proxy {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  color: #5a4a3a;
+  padding: 0.1rem 0.4rem;
+  border-radius: 2px;
+  background: rgba(26, 20, 16, 0.04);
+  border: 1px solid rgba(26, 20, 16, 0.08);
+  white-space: nowrap;
+}
+.card-proxy.is-proxy {
+  color: #a4853e;
+  background: rgba(201, 165, 92, 0.08);
+  border-color: rgba(201, 165, 92, 0.2);
+}
+
+/* 卡片包装器 - 支持悬浮收藏按钮。
+ * 保持默认 pointer-events，避免 Firefox 等浏览器在 pointer-events: none 父元素下
+ * 对子元素 hit-testing 出现误判，导致相邻卡片互相拦截点击。
+ */
 .card-paper-wrap {
   position: relative;
 }

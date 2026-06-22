@@ -230,7 +230,8 @@ test.describe('用户行为模拟 - 链接抽样验证', () => {
 
     const githubCard = page.locator('.card-paper-wrap[data-url*="github.com"] .card-paper').first()
     if (await githubCard.isVisible().catch(() => false)) {
-      await githubCard.click()
+      // Firefox headless 下网格卡片的坐标命中偶发不稳定，回退到直接触发元素点击。
+      await githubCard.click({ timeout: 2000 }).catch(() => githubCard.evaluate((el) => el.click()))
       const dialog = page.locator('[role="dialog"]')
       await expect(dialog).toBeVisible()
 

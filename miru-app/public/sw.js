@@ -1,6 +1,6 @@
 // 智能预缓存清单 - install 时预缓存关键资源
 // Vite 构建产物通过 content hash，部署后由运行时缓存填充
-const CACHE_VERSION = 'v4'
+const CACHE_VERSION = 'v6'
 const CACHE_NAME = `miru-index-${CACHE_VERSION}`
 
 const PRECACHE_ASSETS = [

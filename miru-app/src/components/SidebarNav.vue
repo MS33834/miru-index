@@ -75,6 +75,8 @@ watch(
   () => props.searchQuery,
   (newVal) => {
     localSearchQuery.value = newVal
+    // 外部清空/同步搜索词时立即同步防抖值，避免旧定时器在清空后再次触发搜索
+    setDebouncedValue(newVal, true)
   }
 )
 </script>

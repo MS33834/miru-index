@@ -31,10 +31,14 @@ function validate() {
       const item = cat.items[i]
       const path = `category[${cat.id}].items[${i}]`
 
-      const required = ['name', 'url', 'desc', 'fullDesc', 'tags', 'features', 'proxy', 'health']
+      const required = ['name', 'url', 'desc', 'fullDesc', 'tags', 'features', 'proxy']
       for (const key of required) {
         if (!(key in item)) error(path, `缺少字段 ${key}`)
       }
+
+      // health 按 schema 默认为 'ok'，缺失时仅警告，与运行时行为保持一致
+      const health = item.health ?? 'ok'
+      if (!('health' in item)) warn(path, '缺少字段 health，将使用默认值 ok')
 
       if (typeof item.name !== 'string' || !item.name.trim()) error(path, 'name 为空')
       if (typeof item.url !== 'string' || !item.url.trim()) {
@@ -70,7 +74,7 @@ function validate() {
 
       if (typeof item.proxy !== 'boolean') error(path, `proxy 应为布尔值: ${item.proxy}`)
 
-      if (!VALID_HEALTH.has(item.health)) {
+      if (!VALID_HEALTH.has(health)) {
         error(path, `health 值非法: ${item.health}，允许 ${[...VALID_HEALTH].join('/')}`)
       }
 

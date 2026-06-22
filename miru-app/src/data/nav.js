@@ -1,8 +1,15 @@
-// Miru Index 数据：26 个细分分类，约 170+ 条资源
-// 字段：name, url, desc, fullDesc, tags, features, proxy
+// Miru Index 数据：40+ 个细分分类，约 390+ 条资源
+// 字段：name, url, desc, fullDesc, tags, features, proxy, health, mirrors
 // proxy: true 表示需要科学上网
+//
+// 扩展方式（按未来规模选择）：
+// 1. 修改本文件：适合主分类与核心条目
+// 2. 修改 src/data/site-extensions.js：适合新增分类与批量补充条目
+// 3. 接入 CMS/API：替换 site-extensions.js 的导出即可，nav.js 合并逻辑不变
 
-export const categories = [
+import { extensionCategories, extensionItems } from './site-extensions.js'
+
+const baseCategories = [
   {
     id: 'proxy',
     name: '网络代理',
@@ -2747,3 +2754,49 @@ export const categories = [
     ],
   },
 ]
+
+// ==================== 数据合并（为 CMS / 扩展预留的标准入口）====================
+// 规则：
+// 1. baseCategories 作为核心分类骨架
+// 2. extensionItems[catId] 按分类 id 追加到对应分类，实现“不改主文件即可补内容”
+// 3. extensionCategories 作为新增分类追加到末尾
+// 4. 未来接入 CMS 时，只需把 CMS JSON 映射为 extensionCategories / extensionItems 即可
+
+function mergeCategories(base, extensionCats, extensionItemsMap) {
+  // 按 URL 去重，避免 CMS 与本地数据冲突；同时给缺失 health 的条目填充默认值
+  const seenUrls = new Set()
+  const normalize = (items) =>
+    items
+      .filter((item) => {
+        if (!item.url || seenUrls.has(item.url)) return false
+        seenUrls.add(item.url)
+        return true
+      })
+      .map((item) => ({
+        health: 'ok',
+        ...item,
+      }))
+
+  // 为基础分类追加扩展条目
+  const merged = base.map((cat) => {
+    const extra = extensionItemsMap[cat.id] || []
+    return {
+      ...cat,
+      items: normalize([...cat.items, ...extra]),
+    }
+  })
+
+  // 追加新增分类
+  for (const cat of extensionCats) {
+    const existing = merged.find((c) => c.id === cat.id)
+    if (existing) {
+      existing.items = normalize([...existing.items, ...cat.items])
+    } else {
+      merged.push({ ...cat, items: normalize([...cat.items]) })
+    }
+  }
+
+  return merged
+}
+
+export const categories = mergeCategories(baseCategories, extensionCategories, extensionItems)

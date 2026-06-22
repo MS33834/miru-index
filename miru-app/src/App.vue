@@ -6,14 +6,10 @@ import SiteCard from './components/SiteCard.vue'
 import ErrorBoundary from './components/ErrorBoundary.vue'
 import AppSkeleton from './components/AppSkeleton.vue'
 
-// 重型组件按需异步加载，减少首屏 JS 体积；加载期间使用全局骨架屏占位
-const asyncOptions = { loadingComponent: AppSkeleton }
-const SiteModal = defineAsyncComponent({ ...asyncOptions, loader: () => import('./components/SiteModal.vue') })
-const KeyboardHelp = defineAsyncComponent({ ...asyncOptions, loader: () => import('./components/KeyboardHelp.vue') })
-const PwaInstallPrompt = defineAsyncComponent({
-  ...asyncOptions,
-  loader: () => import('./components/PwaInstallPrompt.vue'),
-})
+// 重型覆盖层组件按需异步加载，减少首屏 JS 体积；加载期间无占位，避免全屏骨架屏突兀
+const SiteModal = defineAsyncComponent(() => import('./components/SiteModal.vue'))
+const KeyboardHelp = defineAsyncComponent(() => import('./components/KeyboardHelp.vue'))
+const PwaInstallPrompt = defineAsyncComponent(() => import('./components/PwaInstallPrompt.vue'))
 import { isOffline } from './main.js'
 import { APP_CONFIG } from './config/constants.js'
 import { useScrollPosition } from './composables/useScrollPosition.js'
@@ -85,6 +81,13 @@ const {
 
 const totalCount = computed(() => allItems.value.length)
 const favoritesCount = computed(() => favorites.value.length)
+
+// 首屏快捷标签：高频 + 有特色，点击直接筛选
+const quickTags = computed(() => {
+  const preferred = ['开源', '教程', 'VTuber', 'Cosplay', 'MMD', '同人音乐', '正版', '声优']
+  const available = new Set(appState.allTags.value.map((t) => t.name))
+  return preferred.filter((t) => available.has(t)).slice(0, 7)
+})
 
 useUrlSync({
   searchQuery,
@@ -475,82 +478,229 @@ onUnmounted(() => {
 
       <!-- =================== 主区 =================== -->
       <main id="main-content" class="main">
-        <!-- Hero（首次进入且无搜索） -->
-        <section v-if="loaded && !searchQuery && activeCategory === 'all'" class="hero">
-          <div class="hero__inner">
-            <!-- 简化的顶部标识 -->
-            <div class="flex items-center gap-3 mb-12">
-              <div class="hanko h-10 w-10 text-base">漫</div>
-              <div>
-                <div class="font-serif-cn text-[#f3ece0] text-lg font-bold tracking-wider">MIRU INDEX</div>
-                <div class="font-mono text-[#8a7a68] text-[10px] tracking-[0.3em] mt-1">ACGN · 2026</div>
+        <!-- 首屏骨架屏，提升加载感知性能 -->
+        <AppSkeleton v-if="!loaded" />
+
+        <template v-else>
+          <!-- Hero（首次进入且无搜索） -->
+          <section v-if="!searchQuery && activeCategory === 'all'" class="hero">
+            <div class="hero__inner">
+              <div class="hero__brand">
+                <div class="hanko hero__brand-mark">漫</div>
+                <div>
+                  <div class="hero__brand-title">MIRU INDEX</div>
+                  <div class="hero__brand-sub">ACGN · 2026</div>
+                </div>
+              </div>
+
+              <div class="hero__main">
+                <h1 class="hero__headline">
+                  <span class="hero-title ink-spread">漫藏</span>
+                  <span class="hero-title-sub ink-spread">藏經閣</span>
+                </h1>
+
+                <p class="hero__intro">
+                  一座属于 <span class="text-[#f3ece0] font-bold">ACGN</span> 的<span class="text-[#ff4d4f] font-bold"
+                    >印经阁</span
+                  >。 精选 <span class="hero__num">{{ totalCount }}</span> 站 · 分
+                  <span class="hero__num">{{ categories.length }}</span> 卷 · 涵漫画 · 番剧 · GalGame · 轻小说 · 绘图 ·
+                  VTuber · 同人音乐 · Cosplay · 声优 · 展会 · GitHub 开源 · 网络工具……
+                </p>
+
+                <div class="hero__stats">
+                  <div class="hero__stat hanko">
+                    <span class="hero__stat-num">{{ totalCount }}</span>
+                    <span class="hero__stat-label">收录</span>
+                  </div>
+                  <div class="hero__stat hanko hero__stat--gold">
+                    <span class="hero__stat-num">{{ categories.length }}</span>
+                    <span class="hero__stat-label">分类</span>
+                  </div>
+                  <div class="hero__stat hanko hero__stat--ink">
+                    <span class="hero__stat-num">{{ VOLUMES.length }}</span>
+                    <span class="hero__stat-label">卷册</span>
+                  </div>
+                </div>
+
+                <div class="hero__shortcuts">
+                  <button v-for="tag in quickTags" :key="tag" type="button" class="hero__tag" @click="toggleTag(tag)">
+                    #{{ tag }}
+                  </button>
+                </div>
               </div>
             </div>
 
-            <!-- 主标题区域 - 更简洁 -->
-            <div class="relative">
-              <h1 class="relative mb-6">
-                <span class="hero-title ink-spread inline-block">漫藏</span>
-                <span class="hero-title-sub ink-spread inline-block ml-4">藏經閣</span>
-              </h1>
-
-              <p class="max-w-2xl text-[#c4bba8] text-base leading-[2] font-kai-cn mb-8">
-                一座属于 <span class="text-[#f3ece0] font-bold">ACGN</span> 的<span class="text-[#ff4d4f] font-bold"
-                  >印经阁</span
-                >。 精选 <span class="text-[#c9a55c] font-serif-cn text-lg mx-1">{{ totalCount }}</span> 站 · 分
-                <span class="text-[#c9a55c] font-serif-cn text-lg mx-1">{{ categories.length }}</span> 卷 · 涵盖漫画 ·
-                番剧 · GalGame · 轻小说 · 绘图 · GitHub 开源 · 网络工具……
-              </p>
-
-              <!-- 简化的标签 -->
-              <div class="flex flex-wrap gap-2">
-                <div class="hanko px-3 py-1.5 text-sm">朱泥 · ACGN</div>
-                <div class="hanko px-3 py-1.5 text-sm" style="background: #1a1410; color: #c9a55c">
-                  御金 · {{ totalCount }}
-                </div>
-                <div class="hanko px-3 py-1.5 text-sm" style="background: #0a0a0a; color: #f3ece0">
-                  墨 · {{ VOLUMES.length }}卷
-                </div>
-              </div>
+            <div class="hero__scroll-hint" aria-hidden="true">
+              <span>向下卷阅</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
             </div>
-          </div>
-        </section>
+          </section>
 
-        <!-- 面包屑 -->
-        <div v-if="!searchQuery" class="breadcrumb">
-          <button
-            type="button"
-            @click="onSelectCategory('all')"
-            class="breadcrumb__item"
-            :class="{ 'is-current': activeCategory === 'all' }"
-          >
-            <span>⌘</span> 總藏
-          </button>
-          <template v-if="currentCategory">
-            <span class="breadcrumb__sep">/</span>
-            <span class="breadcrumb__item is-current">
-              <span>{{ currentCategory.icon }}</span> {{ currentCategory.name }}
+          <!-- 面包屑 -->
+          <div v-if="!searchQuery" class="breadcrumb">
+            <button
+              type="button"
+              @click="onSelectCategory('all')"
+              class="breadcrumb__item"
+              :class="{ 'is-current': activeCategory === 'all' }"
+            >
+              <span>⌘</span> 總藏
+            </button>
+            <template v-if="currentCategory">
+              <span class="breadcrumb__sep">/</span>
+              <span class="breadcrumb__item is-current">
+                <span>{{ currentCategory.icon }}</span> {{ currentCategory.name }}
+              </span>
+            </template>
+            <span class="breadcrumb__count">
+              <span class="font-mono">{{ filteredCount }}</span> 帖
             </span>
-          </template>
-          <span class="breadcrumb__count">
-            <span class="font-mono">{{ filteredCount }}</span> 帖
-          </span>
-        </div>
+          </div>
 
-        <!-- 搜索结果条 -->
-        <div v-if="searchQuery" class="search-result">
-          <div class="flex items-center justify-between gap-3 flex-wrap">
-            <div>
-              <div class="font-mono text-[10px] tracking-[0.3em] text-[#c9a55c]">▎索 · 寻 「{{ searchQuery }}」</div>
-              <div class="font-kai-cn text-[#c4bba8] text-sm mt-1">
-                得 <span class="text-[#c9a55c] font-serif-cn text-lg mx-1">{{ filteredCount }}</span> 条结果
+          <!-- 搜索结果条 -->
+          <div v-if="searchQuery" class="search-result">
+            <div class="flex items-center justify-between gap-3 flex-wrap">
+              <div>
+                <div class="font-mono text-[10px] tracking-[0.3em] text-[#c9a55c]">▎索 · 寻 「{{ searchQuery }}」</div>
+                <div class="font-kai-cn text-[#c4bba8] text-sm mt-1">
+                  得 <span class="text-[#c9a55c] font-serif-cn text-lg mx-1">{{ filteredCount }}</span> 条结果
+                </div>
               </div>
+              <button type="button" @click="onClearSearch" class="search-clear-btn" aria-label="清空搜索">
+                <span>清空</span>
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                  aria-hidden="true"
+                >
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                </svg>
+              </button>
             </div>
-            <button type="button" @click="onClearSearch" class="search-clear-btn" aria-label="清空搜索">
-              <span>清空</span>
+          </div>
+
+          <!-- 过滤与视图工具条：收藏/直连/需梯过滤已集中到侧边栏“快速过滤”，此处保留视图切换与批量操作 -->
+          <div class="filter-bar">
+            <div class="filter-bar__group">
+              <button
+                v-if="selectedTags.size > 0"
+                type="button"
+                class="filter-chip filter-chip--action"
+                @click="clearTags"
+                title="清除标签筛选"
+              >
+                <span>清除标签</span>
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                  aria-hidden="true"
+                >
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                </svg>
+              </button>
+            </div>
+
+            <div class="filter-bar__group">
+              <button
+                type="button"
+                class="view-toggle"
+                :class="{ 'is-active': viewMode === 'grid' }"
+                @click="setMode('grid')"
+                aria-label="网格视图"
+                title="网格视图"
+              >
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  aria-hidden="true"
+                >
+                  <rect x="3" y="3" width="7" height="7" />
+                  <rect x="14" y="3" width="7" height="7" />
+                  <rect x="3" y="14" width="7" height="7" />
+                  <rect x="14" y="14" width="7" height="7" />
+                </svg>
+              </button>
+              <button
+                type="button"
+                class="view-toggle"
+                :class="{ 'is-active': viewMode === 'list' }"
+                @click="setMode('list')"
+                aria-label="列表视图"
+                title="列表视图"
+              >
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  aria-hidden="true"
+                >
+                  <line x1="3" y1="6" x2="21" y2="6" />
+                  <line x1="3" y1="12" x2="21" y2="12" />
+                  <line x1="3" y1="18" x2="21" y2="18" />
+                </svg>
+              </button>
+            </div>
+
+            <div class="filter-bar__group">
+              <button
+                type="button"
+                class="filter-chip filter-chip--action"
+                @click="onExportFavorites"
+                title="导出收藏为 JSON"
+              >
+                导出收藏
+              </button>
+              <button
+                type="button"
+                class="filter-chip filter-chip--action"
+                @click="importInputRef?.click()"
+                title="从 JSON 文件导入收藏"
+              >
+                导入收藏
+              </button>
+              <input ref="importInputRef" type="file" accept="application/json" class="hidden" @change="onImportFile" />
+              <span v-if="importStatus" class="filter-chip__status">{{ importStatus }}</span>
+            </div>
+          </div>
+
+          <!-- 已选标签 -->
+          <div v-if="selectedTags.size > 0" class="selected-tags">
+            <span class="selected-tags__label">已选标签</span>
+            <button
+              v-for="tag in selectedTags"
+              :key="tag"
+              type="button"
+              class="selected-tags__item"
+              @click="toggleTag(tag)"
+              :aria-label="`移除标签 ${tag}`"
+            >
+              <span>#{{ tag }}</span>
               <svg
-                width="12"
-                height="12"
+                width="10"
+                height="10"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -563,262 +713,151 @@ onUnmounted(() => {
               </svg>
             </button>
           </div>
-        </div>
 
-        <!-- 过滤与视图工具条：收藏/直连/需梯过滤已集中到侧边栏“快速过滤”，此处保留视图切换与批量操作 -->
-        <div class="filter-bar">
-          <div class="filter-bar__group">
-            <button
-              v-if="selectedTags.size > 0"
-              type="button"
-              class="filter-chip filter-chip--action"
-              @click="clearTags"
-              title="清除标签筛选"
-            >
-              <span>清除标签</span>
-              <svg
-                width="12"
-                height="12"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2.5"
-                stroke-linecap="round"
-                aria-hidden="true"
-              >
-                <line x1="6" y1="6" x2="18" y2="18" />
-                <line x1="18" y1="6" x2="6" y2="18" />
-              </svg>
-            </button>
-          </div>
-
-          <div class="filter-bar__group">
-            <button
-              type="button"
-              class="view-toggle"
-              :class="{ 'is-active': viewMode === 'grid' }"
-              @click="setMode('grid')"
-              aria-label="网格视图"
-              title="网格视图"
-            >
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                aria-hidden="true"
-              >
-                <rect x="3" y="3" width="7" height="7" />
-                <rect x="14" y="3" width="7" height="7" />
-                <rect x="3" y="14" width="7" height="7" />
-                <rect x="14" y="14" width="7" height="7" />
-              </svg>
-            </button>
-            <button
-              type="button"
-              class="view-toggle"
-              :class="{ 'is-active': viewMode === 'list' }"
-              @click="setMode('list')"
-              aria-label="列表视图"
-              title="列表视图"
-            >
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                aria-hidden="true"
-              >
-                <line x1="3" y1="6" x2="21" y2="6" />
-                <line x1="3" y1="12" x2="21" y2="12" />
-                <line x1="3" y1="18" x2="21" y2="18" />
-              </svg>
-            </button>
-          </div>
-
-          <div class="filter-bar__group">
-            <button
-              type="button"
-              class="filter-chip filter-chip--action"
-              @click="onExportFavorites"
-              title="导出收藏为 JSON"
-            >
-              导出收藏
-            </button>
-            <button
-              type="button"
-              class="filter-chip filter-chip--action"
-              @click="importInputRef?.click()"
-              title="从 JSON 文件导入收藏"
-            >
-              导入收藏
-            </button>
-            <input ref="importInputRef" type="file" accept="application/json" class="hidden" @change="onImportFile" />
-            <span v-if="importStatus" class="filter-chip__status">{{ importStatus }}</span>
-          </div>
-        </div>
-
-        <!-- 已选标签 -->
-        <div v-if="selectedTags.size > 0" class="selected-tags">
-          <span class="selected-tags__label">已选标签</span>
-          <button
-            v-for="tag in selectedTags"
-            :key="tag"
-            type="button"
-            class="selected-tags__item"
-            @click="toggleTag(tag)"
-            :aria-label="`移除标签 ${tag}`"
-          >
-            <span>#{{ tag }}</span>
-            <svg
-              width="10"
-              height="10"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2.5"
-              stroke-linecap="round"
-              aria-hidden="true"
-            >
-              <line x1="6" y1="6" x2="18" y2="18" />
-              <line x1="18" y1="6" x2="6" y2="18" />
-            </svg>
-          </button>
-        </div>
-
-        <!-- 主体：分卷 OR 单一分类 -->
-        <div v-if="groupedByVolume" class="volumes">
-          <article v-for="(vol, vi) in groupedByVolume" :key="vol.id" class="volume content-auto">
-            <!-- 卷首 -->
-            <header class="volume__header">
-              <div class="flex items-end gap-4 sm:gap-6 mb-3 sm:mb-4">
-                <div class="volume-num font-serif-cn">{{ vol.chapterNum }}</div>
-                <div class="flex-1 pb-1">
-                  <div class="chapter-num text-[#8a7a68] mb-1">
-                    CHAPTER · {{ String(vi + 1).padStart(2, '0') }} /
-                    {{ String(groupedByVolume.length).padStart(2, '0') }}
+          <!-- 主体：分卷 OR 单一分类 -->
+          <div v-if="groupedByVolume" class="volumes">
+            <article v-for="(vol, vi) in groupedByVolume" :key="vol.id" class="volume content-auto">
+              <!-- 卷首 -->
+              <header class="volume__header">
+                <div class="flex items-end gap-4 sm:gap-6 mb-3 sm:mb-4">
+                  <div class="volume-num font-serif-cn">{{ vol.chapterNum }}</div>
+                  <div class="flex-1 pb-1">
+                    <div class="chapter-num text-[#8a7a68] mb-1">
+                      CHAPTER · {{ String(vi + 1).padStart(2, '0') }} /
+                      {{ String(groupedByVolume.length).padStart(2, '0') }}
+                    </div>
+                    <h2 class="font-serif-cn text-2xl sm:text-3xl text-[#f3ece0] font-bold tracking-wide">
+                      <span class="text-[#ff4d4f] mr-2">卷</span>{{ vol.name.replace('卷', '') }} · {{ vol.title }}
+                    </h2>
+                    <div class="mt-1.5 text-[#c9a55c] font-mono text-[11px] tracking-[0.2em]">
+                      {{ vol.sub }} · {{ vol.items.length }} 帖
+                    </div>
                   </div>
-                  <h2 class="font-serif-cn text-2xl sm:text-3xl text-[#f3ece0] font-bold tracking-wide">
-                    <span class="text-[#ff4d4f] mr-2">卷</span>{{ vol.name.replace('卷', '') }} · {{ vol.title }}
-                  </h2>
-                  <div class="mt-1.5 text-[#c9a55c] font-mono text-[11px] tracking-[0.2em]">
-                    {{ vol.sub }} · {{ vol.items.length }} 帖
+                  <div class="hidden sm:flex items-center gap-2 pb-1">
+                    <div class="hanko text-xs px-2.5 py-1 stamp-anim">第{{ vol.chapterNum }}卷</div>
                   </div>
                 </div>
-                <div class="hidden sm:flex items-center gap-2 pb-1">
-                  <div class="hanko text-xs px-2.5 py-1 stamp-anim">第{{ vol.chapterNum }}卷</div>
+                <div class="scroll-divider">
+                  <span class="ornament">❀</span>
                 </div>
-              </div>
-              <div class="scroll-divider">
-                <span class="ornament">❀</span>
-              </div>
-            </header>
+              </header>
 
-            <!-- 卷内分组 -->
-            <div class="space-y-10">
-              <div v-for="cat in vol.cats" :key="cat.id" class="subgroup">
-                <div class="subgroup__head">
-                  <span class="subgroup__icon">{{ cat.icon }}</span>
-                  <h3 class="font-serif-cn text-base sm:text-lg font-bold text-[#f3ece0] tracking-wider">
-                    {{ cat.name }}
-                  </h3>
-                  <span class="ink-bar flex-1 min-w-[40px]"></span>
-                  <button type="button" @click="onSelectCategory(cat.id)" class="subgroup__more">全卷 →</button>
-                </div>
-                <div class="site-grid" :class="viewMode === 'list' ? 'site-grid--list' : 'site-grid--grid'">
-                  <SiteCard
-                    v-for="(item, idx) in cat.items"
-                    :key="item.name + (item.url || '')"
-                    :item="item"
-                    :category="cat"
-                    :index="idx"
-                    :compact="true"
-                    :search-query="searchQuery"
-                    :view-mode="viewMode"
-                    @open="openModal"
-                  />
+              <!-- 卷内分组 -->
+              <div class="space-y-10">
+                <div v-for="cat in vol.cats" :key="cat.id" class="subgroup">
+                  <div class="subgroup__head">
+                    <span class="subgroup__icon">{{ cat.icon }}</span>
+                    <h3 class="font-serif-cn text-base sm:text-lg font-bold text-[#f3ece0] tracking-wider">
+                      {{ cat.name }}
+                    </h3>
+                    <span class="ink-bar flex-1 min-w-[40px]"></span>
+                    <button type="button" @click="onSelectCategory(cat.id)" class="subgroup__more">全卷 →</button>
+                  </div>
+                  <div class="site-grid" :class="viewMode === 'list' ? 'site-grid--list' : 'site-grid--grid'">
+                    <SiteCard
+                      v-for="(item, idx) in cat.items"
+                      :key="item.name + (item.url || '')"
+                      :item="item"
+                      :category="cat"
+                      :index="idx"
+                      :compact="true"
+                      :search-query="searchQuery"
+                      :view-mode="viewMode"
+                      @open="openModal"
+                    />
+                  </div>
                 </div>
               </div>
+            </article>
+          </div>
+
+          <div v-else-if="singleCategory" class="single-cat">
+            <article v-for="(group, gi) in singleCategory" :key="group.id" class="content-auto">
+              <header class="volume__header">
+                <div class="flex items-end gap-4 sm:gap-6 mb-3 sm:mb-4">
+                  <div class="volume-num font-serif-cn">{{ CHINESE_NUMS[gi + 1] || '壹' }}</div>
+                  <div class="flex-1 pb-1">
+                    <div class="chapter-num text-[#8a7a68] mb-1">CHAPTER · {{ String(gi + 1).padStart(2, '0') }}</div>
+                    <h2 class="font-serif-cn text-2xl sm:text-3xl text-[#f3ece0] font-bold tracking-wide">
+                      <span class="text-[#ff4d4f] mr-2">{{ group.icon }}</span
+                      >{{ group.name }}
+                    </h2>
+                    <div class="mt-1.5 text-[#8a7a68] font-mono text-[10px] tracking-[0.2em]">
+                      共 {{ group.items.length }} 帖
+                    </div>
+                  </div>
+                  <div class="hidden sm:flex items-center gap-2 pb-1">
+                    <div class="hanko text-xs px-2.5 py-1 stamp-anim">全卷</div>
+                  </div>
+                </div>
+                <div class="scroll-divider">
+                  <span class="ornament">❀</span>
+                </div>
+              </header>
+
+              <div class="site-grid" :class="viewMode === 'list' ? 'site-grid--list' : 'site-grid--grid'">
+                <SiteCard
+                  v-for="(item, idx) in group.items"
+                  :key="item.name + (item.url || '')"
+                  :item="item"
+                  :category="group"
+                  :index="idx"
+                  :search-query="searchQuery"
+                  :view-mode="viewMode"
+                  @open="openModal"
+                />
+              </div>
+            </article>
+          </div>
+
+          <div v-if="isEmpty" class="empty">
+            <div class="hanko-circle w-20 h-20 mx-auto mb-6 text-2xl">空</div>
+            <p class="font-kai-cn text-[#8a7a68] text-lg mb-6">卷帙浩繁，未寻得所求之物……</p>
+            <div class="empty__actions">
+              <button v-if="searchQuery" type="button" class="empty__btn" @click="onClearSearch">清空搜索</button>
+              <button v-if="selectedTags.size > 0" type="button" class="empty__btn" @click="clearTags">清除标签</button>
+              <button v-if="proxyFilter !== 'all'" type="button" class="empty__btn" @click="setProxyFilter('all')">
+                重置代理过滤
+              </button>
+              <button v-if="showFavoritesOnly" type="button" class="empty__btn" @click="toggleFavoritesOnly">
+                取消仅收藏
+              </button>
+              <button type="button" class="empty__btn empty__btn--primary" @click="onSelectCategory('all')">
+                返回总藏
+              </button>
             </div>
-          </article>
-        </div>
-
-        <div v-else-if="singleCategory" class="single-cat">
-          <article v-for="(group, gi) in singleCategory" :key="group.id" class="content-auto">
-            <header class="volume__header">
-              <div class="flex items-end gap-4 sm:gap-6 mb-3 sm:mb-4">
-                <div class="volume-num font-serif-cn">{{ CHINESE_NUMS[gi + 1] || '壹' }}</div>
-                <div class="flex-1 pb-1">
-                  <div class="chapter-num text-[#8a7a68] mb-1">CHAPTER · {{ String(gi + 1).padStart(2, '0') }}</div>
-                  <h2 class="font-serif-cn text-2xl sm:text-3xl text-[#f3ece0] font-bold tracking-wide">
-                    <span class="text-[#ff4d4f] mr-2">{{ group.icon }}</span
-                    >{{ group.name }}
-                  </h2>
-                  <div class="mt-1.5 text-[#8a7a68] font-mono text-[10px] tracking-[0.2em]">
-                    共 {{ group.items.length }} 帖
-                  </div>
-                </div>
-                <div class="hidden sm:flex items-center gap-2 pb-1">
-                  <div class="hanko text-xs px-2.5 py-1 stamp-anim">全卷</div>
-                </div>
-              </div>
-              <div class="scroll-divider">
-                <span class="ornament">❀</span>
-              </div>
-            </header>
-
-            <div class="site-grid" :class="viewMode === 'list' ? 'site-grid--list' : 'site-grid--grid'">
-              <SiteCard
-                v-for="(item, idx) in group.items"
-                :key="item.name + (item.url || '')"
-                :item="item"
-                :category="group"
-                :index="idx"
-                :search-query="searchQuery"
-                :view-mode="viewMode"
-                @open="openModal"
-              />
+            <div v-if="searchQuery || selectedTags.size > 0" class="empty__tips">
+              <p class="text-[#8a7a68] text-sm">试试其它关键词，或从标签云挑选热门标签</p>
             </div>
-          </article>
-        </div>
-
-        <div v-if="isEmpty" class="empty">
-          <div class="hanko-circle w-20 h-20 mx-auto mb-6 text-2xl">空</div>
-          <p class="font-kai-cn text-[#8a7a68] text-lg">卷帙浩繁，未寻得所求之物……</p>
-        </div>
-
-        <!-- 分页控件 -->
-        <nav v-if="activeCategory === 'all' && totalPageCount > 1" class="pagination" aria-label="分页导航">
-          <button
-            type="button"
-            @click="onPrevPage"
-            :disabled="currentPage === 1"
-            class="pagination__btn"
-            aria-label="上一页"
-          >
-            ← 前一页
-          </button>
-          <div class="pagination__info">
-            <span class="font-serif-cn text-[#c9a55c]">{{ currentPage }}</span>
-            <span class="text-[#8a7a68]">/</span>
-            <span>{{ totalPageCount }}</span>
           </div>
-          <button
-            type="button"
-            @click="onNextPage"
-            :disabled="currentPage === totalPageCount"
-            class="pagination__btn"
-            aria-label="下一页"
-          >
-            后一页 →
-          </button>
-        </nav>
+
+          <!-- 分页控件 -->
+          <nav v-if="activeCategory === 'all' && totalPageCount > 1" class="pagination" aria-label="分页导航">
+            <button
+              type="button"
+              @click="onPrevPage"
+              :disabled="currentPage === 1"
+              class="pagination__btn"
+              aria-label="上一页"
+            >
+              ← 前一页
+            </button>
+            <div class="pagination__info">
+              <span class="font-serif-cn text-[#c9a55c]">{{ currentPage }}</span>
+              <span class="text-[#8a7a68]">/</span>
+              <span>{{ totalPageCount }}</span>
+            </div>
+            <button
+              type="button"
+              @click="onNextPage"
+              :disabled="currentPage === totalPageCount"
+              class="pagination__btn"
+              aria-label="下一页"
+            >
+              后一页 →
+            </button>
+          </nav>
+        </template>
       </main>
 
       <!-- =================== FOOTER =================== -->
@@ -1021,42 +1060,209 @@ onUnmounted(() => {
 
 /* ============== Hero ============== */
 .hero {
-  padding: 4rem 1.5rem 3rem;
+  padding: 3rem 1rem 4rem;
   position: relative;
+  min-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 @media (min-width: 640px) {
   .hero {
-    padding: 6rem 2rem 4rem;
+    padding: 4rem 2rem 5rem;
   }
 }
 @media (min-width: 1024px) {
   .hero {
-    padding: 8rem 3rem 5rem;
+    padding: 5rem 3rem 6rem;
+    min-height: 88vh;
   }
 }
 
 .hero__inner {
-  max-width: 800px;
+  max-width: 860px;
   margin: 0 auto;
+  width: 100%;
+}
+
+.hero__brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 2.5rem;
+}
+.hero__brand-mark {
+  width: 2.75rem;
+  height: 2.75rem;
+  font-size: 1rem;
+}
+.hero__brand-title {
+  font-family: var(--serif);
+  color: var(--washi);
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  line-height: 1;
+}
+.hero__brand-sub {
+  font-family: var(--mono);
+  color: var(--ashi);
+  font-size: 0.65rem;
+  letter-spacing: 0.3em;
+  margin-top: 0.35rem;
+}
+
+.hero__main {
+  position: relative;
+}
+.hero__main::before {
+  content: '';
+  position: absolute;
+  top: -2rem;
+  left: -1.5rem;
+  width: 120px;
+  height: 120px;
+  background: radial-gradient(circle, rgba(255, 77, 79, 0.12) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero__main::after {
+  content: '';
+  position: absolute;
+  bottom: -1rem;
+  right: -1rem;
+  width: 160px;
+  height: 160px;
+  background: radial-gradient(circle, rgba(201, 165, 92, 0.1) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.hero__headline {
+  margin-bottom: 1.5rem;
+  position: relative;
 }
 
 .hero-title {
   font-family: var(--serif);
-  font-size: clamp(3.5rem, 12vw, 6rem);
+  font-size: clamp(4rem, 14vw, 7rem);
   font-weight: 900;
   color: var(--washi);
-  letter-spacing: 0.05em;
-  line-height: 1.1;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  display: inline-block;
 }
 
 .hero-title-sub {
   font-family: var(--serif);
-  font-size: clamp(3rem, 10vw, 5rem);
+  font-size: clamp(3.25rem, 11vw, 5.5rem);
   font-weight: 900;
   color: var(--seal);
-  letter-spacing: 0.05em;
-  line-height: 1.1;
-  opacity: 0.9;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  opacity: 0.95;
+  display: inline-block;
+  margin-left: 0.75rem;
+}
+
+.hero__intro {
+  max-width: 680px;
+  color: #c4bba8;
+  font-size: clamp(0.95rem, 2.5vw, 1.15rem);
+  line-height: 2;
+  font-family: var(--kai);
+  margin-bottom: 2rem;
+}
+
+.hero__num {
+  color: var(--gold);
+  font-family: var(--serif);
+  font-size: 1.35em;
+  font-weight: 700;
+  margin: 0 0.15em;
+}
+
+.hero__stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+.hero__stat {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  padding: 0.45rem 0.9rem;
+  font-size: 0.9rem;
+  border-radius: 4px;
+}
+.hero__stat--gold {
+  background: #1a1410;
+  color: var(--gold);
+  box-shadow: inset 0 0 0 1px rgba(201, 165, 92, 0.4);
+}
+.hero__stat--ink {
+  background: #0a0a0a;
+  color: var(--washi);
+  box-shadow: inset 0 0 0 1px rgba(243, 236, 224, 0.15);
+}
+.hero__stat-num {
+  font-size: 1.1rem;
+  font-weight: 900;
+}
+.hero__stat-label {
+  font-size: 0.75rem;
+  opacity: 0.85;
+}
+
+.hero__shortcuts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.hero__tag {
+  font-family: var(--serif);
+  font-size: 0.8rem;
+  color: var(--washi);
+  background: rgba(243, 236, 224, 0.05);
+  border: 1px solid rgba(255, 77, 79, 0.2);
+  border-radius: 2px;
+  padding: 0.35rem 0.7rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.hero__tag:hover {
+  background: rgba(255, 77, 79, 0.12);
+  border-color: rgba(255, 77, 79, 0.45);
+  color: #fff;
+}
+
+.hero__scroll-hint {
+  position: absolute;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  color: #b8a898;
+  font-family: var(--kai);
+  font-size: 0.75rem;
+  opacity: 0.85;
+  animation: hero-bounce 2s infinite;
+}
+@keyframes hero-bounce {
+  0%,
+  100% {
+    transform: translateX(-50%) translateY(0);
+  }
+  50% {
+    transform: translateX(-50%) translateY(6px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero__scroll-hint {
+    animation: none;
+  }
 }
 
 /* ============== 面包屑 ============== */
@@ -1154,7 +1360,42 @@ onUnmounted(() => {
 
 .empty {
   text-align: center;
-  padding: 4rem 0;
+  padding: 4rem 1rem;
+}
+.empty__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.6rem;
+  margin-bottom: 1.5rem;
+}
+.empty__btn {
+  font-family: var(--serif);
+  font-size: 0.85rem;
+  color: var(--washi);
+  background: rgba(243, 236, 224, 0.05);
+  border: 1px solid rgba(255, 77, 79, 0.2);
+  border-radius: 2px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.empty__btn:hover {
+  background: rgba(255, 77, 79, 0.1);
+  border-color: rgba(255, 77, 79, 0.4);
+}
+.empty__btn--primary {
+  background: rgba(201, 165, 92, 0.12);
+  border-color: rgba(201, 165, 92, 0.4);
+  color: var(--gold);
+}
+.empty__btn--primary:hover {
+  background: rgba(201, 165, 92, 0.2);
+  border-color: var(--gold);
+}
+.empty__tips {
+  max-width: 400px;
+  margin: 0 auto;
 }
 
 /* ============== 移动端微调 ============== */
@@ -1429,21 +1670,25 @@ onUnmounted(() => {
   align-items: center;
   gap: 0.75rem;
   padding: 0.75rem 1.25rem;
-  background: rgba(26, 20, 16, 0.95);
+  background: #1a1410;
   color: var(--washi);
-  border: 1px solid rgba(201, 165, 92, 0.4);
+  border: 1px solid rgba(201, 165, 92, 0.6);
   border-radius: 4px;
   font-family: var(--kai);
   font-size: 0.875rem;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
   z-index: 50;
-  backdrop-filter: blur(8px);
+  /* 提示条不阻挡背后的内容交互，仅按钮自身可点击 */
+  pointer-events: none;
+}
+.update-banner > * {
+  pointer-events: auto;
 }
 .update-banner__btn {
   font-family: var(--serif);
   font-size: 0.8rem;
   padding: 0.35rem 0.75rem;
-  background: #c9a55c;
+  background: #f3ece0;
   color: #1a1410;
   border: none;
   border-radius: 2px;
@@ -1451,7 +1696,7 @@ onUnmounted(() => {
   transition: background 0.2s;
 }
 .update-banner__btn:hover {
-  background: #ff4d4f;
-  color: #f3ece0;
+  background: #fff;
+  color: #1a1410;
 }
 </style>

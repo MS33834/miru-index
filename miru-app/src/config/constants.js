@@ -14,7 +14,7 @@ export const APP_CONFIG = {
       sub: 'Network · Tools',
       catIds: ['proxy', 'downloader', 'archive', 'imagesearch'],
     },
-    { id: 'v2', name: '卷贰', title: '工坊', sub: 'Workshop', catIds: ['ai', 'imgai'] },
+    { id: 'v2', name: '卷贰', title: '工坊 · 研习', sub: 'Workshop · Study', catIds: ['ai', 'imgai', 'tutorials'] },
     {
       id: 'v3',
       name: '卷叁',
@@ -29,14 +29,26 @@ export const APP_CONFIG = {
       sub: 'Community · News',
       catIds: ['news', 'community', 'galgame_news'],
     },
-    { id: 'v5', name: '卷伍', title: '视听娱乐', sub: 'Audio · Visual', catIds: ['music', 'draw', 'video', 'sticker'] },
-    { id: 'v6', name: '卷陆', title: '周边 · 聚合', sub: 'Figure · Aggregator', catIds: ['figure', 'agg', 'github'] },
+    {
+      id: 'v5',
+      name: '卷伍',
+      title: '视听 · 演出',
+      sub: 'Audio · Visual · Performance',
+      catIds: ['music', 'draw', 'video', 'sticker', 'vtuber', 'seiyu', 'doujin_music', 'podcast'],
+    },
+    {
+      id: 'v6',
+      name: '卷陆',
+      title: '周边 · 次元',
+      sub: 'Figure · Cosplay · Events',
+      catIds: ['figure', 'agg', 'github', 'cosplay', 'events'],
+    },
     {
       id: 'v7',
       name: '卷柒',
       title: '资源 · 工具',
       sub: 'Resources · Tools',
-      catIds: ['font', 'wallpaper', 'imghost', 'illust', 'subgroup', 'game', 'nav'],
+      catIds: ['font', 'wallpaper', 'imghost', 'illust', 'subgroup', 'game', 'game_dev', 'nav', 'mmd', 'lore'],
     },
   ],
 
@@ -55,7 +67,7 @@ export const APP_CONFIG = {
 
   // 缓存配置（与 public/sw.js 保持一致）
   CACHE: {
-    VERSION: 'v4',
+    VERSION: 'v6',
     NAME_PREFIX: 'miru-index-',
     PRECACHE_ASSETS: [
       '/miru-index/',

@@ -9,8 +9,13 @@ export function useDebounce(delay = 300) {
   const debouncedValue = ref('')
   let timer = null
 
-  function setDebouncedValue(value) {
+  function setDebouncedValue(value, immediate = false) {
     if (timer) clearTimeout(timer)
+    if (immediate) {
+      debouncedValue.value = value
+      timer = null
+      return
+    }
     timer = setTimeout(() => {
       debouncedValue.value = value
       timer = null
