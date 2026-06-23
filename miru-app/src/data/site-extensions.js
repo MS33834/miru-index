@@ -66,6 +66,7 @@ export const extensionCategories = [
       {
         name: 'CIEL 声优养成所',
         url: 'https://ciel-voice.jp/',
+        health: 'unstable',
         desc: '日本声优学校',
         fullDesc: '日本声优 / 配音培训机构 CIÉL 官方资料站，可了解声优养成课程、业界生态，对想入行或爱好者的参考站。',
         tags: ['声优', '培训', '日本'],
@@ -271,6 +272,7 @@ export const extensionCategories = [
       {
         name: 'Playboard',
         url: 'https://playboard.co/',
+        health: 'unstable',
         desc: 'YouTube 直播数据',
         fullDesc: 'YouTube 直播与 VTuber 数据排行榜，可查看 SC 收入、观看人数、订阅增长等，是研究 VTuber 生态的数据站。',
         tags: ['VTuber', '数据', 'YouTube'],
@@ -350,6 +352,7 @@ export const extensionCategories = [
       {
         name: '声优 Grand Prix',
         url: 'https://seigura.com/',
+        health: 'unstable',
         desc: '声优杂志官网',
         fullDesc: '日本声优专门杂志《声優グランプリ》官网，报道声优访谈、新番配音情报、广播节目、活动资讯。',
         tags: ['声优', '杂志', '访谈'],
@@ -368,6 +371,7 @@ export const extensionCategories = [
       {
         name: '声優ボイス',
         url: 'https://voice-style.jp/',
+        health: 'unstable',
         desc: '声优采访与专栏',
         fullDesc: '日本声优采访、专栏、广播节目情报站点，内容深度高，适合想了解声优幕后的粉丝。',
         tags: ['声优', '采访', '广播'],
@@ -403,7 +407,7 @@ export const extensionCategories = [
       },
       {
         name: '声优大典',
-        url: 'http://seiyu.info/',
+        url: 'https://www.mochi-mochi.com/',
         desc: '日本声优数据库',
         fullDesc: '日本声优 / 配音演员数据库，可按作品、角色、年代检索声优出演记录，考据党常用。',
         tags: ['声优', '数据库', '作品'],
@@ -467,6 +471,7 @@ export const extensionCategories = [
       {
         name: 'AG-ON',
         url: 'https://www.agqr.jp/',
+        health: 'unstable',
         desc: '超！A&G+ 官方平台',
         fullDesc: '文化放送超！A&G+ 的官方网络收听平台，提供动画、游戏、声优广播节目的直播与部分回放。',
         tags: ['广播', 'A&G+', '声优'],
@@ -476,6 +481,7 @@ export const extensionCategories = [
       {
         name: 'Seiyuuri',
         url: 'https://seiyuuri.com/',
+        health: 'unstable',
         desc: '声优活动情报站',
         fullDesc: '日本声优活动、见面会、演唱会、广播活动情报汇总站，方便粉丝追踪声优线下行程。',
         tags: ['声优', '活动', '情报'],
@@ -500,7 +506,8 @@ export const extensionCategories = [
     items: [
       {
         name: '半次元',
-        url: 'https://bcy.net/',
+        url: 'https://bcy.app/',
+        health: 'unstable',
         desc: 'Cosplay / 同人社区',
         fullDesc: '国内最大的 Cosplay、同人绘画、手作综合社区，Coser 投稿、正片、教程、约拍资源丰富。',
         tags: ['Cosplay', '社区', '摄影'],
@@ -545,7 +552,8 @@ export const extensionCategories = [
       },
       {
         name: '萌聚',
-        url: 'https://www.mengju.me/',
+        url: 'https://mengju.me/',
+        health: 'unstable',
         desc: '二次元约拍平台',
         fullDesc: '国内二次元摄影 / Cosplay 约拍平台，连接摄影、Coser、妆娘、后期，提供作品展示与接单。',
         tags: ['Cosplay', '约拍', '摄影'],
@@ -573,6 +581,7 @@ export const extensionCategories = [
       {
         name: '萤火虫动漫游戏嘉年华',
         url: 'https://www.fireflyacg.com/',
+        health: 'unstable',
         desc: '华南大型漫展',
         fullDesc: '萤火虫动漫游戏嘉年华官方平台，华南地区大型动漫展会，Cosplay、赛事、嘉宾签售、同人摊信息集中发布。',
         tags: ['漫展', 'Cosplay', '华南'],
@@ -590,7 +599,8 @@ export const extensionCategories = [
       },
       {
         name: '次元岛',
-        url: 'https://www.ciyuandao.com/',
+        url: 'https://www.ciyuanfang.com/',
+        health: 'unstable',
         desc: 'Cosplay 与摄影',
         fullDesc: '国内二次元摄影与 Cosplay 创作分享社区，提供场照、正片、约拍、妆娘、后期等资源整合。',
         tags: ['Cosplay', '摄影', '约拍'],
@@ -617,7 +627,8 @@ export const extensionCategories = [
       },
       {
         name: 'Cosplay Japan',
-        url: 'https://www.cosplay-japan.com/',
+        url: 'https://www.cosplay-jp.com/',
+        health: 'unstable',
         desc: '日本 Cosplay 资讯',
         fullDesc: '日本 Cosplay 综合资讯站，报道日本 Coser、活动、摄影、道具与妆造趋势，是了解日本 Cosplay 文化的窗口。',
         tags: ['Cosplay', '日本', '资讯'],
@@ -645,6 +656,7 @@ export const extensionCategories = [
       {
         name: '抖音 Cosplay',
         url: 'https://www.douyin.com/',
+        health: 'unstable',
         desc: '短视频 Cosplay 内容',
         fullDesc: '抖音上的 Cosplay、妆娘、摄影、漫展短视频内容丰富，是观察国内 Cosplay 流行与创作者生态的入口。',
         tags: ['Cosplay', '短视频', '国内'],
@@ -653,7 +665,8 @@ export const extensionCategories = [
       },
       {
         name: 'Cosplay Amino',
-        url: 'https://aminoapps.com/c/cosplay/home/',
+        url: 'https://aminoapps.com/c/anime-cosplay/',
+        health: 'unstable',
         desc: 'Cosplay 移动社区',
         fullDesc: 'Amino 上的 Cosplay 社区，移动端友好，Coser 分享正片、教程、道具制作过程，社群活跃。',
         tags: ['Cosplay', '社区', '移动'],
@@ -671,7 +684,8 @@ export const extensionCategories = [
       },
       {
         name: 'Rolecosplay',
-        url: 'https://www.rolecosplay.com/',
+        url: 'https://www.rolecosplayworld.com/',
+        health: 'unstable',
         desc: 'Cosplay 服装商城',
         fullDesc: 'Rolecosplay 是面向全球的 Cosplay 服装、假发、配件电商平台，性价比高，角色覆盖广泛。',
         tags: ['Cosplay', '服装', '商城'],
@@ -777,7 +791,7 @@ export const extensionCategories = [
       },
       {
         name: 'MikuMikuDance 中文社区',
-        url: 'https://www.mikumikudance.cn/',
+        url: 'https://tieba.baidu.com/f?kw=mikumikudance',
         desc: 'MMD 中文资源',
         fullDesc: 'MikuMikuDance 中文资源与教程站点，提供软件下载、模型、动作、教程与创作交流，是国内 MMD 新手入门站。',
         tags: ['MMD', '中文', '资源'],
@@ -787,6 +801,7 @@ export const extensionCategories = [
       {
         name: '3DNchu',
         url: 'https://3dnchu.com/',
+        health: 'unstable',
         desc: '3DCG 与 MMD 资讯',
         fullDesc: '日本 3DCG / MMD / VTuber 相关资讯与教程博客，常有 Blender、Unity、MMD 工具与渲染技术分享。',
         tags: ['3DCG', 'MMD', '资讯'],
@@ -1240,6 +1255,7 @@ export const extensionCategories = [
       {
         name: '萤火虫动漫游戏嘉年华',
         url: 'https://www.fireflyacg.com/',
+        health: 'unstable',
         desc: '华南大型漫展',
         fullDesc: '萤火虫动漫游戏嘉年华官方平台，华南地区大型动漫游戏展会，Cosplay、赛事、嘉宾、同人摊信息集中发布。',
         tags: ['漫展', '华南', '综合'],
@@ -1249,6 +1265,7 @@ export const extensionCategories = [
       {
         name: 'CCG EXPO',
         url: 'https://www.ccgexpo.cn/',
+        health: 'unstable',
         desc: '中国国际动漫游戏博览会',
         fullDesc: '中国国际动漫游戏博览会（CCG EXPO）官方平台，上海大型动漫游戏展会，动画、漫画、游戏、衍生品集中展示。',
         tags: ['漫展', '上海', '游戏'],
@@ -1303,6 +1320,7 @@ export const extensionCategories = [
       {
         name: 'IDO 动漫游戏嘉年华',
         url: 'https://www.idoacg.com/',
+        health: 'unstable',
         desc: '北京大型漫展',
         fullDesc: 'IDO 动漫游戏嘉年华是北京及北方地区大型动漫游戏展会，Cosplay 赛事、嘉宾签售、同人摊、舞台活动丰富。',
         tags: ['漫展', '北京', '国漫'],
@@ -1382,6 +1400,7 @@ export const extensionCategories = [
       {
         name: 'Google Podcasts',
         url: 'https://podcasts.google.com/',
+        health: 'mirror',
         desc: '谷歌播客',
         fullDesc: 'Google 播客平台，可订阅全球 ACG、动漫、游戏文化播客，跨平台同步收听进度。',
         tags: ['播客', '谷歌', '全球'],
@@ -1542,6 +1561,7 @@ export const extensionCategories = [
       {
         name: '游戏蛮牛',
         url: 'https://www.manew.com/',
+        health: 'unstable',
         desc: 'Unity 中文社区',
         fullDesc: '游戏蛮牛是国内最大的 Unity 开发者社区与教程站，提供教程、资源、问答、招聘，是 Unity 中文开发者核心阵地。',
         tags: ['Unity', '社区', '教程'],
@@ -1647,7 +1667,7 @@ export const extensionCategories = [
     items: [
       {
         name: "ChatGPT",
-        url: "https://chat.openai.com/",
+        url: "https://chatgpt.com/",
         desc: "OpenAI 旗舰对话",
         fullDesc: "OpenAI 推出的旗舰对话式 AI 助手，基于 GPT 系列模型，支持多轮对话、代码生成、文档分析、图像理解、DALL·E 图像生成，海外最主流的 AI 工具。",
         tags: ["GPT","对话","OpenAI"],
@@ -1809,7 +1829,7 @@ export const extensionCategories = [
       },
       {
         name: "Leonardo.ai",
-        url: "https://leonardo.ai/",
+        url: "https://leonardoai.com/",
         desc: "在线 AI 绘画",
         fullDesc: "Leonardo.ai 在线 AI 绘画平台，提供 SDXL 微调模型、Canvas 编辑、纹理生成、3D 纹理、动画生成等高级功能，免费额度友好。",
         tags: ["Leonardo","在线","SDXL"],
@@ -1818,7 +1838,7 @@ export const extensionCategories = [
       },
       {
         name: "SeaArt",
-        url: "https://www.seaart.ai/",
+        url: "https://www.seaart.io/",
         desc: "国内 AI 绘画",
         fullDesc: "SeaArt（海艺）国内 AI 绘画平台，模型库丰富、生成速度快、中文提示词友好、可训练 LoRA，国内创作者常用。",
         tags: ["SeaArt","国内","LoRA"],
@@ -1854,7 +1874,7 @@ export const extensionCategories = [
       },
       {
         name: "Pixlr",
-        url: "https://www.pixlr.com/",
+        url: "https://pixlr.com/editor/",
         desc: "在线 PS 替代",
         fullDesc: "Pixlr 在线图片编辑器，AI 抠图、AI 修图、AI 生成一应俱全，桌面 / 移动 / Web 全平台，免费版即可完成 90% 日常修图。",
         tags: ["Pixlr","在线","修图"],
@@ -1924,7 +1944,7 @@ export const extensionCategories = [
       },
       {
         name: "Suno",
-        url: "https://www.suno.ai/",
+        url: "https://suno.com/",
         desc: "AI 音乐生成",
         fullDesc: "Suno 是当前最强的 AI 音乐生成工具，输入歌词或描述即可生成完整歌曲（人声 + 伴奏），v3.5 质量接近人类创作。",
         tags: ["Suno","音乐","作曲"],
@@ -2285,7 +2305,7 @@ export const extensionCategories = [
       },
       {
         name: "字魂网",
-        url: "https://www.zihun.com/",
+        url: "https://www.izihun.com/",
         desc: "中文字体下载",
         fullDesc: "字魂网（zihun）收录大量中文字体免费下载，覆盖黑体、宋体、楷体、卡通、手写、艺术体，分类齐全，是中文字体下载常用站。",
         tags: ["中文字体","下载","免费"],
@@ -2416,7 +2436,7 @@ export const extensionCategories = [
     items: [
       {
         name: "半次元",
-        url: "https://bcy.net/",
+        url: "https://bcy.app/",
         desc: "二次元创作社区",
         fullDesc: "半次元（bcy.net）国内 ACG 创作社区，cosplay / 插画 / 同人 / 手工 / 摄影垂直社区，用户活跃度高，是 ACG 创作者交流首选。",
         tags: ["半次元","同人","社区"],
@@ -2549,7 +2569,7 @@ export const extensionCategories = [
       },
       {
         name: "成为小说家吧",
-        url: "https://syosetu.com/",
+        url: "https://ncode.syosetu.com/",
         desc: "日本 Web 小说",
         fullDesc: "成为小说家吧（narou）是日本最大的 Web 小说投稿站，异世界 / 恋爱 / 奇幻 / 推理题材聚集，多部热门作品动画化（《无职转生》《Re:Zero》等）。",
         tags: ["narou","日轻","Web 小说"],
@@ -2831,7 +2851,7 @@ export const extensionCategories = [
       },
       {
         name: "谷歌以图搜图",
-        url: "https://www.google.com/imghp",
+        url: "https://www.google.com/imghp?gl=zh-CN",
         desc: "Google 搜图",
         fullDesc: "Google Images 谷歌以图搜图，全球最大综合图源，识别度综合最强，是核实图片来源、查找原图的首选。",
         tags: ["Google","搜图","综合"],
@@ -2910,7 +2930,7 @@ export const extensionCategories = [
       },
       {
         name: "MEGA",
-        url: "https://mega.nz/",
+        url: "https://mega.io/",
         desc: "MEGA",
         fullDesc: "MEGA 端到端加密云存储，20GB 免费、注重隐私、大文件分享友好，是海外文件分享高频工具。",
         tags: ["MEGA","加密","分享"],
@@ -3111,7 +3131,7 @@ export const extensionItems = {
     },
     {
       name: '次元导航',
-      url: 'https://www.ciyuandh.com/',
+      url: 'https://www.ciyuanmao.com/',
       desc: '二次元资源导航',
       fullDesc: '国内二次元资源导航站，收录动漫、漫画、游戏、小说、图床、工具等站点，附带站点状态标识。',
       tags: ['导航', '资源', '状态'],
@@ -3120,7 +3140,7 @@ export const extensionItems = {
     },
     {
       name: '爱达杂货铺',
-      url: 'https://adzhp.top/',
+      url: 'https://adzhp.xyz/',
       desc: '工具资源导航',
       fullDesc: '收录大量在线工具、资源站点、软件下载的导航站，分类细致，适合查找各种生产力与娱乐工具。',
       tags: ['工具', '导航', '资源'],
@@ -3138,7 +3158,8 @@ export const extensionItems = {
     },
     {
       name: '果汁导航',
-      url: 'https://guozhivip.com/',
+      url: 'https://www.guozhivip.com/',
+      health: 'unstable',
       desc: '实用工具导航',
       fullDesc: '果汁导航，聚合实用工具、学习资源、影视、音乐、软件下载等站点，适合作为个人浏览器主页。',
       tags: ['导航', '工具', '资源'],
@@ -3304,7 +3325,8 @@ export const extensionItems = {
     },
     {
       name: '画世界',
-      url: 'https://www.huashengjie.com/',
+      url: 'https://www.huashijie.com/',
+      health: 'unstable',
       desc: '绘画创作社区',
       fullDesc: '画世界是国内绘画创作与社交平台，提供在线绘画工具、作品展示、绘画比赛与同好交流，移动端体验好。',
       tags: ['绘画', '社区', '工具'],
@@ -3369,7 +3391,8 @@ export const extensionItems = {
     },
     {
       name: '书享家',
-      url: 'https://www.shuxiangjia.cn/',
+      url: 'https://www.shuxiangjia.com/',
+      health: 'unstable',
       desc: '电子书资源导航',
       fullDesc: '电子书资源聚合导航站，收录各类电子书搜索、下载、阅读站点，方便查找学术、小说、古籍等资源。',
       tags: ['电子书', '导航', '资源'],
@@ -3407,7 +3430,8 @@ export const extensionItems = {
     },
     {
       name: 'ESJ Zone',
-      url: 'https://www.esjzone.cc/',
+      url: 'https://www.esjzone.me/',
+      health: 'unstable',
       desc: '中文 Web 小说平台',
       fullDesc: '中文 Web 小说与轻小说平台，支持作者投稿与读者追更，作品涵盖奇幻、恋爱、科幻等多种题材。',
       tags: ['Web小说', '投稿', '中文'],
@@ -3425,7 +3449,8 @@ export const extensionItems = {
     },
     {
       name: '成为小说家吧',
-      url: 'https://syosetu.com/',
+      url: 'https://ncode.syosetu.com/',
+      health: 'mirror',
       desc: '日本 Web 小说发源地',
       fullDesc: '日本最大的 Web 小说投稿平台，“成为小说家吧”是很多轻小说原作的发源地，日文资源极丰富。',
       tags: ['Web小说', '日本', '投稿'],
@@ -3590,6 +3615,7 @@ export const extensionItems = {
     {
       name: 'Disney+',
       url: 'https://www.disneyplus.com/',
+      health: 'mirror',
       desc: '迪士尼流媒体',
       fullDesc: 'Disney+ 全球流媒体平台，收录迪士尼、皮克斯、漫威、星战及日本动画内容，部分地区有独家番剧。',
       tags: ['番剧', '流媒体', '全球'],
@@ -3601,6 +3627,7 @@ export const extensionItems = {
     {
       name: 'Kobo 漫画',
       url: 'https://www.kobo.com/tw/zh/manga',
+      health: 'unstable',
       desc: '正版日漫电子书',
       fullDesc: 'Rakuten Kobo 日文漫画正版电子书商店，可购买繁中 / 日文漫画，支持多设备阅读。',
       tags: ['漫画', '正版', '电子书'],
@@ -3610,6 +3637,7 @@ export const extensionItems = {
     {
       name: 'BookWalker',
       url: 'https://bookwalker.jp/',
+      health: 'unstable',
       desc: '日本漫画电子书',
       fullDesc: '日本最大漫画 / 轻小说电子书平台之一，角川旗下，新刊首发、积分活动多。',
       tags: ['漫画', '电子书', '日本'],
@@ -3791,7 +3819,8 @@ export const extensionItems = {
     },
     {
       name: 'HiFiNi',
-      url: 'https://www.hifini.com/',
+      url: 'https://www.hifini.io/',
+      health: 'unstable',
       desc: '音乐资源社区',
       fullDesc: '国内音乐资源分享社区，ACG、动漫、游戏音乐资源丰富，用户分享无损与 MP3 资源。',
       tags: ['音乐', '资源', '社区'],
@@ -3821,6 +3850,7 @@ export const extensionItems = {
     {
       name: '小红书',
       url: 'https://www.xiaohongshu.com/',
+      health: 'unstable',
       desc: '生活方式与 ACG',
       fullDesc: '小红书逐渐成为 Cosplay、谷子、手账、同人创作、漫展分享的年轻社区。',
       tags: ['社区', 'Cosplay', '谷子'],
@@ -3967,6 +3997,7 @@ export const extensionItems = {
     {
       name: '4Gamer',
       url: 'https://www.4gamer.net/',
+      health: 'unstable',
       desc: '日本游戏媒体',
       fullDesc: '日本知名游戏资讯站，覆盖 PC、主机、手游、电竞、ACG 业界新闻，资讯量大且更新快。',
       tags: ['游戏', '日本', '资讯'],

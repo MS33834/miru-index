@@ -17,8 +17,8 @@ const baseCategories = [
     items: [
       {
         name: '起飞VPN',
-        url: 'https://goflyvpn.com/',
-        health: 'mirror',
+        url: 'https://www.goflyvpn.com/',
+        health: 'unstable',
         desc: '多国节点商业VPN',
         fullDesc:
           '国内老牌商业 VPN 之一，提供 Windows / macOS / Android / iOS 全平台客户端，主打稳定与多国节点。免费试用窗口短，长期使用建议付费套餐。',
@@ -39,8 +39,8 @@ const baseCategories = [
       },
       {
         name: '绿茶VPN',
-        url: 'https://www.lcvpn.qpon?id=177002747',
-        health: 'mirror',
+        url: 'https://www.lcvpn.com/',
+        health: 'unstable',
         desc: '连接最快',
         fullDesc: '主打"低延迟 + 极速连接"的免费试用 VPN，按连接速度自动匹配最优节点，适合临时访问海外学术或开发资源。',
         tags: ['VPN', '免费试用', '低延迟'],
@@ -236,7 +236,7 @@ const baseCategories = [
     items: [
       {
         name: '谷歌搜图',
-        url: 'https://www.google.com/imghp',
+        url: 'https://www.google.com/imghp?gl=zh-CN',
         health: 'mirror',
         desc: '综合反向图片搜索',
         fullDesc:
@@ -280,7 +280,7 @@ const baseCategories = [
       {
         name: 'TinEye',
         url: 'https://tineye.com/',
-        health: 'mirror',
+        health: 'unstable',
         desc: '最早的反向搜图',
         fullDesc:
           '全球最早的反向图片搜索服务，主要用于识别图片来源、追踪图片在网络上的最早出现时间，识别"老图"特别准。',
@@ -544,7 +544,7 @@ const baseCategories = [
       },
       {
         name: 'Qingse',
-        url: 'https://qingse.one/',
+        url: 'https://qingse.co/',
         health: 'unstable',
         desc: '网站集合',
         fullDesc: '轻量化 ACGN 资源聚合站，分类细致，更新频率高，移动端适配做得好。',
@@ -561,7 +561,7 @@ const baseCategories = [
     items: [
       {
         name: '青桔网',
-        url: 'https://www.qingju.org/',
+        url: 'https://www.qingju.com/',
         health: 'unstable',
         desc: '网盘资源',
         fullDesc: '老牌 GalGame 资源站，主要以网盘形式分发中日韩 GalGame 原版与汉化版，附带攻略 / CG 包。',
@@ -631,7 +631,7 @@ const baseCategories = [
       },
       {
         name: '岛屿ACG',
-        url: 'https://www.acgwfb.com/',
+        url: 'https://www.2000fun.com/',
         health: 'unstable',
         desc: '资源+论坛',
         fullDesc: 'ACG 资源 + 论坛形式的综合站，GalGame / 漫画 / 番剧 / 音乐都有专属板块，社交属性强。',
@@ -669,7 +669,7 @@ const baseCategories = [
       },
       {
         name: '次元小屋',
-        url: 'https://cyxw.xyz/',
+        url: 'https://www.ciyuanju.com/',
         health: 'unstable',
         desc: '二次元资源',
         fullDesc: '二次元资讯 + 资源综合站，文章质量较高，常有作者专访和制作组访谈。',
@@ -716,7 +716,7 @@ const baseCategories = [
     items: [
       {
         name: '拷贝漫画',
-        url: 'https://www.copymanga.site/',
+        url: 'https://www.mangacopy.com/',
         health: 'unstable',
         desc: '国漫在线',
         fullDesc: '国漫 / 日漫双语在线阅读站，UI 仿哔咔，资源更新快，移动端适配好。',
@@ -726,7 +726,7 @@ const baseCategories = [
       },
       {
         name: '漫画柜',
-        url: 'https://www.manhuagui.com/',
+        url: 'https://tw.manhuagui.com/',
         health: 'unstable',
         desc: '日漫在线',
         fullDesc: '老牌日漫在线阅读站，资源池大（数万部），支持按作者 / 杂志 / 标签筛选。',
@@ -736,7 +736,7 @@ const baseCategories = [
       },
       {
         name: '动漫之家',
-        url: 'https://www.dmzj.com/',
+        url: 'https://www.idmzj.com/',
         health: 'unstable',
         desc: '国漫日漫',
         fullDesc: '国内最老牌的动漫综合站之一，漫画 / 番剧 / 资讯 / 论坛一体化，资源池极大。',
@@ -746,8 +746,8 @@ const baseCategories = [
       },
       {
         name: 'E-Hentai',
-        url: 'https://e-hentai.org',
-        health: 'mirror',
+        url: 'https://e-hentai.org/',
+        health: 'unstable',
         desc: '英文漫画档案库',
         fullDesc: '全球最大的英文漫画档案库，俗称"E 站"，资源以画廊形式组织，原始画廊可打包下载。需要科学上网。',
         tags: ['英文', '档案库', '画廊'],
@@ -757,7 +757,7 @@ const baseCategories = [
       {
         name: 'nhentai',
         url: 'https://nhentai.net/',
-        health: 'mirror',
+        health: 'unstable',
         desc: '同人志合集',
         fullDesc: '以"番号"索引的英文 / 日文同人志合集站，资源以画廊形式浏览，按标签分类极细。仅收录合规内容。',
         tags: ['同人志', '番号', '画廊'],
@@ -767,7 +767,7 @@ const baseCategories = [
       {
         name: 'hitomi.la',
         url: 'https://hitomi.la/',
-        health: 'mirror',
+        health: 'unstable',
         desc: '日漫同人',
         fullDesc: '日漫 / 同人 / 画廊类站点，资源以图集形式发布，画质普遍高，适合二次元高清党。',
         tags: ['日漫', '同人', '高画质'],
@@ -777,7 +777,7 @@ const baseCategories = [
       {
         name: 'MangaDex',
         url: 'https://mangadex.org/',
-        health: 'ok',
+        health: 'unstable',
         desc: '海外漫画站',
         fullDesc:
           'MangaDex 是全球最大的合法英 / 日 / 西班牙语漫画阅读站，30 万+ 作品，作者直接发布，按作品 / 章节 / 标签组织，需科学上网。',
@@ -863,7 +863,7 @@ const baseCategories = [
       {
         name: 'PicACG',
         url: 'https://www.picacomic.com/',
-        health: 'mirror',
+        health: 'unstable',
         desc: '哔咔哔咔客户端',
         fullDesc:
           'Bika Bika（哔咔哔咔）官方多平台客户端，覆盖 Android / iOS / Windows / macOS，资源以社区投稿 + 官方授权为主。',
@@ -1102,7 +1102,7 @@ const baseCategories = [
       },
       {
         name: 'MX动漫',
-        url: 'https://www.mxdm999.com/',
+        url: 'https://www.mxdm.cc/',
         health: 'unstable',
         desc: '在线番剧',
         fullDesc: '在线番剧聚合站，无广告、移动端友好，资源按新番速更，多线路切换。',
@@ -1122,8 +1122,8 @@ const baseCategories = [
       },
       {
         name: '第一动漫',
-        url: 'https://1anime2024.com/',
-        health: 'ok',
+        url: 'https://1anime.tv/',
+        health: 'unstable',
         desc: '在线番剧',
         fullDesc: '新晋在线番剧站，主打 4K 高画质 + 新番同步更新，UI 现代。',
         tags: ['在线', '4K', '新站'],
@@ -1132,7 +1132,7 @@ const baseCategories = [
       },
       {
         name: 'H次元',
-        url: 'https://h-ciyuan.com/',
+        url: 'https://www.hciyuan.com/',
         health: 'unstable',
         desc: '在线番剧',
         fullDesc: '在线番剧 / 漫画综合站，UI 仿哔咔风格，资源以网盘 + 在线双模式分发。',
@@ -1142,7 +1142,7 @@ const baseCategories = [
       },
       {
         name: 'AGE 动漫',
-        url: 'https://www.agemys.org/',
+        url: 'https://www.agedm.io/',
         health: 'ok',
         desc: '在线番剧',
         fullDesc: 'AGE 动漫网，老牌在线番剧站，资源以季度归档，按字母索引齐全，无广告设计简洁，是新番党补番常用站。',
@@ -1169,8 +1169,8 @@ const baseCategories = [
     items: [
       {
         name: '动漫花园',
-        url: 'https://share.dmhy.org/',
-        health: 'mirror',
+        url: 'https://dmhy.org/',
+        health: 'unstable',
         desc: '字幕组磁力聚合',
         fullDesc: '老牌动漫字幕组磁力聚合站（DMHY），每天实时聚合各大字幕组新番发布，磁力 + 迅雷链接双发。',
         tags: ['字幕组', '磁力', '新番'],
@@ -1179,8 +1179,8 @@ const baseCategories = [
       },
       {
         name: 'ACG.RIP',
-        url: 'https://acg.rip/',
-        health: 'mirror',
+        url: 'https://acgrip.com/',
+        health: 'unstable',
         desc: '高质量新番',
         fullDesc: '高品质新番磁力站，主打"质量优先"，每集附带发布组、分辨率、编码信息，适合收藏党。',
         tags: ['高质量', '磁力', '新番'],
@@ -1189,8 +1189,8 @@ const baseCategories = [
       },
       {
         name: 'Nyaa',
-        url: 'https://nyaa.si/',
-        health: 'mirror',
+        url: 'https://nyaa.iss.one/',
+        health: 'unstable',
         desc: '海外动漫磁力',
         fullDesc: '海外最知名的动漫磁力索引站（喵站），资源以日 / 英 / 韩新番和里番为主，分类细致。',
         tags: ['Nyaa', '海外', '磁力'],
@@ -1199,7 +1199,7 @@ const baseCategories = [
       },
       {
         name: '蜜柑计划',
-        url: 'https://mikanani.me/',
+        url: 'https://mikanime.tv/',
         health: 'mirror',
         desc: '新番磁力索引',
         fullDesc: '国内新番磁力索引站，自动从各字幕组抓取新番发布，UI 简洁，磁力 + 迅雷链双发。',
@@ -1220,8 +1220,8 @@ const baseCategories = [
       },
       {
         name: '字幕库',
-        url: 'https://zimuku.org/',
-        health: 'ok',
+        url: 'https://zimuku.org.cn/',
+        health: 'unstable',
         desc: '字幕下载',
         fullDesc:
           '字幕库（zimuku.org）国内最老牌的电影 / 剧集 / 动漫字幕下载站，每日更新，按影片 / 字幕组 / 语言多维度搜索。',
@@ -1231,8 +1231,8 @@ const baseCategories = [
       },
       {
         name: 'SubHD',
-        url: 'https://subhd.tv/',
-        health: 'ok',
+        url: 'https://subhd.org/',
+        health: 'unstable',
         desc: '剧集字幕',
         fullDesc: 'SubHD 美剧 / 英剧 / 日剧 / 韩剧字幕分享站，志愿者维护，字幕质量高，按剧集 / 季集 / 字幕组多维筛选。',
         tags: ['剧集', '字幕', '志愿'],
@@ -1252,7 +1252,7 @@ const baseCategories = [
       {
         name: 'BTDig',
         url: 'https://btdig.com/',
-        health: 'mirror',
+        health: 'unstable',
         desc: '磁力聚合搜索',
         fullDesc: 'BTDig 磁力链接聚合搜索引擎，索引全球 BT 资源，无注册无广告，磁力链直接出，DHT 网络爬取。',
         tags: ['磁力', '搜索', 'DHT'],
@@ -1423,7 +1423,7 @@ const baseCategories = [
       {
         name: 'Library Digital',
         url: 'https://library.ucsd.edu/dc/',
-        health: 'ok',
+        health: 'unstable',
         desc: 'UCSD 数字馆藏',
         fullDesc: '加州大学圣地亚哥分校数字馆藏公开访问入口，含古籍 / 报纸 / 照片 / 音像资料，免费浏览。',
         tags: ['UCSD', '公开', '古籍'],
@@ -1910,7 +1910,7 @@ const baseCategories = [
       },
       {
         name: '千千音乐',
-        url: 'https://www.taihe.com/',
+        url: 'https://www.qianqian.com/',
         health: 'unstable',
         desc: '在线音乐',
         fullDesc: '老牌在线音乐平台（前百度音乐），ACG / 二次元专区收录丰富，资源齐全 + 智能推荐。',
@@ -1979,7 +1979,7 @@ const baseCategories = [
       {
         name: '千岛 App',
         url: 'https://www.qdobos.com/',
-        health: 'mirror',
+        health: 'unstable',
         desc: '潮玩 / 谷子',
         fullDesc: '潮玩 / 谷子垂类交易平台，闪购模式 + 行情榜 + 圈子社区，潮玩圈和谷圈核心用户的"查价 + 闪购"双优选。',
         tags: ['潮玩', '谷子', '闪购'],
@@ -1989,7 +1989,7 @@ const baseCategories = [
       {
         name: 'Animate 中国',
         url: 'https://www.animate-onlineshop.com.cn/',
-        health: 'mirror',
+        health: 'unstable',
         desc: '动漫周边',
         fullDesc: '日本 Animate 在华官方商城，IP 周边齐全（手办 / 周边 / CD / 漫画），常有限定商品。',
         tags: ['Animate', '官方', 'IP'],
@@ -2185,8 +2185,8 @@ const baseCategories = [
       },
       {
         name: 'Cutout',
-        url: 'https://www.cutout.pro/',
-        health: 'mirror',
+        url: 'https://www.photoroom.com/tools/background-remover',
+        health: 'unstable',
         desc: '在线抠图 / 编辑',
         fullDesc: 'Cutout Pro 在线抠图 / 图像增强 / 视频抠像工具，5 秒自动识别主体，支持批量处理，免费版够用。',
         tags: ['抠图', '在线', '编辑'],
@@ -2422,7 +2422,7 @@ const baseCategories = [
       },
       {
         name: '鸠摩搜索',
-        url: 'https://www.jiumodiary.com/',
+        url: 'https://www.jiumosoushu.com/',
         health: 'ok',
         desc: '电子书聚合',
         fullDesc: '电子书聚合搜索引擎，跨网盘 / 论坛 / Z-Library 等多个数据源，结果按相关度 / 时间排序，找书神器。',
@@ -2469,7 +2469,7 @@ const baseCategories = [
       {
         name: '夸克网盘',
         url: 'https://pan.quark.cn/',
-        health: 'ok',
+        health: 'unstable',
         desc: '网盘 + 视频',
         fullDesc: '夸克浏览器旗下网盘，ACG 资源 + 在线视频 + 学习资料生态齐备，免费扩容活动多。',
         tags: ['网盘', '夸克', '视频'],
@@ -2638,7 +2638,7 @@ const baseCategories = [
     items: [
       {
         name: '斗图啦',
-        url: 'https://www.doutula.com/',
+        url: 'https://www.pkdoutu.com/',
         health: 'unstable',
         desc: '斗图表情',
         fullDesc:
