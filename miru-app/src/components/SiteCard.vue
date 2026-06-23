@@ -48,6 +48,8 @@ function handleFavoriteKeydown(e) {
 
 const nameParts = computed(() => getHighlightedParts(props.item.name, props.searchQuery))
 const descParts = computed(() => getHighlightedParts(props.item.desc, props.searchQuery))
+// 缓存健康状态信息，避免模板中重复调用 healthOf
+const healthInfo = computed(() => healthOf(props.item))
 </script>
 
 <template>
@@ -79,13 +81,13 @@ const descParts = computed(() => getHighlightedParts(props.item.desc, props.sear
             </span>
             <span
               v-if="item.health"
-              :title="`健康: ${healthOf(item).label}`"
+              :title="`健康: ${healthInfo.label}`"
               class="health-badge"
-              :style="{ color: healthOf(item).color, background: healthOf(item).bg }"
+              :style="{ color: healthInfo.color, background: healthInfo.bg }"
               aria-hidden="true"
             >
-              <span class="health-badge__dot" :style="{ background: healthOf(item).color }"></span>
-              {{ healthOf(item).label }}
+              <span class="health-badge__dot" :style="{ background: healthInfo.color }"></span>
+              {{ healthInfo.label }}
             </span>
           </div>
         </div>

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { chromium, devices } from 'playwright'
+import { chromium, devices } from '@playwright/test'
 import AxeBuilder from '@axe-core/playwright'
 import fs from 'fs/promises'
 import path from 'path'

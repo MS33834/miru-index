@@ -1,15 +1,37 @@
 <script setup>
-import { ref, computed, onMounted, onUnmounted, watch, nextTick, defineAsyncComponent } from 'vue'
+import { ref, computed, onMounted, onUnmounted, onBeforeUnmount, watch, nextTick, defineAsyncComponent, h } from 'vue'
 import { categories } from './data/nav.js'
 import SidebarNav from './components/SidebarNav.vue'
 import SiteCard from './components/SiteCard.vue'
 import ErrorBoundary from './components/ErrorBoundary.vue'
 import AppSkeleton from './components/AppSkeleton.vue'
 
-// 重型覆盖层组件按需异步加载，减少首屏 JS 体积；加载期间无占位，避免全屏骨架屏突兀
-const SiteModal = defineAsyncComponent(() => import('./components/SiteModal.vue'))
-const KeyboardHelp = defineAsyncComponent(() => import('./components/KeyboardHelp.vue'))
-const PwaInstallPrompt = defineAsyncComponent(() => import('./components/PwaInstallPrompt.vue'))
+// 重型覆盖层组件按需异步加载，减少首屏 JS 体积。
+// 加载失败时（如离线）显示错误占位并自动重试，避免静默失败。
+function makeAsync(loader) {
+  return defineAsyncComponent({
+    loader,
+    delay: 200,
+    timeout: 10000,
+    loadingComponent: { render: () => null },
+    errorComponent: {
+      setup: () => () =>
+        h(
+          'div',
+          { class: 'async-fallback', role: 'alert' },
+          '组件加载失败，请检查网络后重试'
+        ),
+    },
+    onError(err, retry, fail, attempts) {
+      if (attempts <= 2) retry()
+      else fail()
+    },
+  })
+}
+
+const SiteModal = makeAsync(() => import('./components/SiteModal.vue'))
+const KeyboardHelp = makeAsync(() => import('./components/KeyboardHelp.vue'))
+const PwaInstallPrompt = makeAsync(() => import('./components/PwaInstallPrompt.vue'))
 import { isOffline } from './main.js'
 import { APP_CONFIG } from './config/constants.js'
 import { useScrollPosition } from './composables/useScrollPosition.js'
@@ -89,7 +111,7 @@ const quickTags = computed(() => {
   return preferred.filter((t) => available.has(t)).slice(0, 7)
 })
 
-useUrlSync({
+const urlSync = useUrlSync({
   searchQuery,
   activeCategory,
   selectedTags,
@@ -206,30 +228,24 @@ function closeModal() {
 function onSelectCategory(id) {
   selectCategory(id)
   drawerOpen.value = false
-  if (typeof window !== 'undefined') {
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
+  scrollToTop()
 }
 function onClearSearch() {
   clearSearch()
-  if (typeof window !== 'undefined') {
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
+  scrollToTop()
 }
 function onNextPage() {
   nextPage()
-  if (typeof window !== 'undefined') {
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
+  scrollToTop()
 }
 function onPrevPage() {
   prevPage()
+  scrollToTop()
+}
+function scrollToTop() {
   if (typeof window !== 'undefined') {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
-}
-function scrollToTop() {
-  window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 function focusSearch() {
   sidebarCollapsed.value = false
@@ -364,8 +380,13 @@ function handleKeydown(e) {
 }
 
 onMounted(() => {
-  setTimeout(() => (loaded.value = true), 80)
+  // 数据同步 import 已就绪，下一帧切换避免骨架屏闪烁
+  requestAnimationFrame(() => (loaded.value = true))
   window.addEventListener('keydown', handleKeydown)
+})
+
+onBeforeUnmount(() => {
+  urlSync.cleanup()
 })
 
 onUnmounted(() => {
@@ -398,8 +419,6 @@ onUnmounted(() => {
           @toggle-favorites-only="toggleFavoritesOnly"
         />
       </div>
-
-      <a href="#main-content" class="skip-link">跳到主体内容</a>
 
       <!-- =================== 顶栏（平板/手机） =================== -->
       <header class="mobile-topbar lg:hidden">
@@ -842,7 +861,7 @@ onUnmounted(() => {
             >
               ← 前一页
             </button>
-            <div class="pagination__info">
+            <div class="pagination__info" aria-current="page">
               <span class="font-serif-cn text-[#c9a55c]">{{ currentPage }}</span>
               <span class="text-[#8a7a68]">/</span>
               <span>{{ totalPageCount }}</span>
@@ -1613,6 +1632,24 @@ onUnmounted(() => {
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+
+/* ============== 异步组件错误占位 ============== */
+.async-fallback {
+  position: fixed;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.75rem 1.25rem;
+  background: rgba(26, 20, 16, 0.95);
+  color: var(--washi);
+  border: 1px solid rgba(255, 77, 79, 0.4);
+  border-radius: 4px;
+  font-family: var(--kai);
+  font-size: 0.875rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  z-index: 60;
+  backdrop-filter: blur(8px);
 }
 
 /* ============== 离线状态提示 ============== */

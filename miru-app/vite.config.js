@@ -14,8 +14,8 @@ export default defineConfig({
     sourcemap: false,
     // 资源内联阈值（小于 4kb 的资源内联为 base64）
     assetsInlineLimit: 4096,
-    // 目标浏览器兼容性
-    target: 'es2015',
+    // 目标浏览器：es2020 覆盖 async/await、可选链、空值合并，无需降级 polyfill
+    target: 'es2020',
     rollupOptions: {
       output: {
         // 代码分割配置
@@ -28,10 +28,6 @@ export default defineConfig({
             // Vue 相关依赖单独打包
             if (id.includes('/vue/') || id.includes('/@vue/')) {
               return 'vue-vendor'
-            }
-            // Tailwind CSS 相关单独打包
-            if (id.includes('tailwindcss')) {
-              return 'tailwind-vendor'
             }
           }
         },

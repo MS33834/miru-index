@@ -109,7 +109,9 @@ function isBlockedHost(url) {
     const host = new URL(url).hostname.toLowerCase()
     if (SKIP_DOMAINS.has(host)) return 'skip'
     if (KNOWN_BLOCKED.some((d) => host === d || host.endsWith('.' + d))) return 'blocked'
-  } catch {}
+  } catch {
+    /* 无效 URL，忽略 */
+  }
   return null
 }
 

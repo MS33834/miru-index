@@ -4,7 +4,7 @@
  * 用 Playwright 模拟真实用户访问，检查页面标题与 URL，识别真正的失效页面。
  * 不依赖 HTTP 状态码，避免反爬 / 云盾 / 证书拦截导致的误判。
  */
-import { chromium } from 'playwright'
+import { chromium } from '@playwright/test'
 import fs from 'fs/promises'
 import path from 'path'
 
