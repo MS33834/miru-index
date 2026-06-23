@@ -123,7 +123,7 @@ const baseCategories = [
       },
       {
         name: 'Motrix',
-        url: 'https://motrix.app/',
+        url: 'https://github.com/agalwood/Motrix/releases',
         health: 'mirror',
         desc: '全平台开源',
         fullDesc:
@@ -716,7 +716,7 @@ const baseCategories = [
     items: [
       {
         name: '拷贝漫画',
-        url: 'https://www.mangacopy.com/',
+        url: 'https://www.copymanga.site/',
         health: 'unstable',
         desc: '国漫在线',
         fullDesc: '国漫 / 日漫双语在线阅读站，UI 仿哔咔，资源更新快，移动端适配好。',
@@ -1102,7 +1102,7 @@ const baseCategories = [
       },
       {
         name: 'MX动漫',
-        url: 'https://www.mxdm.xyz/',
+        url: 'https://www.mxdm999.com/',
         health: 'unstable',
         desc: '在线番剧',
         fullDesc: '在线番剧聚合站，无广告、移动端友好，资源按新番速更，多线路切换。',
