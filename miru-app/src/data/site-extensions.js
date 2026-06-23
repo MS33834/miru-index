@@ -1668,6 +1668,7 @@ export const extensionCategories = [
       {
         name: "ChatGPT",
         url: "https://chatgpt.com/",
+        health: 'mirror',
         desc: "OpenAI 旗舰对话",
         fullDesc: "OpenAI 推出的旗舰对话式 AI 助手，基于 GPT 系列模型，支持多轮对话、代码生成、文档分析、图像理解、DALL·E 图像生成，海外最主流的 AI 工具。",
         tags: ["GPT","对话","OpenAI"],
@@ -1686,6 +1687,7 @@ export const extensionCategories = [
       {
         name: "Gemini",
         url: "https://gemini.google.com/",
+        health: 'mirror',
         desc: "Google 多模态 AI",
         fullDesc: "Google DeepMind 推出的多模态 AI 助手 Gemini（原 Bard），原生支持图像、视频、音频、文本四种模态，深度整合 Google 搜索与 Workspace。",
         tags: ["Gemini","Google","多模态"],
@@ -1704,6 +1706,7 @@ export const extensionCategories = [
       {
         name: "Perplexity",
         url: "https://www.perplexity.ai/",
+        health: 'mirror',
         desc: "AI 搜索引擎",
         fullDesc: "Perplexity 是一款 AI 驱动的对话式搜索引擎，结合大模型与实时网络检索，给出带引用来源的答案，是替代 Google 的新一代搜索工具。",
         tags: ["搜索","AI","引用"],
@@ -1767,6 +1770,7 @@ export const extensionCategories = [
       {
         name: "You.com",
         url: "https://you.com/",
+        health: 'unstable',
         desc: "AI 搜索引擎",
         fullDesc: "You.com 是一款 AI 驱动的搜索引擎，集成 GPT、Claude 等模型，支持多模态、定制 App、隐私优先，可作为 Google 替代品。",
         tags: ["You","搜索","AI"],
@@ -1839,6 +1843,7 @@ export const extensionCategories = [
       {
         name: "SeaArt",
         url: "https://www.seaart.io/",
+        health: 'mirror',
         desc: "国内 AI 绘画",
         fullDesc: "SeaArt（海艺）国内 AI 绘画平台，模型库丰富、生成速度快、中文提示词友好、可训练 LoRA，国内创作者常用。",
         tags: ["SeaArt","国内","LoRA"],
@@ -1857,6 +1862,7 @@ export const extensionCategories = [
       {
         name: "DALL·E 3",
         url: "https://openai.com/dall-e-3",
+        health: 'mirror',
         desc: "OpenAI 绘画",
         fullDesc: "OpenAI 推出的 DALL·E 3 图像生成模型，集成于 ChatGPT Plus / Bing Image Creator，文字理解力强、提示词直译效果好。",
         tags: ["DALL·E","OpenAI","ChatGPT"],
@@ -1875,6 +1881,7 @@ export const extensionCategories = [
       {
         name: "Pixlr",
         url: "https://pixlr.com/editor/",
+        health: 'mirror',
         desc: "在线 PS 替代",
         fullDesc: "Pixlr 在线图片编辑器，AI 抠图、AI 修图、AI 生成一应俱全，桌面 / 移动 / Web 全平台，免费版即可完成 90% 日常修图。",
         tags: ["Pixlr","在线","修图"],
@@ -1909,6 +1916,7 @@ export const extensionCategories = [
       {
         name: "Pika",
         url: "https://pika.art/",
+        health: 'mirror',
         desc: "AI 短视频",
         fullDesc: "Pika 推出的 AI 视频生成工具，输入文本/图像即可生成 3-10 秒短视频，支持动作控制、镜头平移、视频风格转换，社区氛围活跃。",
         tags: ["Pika","短视频","图生视频"],
@@ -1918,6 +1926,7 @@ export const extensionCategories = [
       {
         name: "Sora",
         url: "https://openai.com/sora",
+        health: 'mirror',
         desc: "OpenAI 视频模型",
         fullDesc: "OpenAI 推出的 Sora 视频生成模型，可生成长达 60 秒的高质量视频，理解物理世界、镜头语言、角色一致性，是当前最受关注的 AI 视频模型。",
         tags: ["Sora","OpenAI","长视频"],
@@ -1945,6 +1954,7 @@ export const extensionCategories = [
       {
         name: "Suno",
         url: "https://suno.com/",
+        health: 'mirror',
         desc: "AI 音乐生成",
         fullDesc: "Suno 是当前最强的 AI 音乐生成工具，输入歌词或描述即可生成完整歌曲（人声 + 伴奏），v3.5 质量接近人类创作。",
         tags: ["Suno","音乐","作曲"],
@@ -2024,6 +2034,7 @@ export const extensionCategories = [
       {
         name: "Greasy Fork",
         url: "https://greasyfork.org/zh-CN",
+        health: 'mirror',
         desc: "油猴脚本",
         fullDesc: "Greasy Fork 是最大的用户脚本（油猴脚本）社区，托管上万脚本，按安装量排序，覆盖 ACG 站去广告、网盘加速、翻译、辅助等。",
         tags: ["油猴","脚本","Tampermonkey"],
@@ -2139,6 +2150,7 @@ export const extensionCategories = [
       {
         name: "极客时间",
         url: "https://time.geekbang.org/",
+        health: 'mirror',
         desc: "IT 技能学习",
         fullDesc: "极客时间极客邦旗下 IT 技能学习平台，课程覆盖架构、AI、Python、前端、运维、产品等，业内一线工程师 / 架构师主讲。",
         tags: ["极客","IT","付费"],
@@ -2446,6 +2458,7 @@ export const extensionCategories = [
       {
         name: "涂手",
         url: "https://www.tushuoapp.com/",
+        health: 'mirror',
         desc: "随手画社区",
         fullDesc: "涂手（tushuo）随手画创作社区，手机涂鸦 / 简笔画 / 概念速写为核心，扁平工具 + 简单滤镜，灵感分享和脑暴常用。",
         tags: ["涂手","随手画","社区"],
@@ -2455,6 +2468,7 @@ export const extensionCategories = [
       {
         name: "动漫之家社区",
         url: "https://bbs.acg06.com/",
+        health: 'mirror',
         desc: "ACG 综合论坛",
         fullDesc: "ACG06 动漫之家论坛，动漫、漫画、轻小说、同人、cosplay 讨论区齐全，资源分享与水区并存，ACG 圈老牌论坛。",
         tags: ["ACG06","论坛","综合"],
@@ -2597,6 +2611,7 @@ export const extensionCategories = [
       {
         name: "Archive of Our Own",
         url: "https://archiveofourown.org/",
+        health: 'mirror',
         desc: "AO3 同人",
         fullDesc: "Archive of Our Own（AO3）非营利同人作品档案库，由 OTW 维护，覆盖小说 / 同人 / 漫画 / 翻译，标签系统极强，ACGN 同人读者首选。",
         tags: ["AO3","同人","英文"],
@@ -2667,6 +2682,7 @@ export const extensionCategories = [
       {
         name: "ABEMA",
         url: "https://abema.tv/",
+        health: 'mirror',
         desc: "日本直播",
         fullDesc: "ABEMA 是日本 CyberAgent 旗下的免费流媒体平台，番剧 / 综艺 / 新闻 / 体育 / 恋爱真人秀直播，部分内容限定日本 IP。",
         tags: ["ABEMA","日本","直播"],
@@ -2904,6 +2920,7 @@ export const extensionCategories = [
       {
         name: "OneDrive",
         url: "https://onedrive.live.com/",
+        health: 'mirror',
         desc: "微软云盘",
         fullDesc: "OneDrive 微软个人云盘，深度整合 Office 365、5GB 免费（订阅 1TB），跨平台同步，企业用户与海外华人常用。",
         tags: ["OneDrive","微软","Office"],
@@ -2913,6 +2930,7 @@ export const extensionCategories = [
       {
         name: "Google Drive",
         url: "https://drive.google.com/",
+        health: 'mirror',
         desc: "Google Drive",
         fullDesc: "Google Drive 谷歌云盘，15GB 免费、深度整合 Google 文档/表格/幻灯片，海外华人 / 留学生常用，AI 搜索能力增强。",
         tags: ["GDrive","Google","15GB"],
@@ -2922,6 +2940,7 @@ export const extensionCategories = [
       {
         name: "Dropbox",
         url: "https://www.dropbox.com/",
+        health: 'mirror',
         desc: "Dropbox",
         fullDesc: "Dropbox 老牌云存储，文件同步 / 协作 / 第三方集成生态完善，2GB 免费，是海外创业团队、设计公司高频工具。",
         tags: ["Dropbox","同步","海外"],
@@ -2931,6 +2950,7 @@ export const extensionCategories = [
       {
         name: "MEGA",
         url: "https://mega.io/",
+        health: 'mirror',
         desc: "MEGA",
         fullDesc: "MEGA 端到端加密云存储，20GB 免费、注重隐私、大文件分享友好，是海外文件分享高频工具。",
         tags: ["MEGA","加密","分享"],
@@ -2947,6 +2967,7 @@ export const extensionCategories = [
       {
         name: "500px",
         url: "https://500px.com/",
+        health: 'mirror',
         desc: "摄影社区",
         fullDesc: "500px 是全球知名摄影作品分享社区，摄影师上传作品、按主题分类、社区打分（Pulse），是摄影爱好者作品集和商业接单平台。",
         tags: ["500px","摄影","社区"],
@@ -2974,6 +2995,7 @@ export const extensionCategories = [
       {
         name: "Behance",
         url: "https://www.behance.net/",
+        health: 'mirror',
         desc: "设计作品集",
         fullDesc: "Behance Adobe 旗下创意作品集平台，全球设计师 / 摄影师 / 插画师 / 动态设计师发布作品、招聘 / 接单，是国际作品集标配。",
         tags: ["Behance","Adobe","作品集"],
@@ -3001,6 +3023,7 @@ export const extensionCategories = [
       {
         name: "CNU 视觉联盟",
         url: "https://www.cnu.cc/",
+        health: 'mirror',
         desc: "视觉中国",
         fullDesc: "CNU 视觉联盟（cnu.cc）国内设计 / 摄影 / 插画灵感社区，汇集优秀作品与原创作者，分类齐全、每日更新。",
         tags: ["CNU","视觉","国内"],
@@ -3010,6 +3033,7 @@ export const extensionCategories = [
       {
         name: "Pixivic",
         url: "https://pixivic.com/",
+        health: 'mirror',
         desc: "Pixiv 镜像",
         fullDesc: "Pixivic 是 Pixiv 的国内镜像，提供按关键词 / 画师 / 排行榜检索、收藏、下载，UI 现代化，是不翻墙用 Pixiv 的优秀替代。",
         tags: ["Pixivic","镜像","国内"],

@@ -70,6 +70,37 @@ const KNOWN_BLOCKED_DOMAINS = new Set([
   // 综合
   'tvtropes.org', 'gamejolt.com', 'itch.io', 'rpgmakerweb.com',
   'monogame.net', 'mastodon.social', 'medium.com',
+  // 补充：AI / 工具 / 设计
+  'seaart.io', 'seaart.ai', 'pixlr.com', 'pika.art',
+  'suno.com', 'suno.ai', 'greasyfork.org',
+  'openai.com', 'openai.com', 'dall-e-3',
+  'time.geekbang.org', 'geekbang.org',
+  'tushuoapp.com', 'bbs.acg06.com', 'cnu.cc',
+  'live2d.com', 'esotericsoftware.com',
+  'vrchat.com', 'hello.vrchat.com',
+  'seigura.com', 'voice-style.jp', 'ciel-voice.jp',
+  'radiko.jp', 'agqr.jp', 'uniqueradio.jp',
+  '4gamer.net', 'manew.com', 'manew.cn',
+  'fireflyacg.com', 'ccgexpo.cn', 'idoacg.com',
+  'mengju.me', 'ciyuanfang.com', 'bcy.app',
+  'douyin.com', 'cosplay-jp.com', 'rolecosplayworld.com',
+  'aminoapps.com', 'qdobos.com', 'xiaohongshu.com',
+  'huashijie.com', 'huashengjie.com',
+  'yuanyintang.com', 'qianqian.com', 'taihe.com',
+  'hifini.com', 'hifini.io',
+  'playboard.co', 'seiyuuri.com', 'mochi-mochi.com',
+  'btdig.com', 'biu.moe', 'dmhy.org',
+  'shuge.org', 'shuxiangjia.com',
+  'mangacopy.com', 'idmzj.com', 'agedm.tv', 'agedm.io',
+  'mxdm.cc', 'esjzone.me', 'zimuku.org.cn', 'subhd.org',
+  'acgrip.com', 'dmbtl.org', 'nyaa.iss.one',
+  '1anime.tv', 'hciyuan.com', 'picacomic.com',
+  'kobo.com', 'bookwalker.jp', 'bookwalker.co.jp',
+  'goflyvpn.com', 'lcvpn.com', 'guozhivip.com',
+  'qingju.com', 'ciyuanju.com', 'ciyuanmao.com',
+  'tineye.com', 'animate-onlineshop.com.cn', 'animate.cn',
+  'tyrano.jp', 'b.tyrano.jp',
+  'vtuber-post.com',
 ])
 
 function isBlocked(url) {
@@ -85,19 +116,19 @@ function isBlocked(url) {
 }
 
 function fixFile(text, deadSet) {
-  // 支持 nav.js (8 空格) 和 site-extensions.js (6 空格) 两种缩进
+  // 支持 nav.js (8 空格, 单引号) 和 site-extensions.js (6 空格, 双引号) 两种格式
   return text.replace(
-    /(\{\s*\n(\s+)name: '([^']+)',\s*\n\s+url: '(https?:\/\/[^']+)',([\s\S]*?))\n(\s+\},)/g,
+    /(\{\s*\n(\s+)name: ['"]([^'"]+)['"],\s*\n\s+url: ['"](https?:\/\/[^'"]+)['"],([\s\S]*?))\n(\s+\},)/g,
     (m, body, indent, name, url, tail, end) => {
       if (!deadSet.has(url)) return m
       // 决定 health 值：国际站/被墙 → mirror；国内站临时挂 → unstable
       const targetHealth = isBlocked(url) ? 'mirror' : 'unstable'
       // 已有 health 字段 → 改值
-      if (/health:\s*'[^']+'/.test(tail)) {
-        return body.replace(/health:\s*'[^']+'/, `health: '${targetHealth}'`) + '\n' + end
+      if (/health:\s*['"][^'"]+['"]/.test(tail)) {
+        return body.replace(/health:\s*['"][^'"]+['"]/, `health: '${targetHealth}'`) + '\n' + end
       }
       // 没有 health 字段 → 插一个
-      return body.replace(/(url: '[^']+',)/, `$1\n${indent}health: '${targetHealth}',`) + '\n' + end
+      return body.replace(/(url: ['"][^'"]+['"],)/, `$1\n${indent}health: '${targetHealth}',`) + '\n' + end
     }
   )
 }

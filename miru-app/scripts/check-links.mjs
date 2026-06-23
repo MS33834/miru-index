@@ -113,12 +113,20 @@ function isBlockedHost(url) {
   return null
 }
 
+// 已知问题状态：已标记的条目跳过检测，不计入 dead
+const KNOWN_ISSUE_HEALTH = new Set(['mirror', 'unstable', 'crawl'])
+
 function collectUrls() {
   const list = []
   for (const cat of categories) {
     for (const item of cat.items) {
       if (item.url) {
-        list.push({ category: cat.id, name: item.name, url: item.url })
+        list.push({
+          category: cat.id,
+          name: item.name,
+          url: item.url,
+          health: item.health || 'ok',
+        })
       }
     }
   }
@@ -177,6 +185,11 @@ async function runBatch(items, onResult) {
     .map(async () => {
       while (queue.length) {
         const item = queue.shift()
+        // 已标记为 mirror/unstable/crawl 的条目跳过检测
+        if (KNOWN_ISSUE_HEALTH.has(item.health)) {
+          onResult(item, 'skip')
+          continue
+        }
         const pre = isBlockedHost(item.url)
         if (pre === 'skip') {
           onResult(item, 'skip')
