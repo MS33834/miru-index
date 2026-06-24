@@ -298,7 +298,11 @@ onBeforeUnmount(() => {
             >
               {{ item.name }}
             </h2>
-            <p v-if="item.desc" :id="`${safeId}-desc`" class="mt-3 font-kai-cn text-[#3a2e22] text-base sm:text-lg leading-relaxed">
+            <p
+              v-if="item.desc"
+              :id="`${safeId}-desc`"
+              class="mt-3 font-kai-cn text-[#3a2e22] text-base sm:text-lg leading-relaxed"
+            >
               {{ item.desc }}
             </p>
           </div>
@@ -483,12 +487,7 @@ onBeforeUnmount(() => {
           </div>
 
           <!-- 弹窗被浏览器拦截时的内联提示，替代 alert() -->
-          <div
-            v-if="popupBlocked"
-            class="modal-popup-blocked"
-            role="alert"
-            aria-live="assertive"
-          >
+          <div v-if="popupBlocked" class="modal-popup-blocked" role="alert" aria-live="assertive">
             <span class="modal-popup-blocked__icon" aria-hidden="true">⚠</span>
             <span>弹窗被浏览器拦截，请允许弹窗后重试，或使用「抄 · 录」复制链接手动打开</span>
           </div>

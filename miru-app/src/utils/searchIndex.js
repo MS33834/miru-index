@@ -16,7 +16,9 @@ class SearchIndex {
       const tags = (item.tags || []).join(' ')
       const features = (item.features || []).join(' ')
       const name = (item.name || '').toLowerCase()
-      const haystack = [item.name, item.desc || '', item.fullDesc || '', cat.name || '', tags, features].join(' ').toLowerCase()
+      const haystack = [item.name, item.desc || '', item.fullDesc || '', cat.name || '', tags, features]
+        .join(' ')
+        .toLowerCase()
       return { i, haystack, name }
     })
   }

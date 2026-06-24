@@ -3,8 +3,7 @@ import { STORAGE_KEYS, FAVORITES_LIMITS } from '../config/constants.js'
 
 const STORAGE_KEY = STORAGE_KEYS.FAVORITES
 const BACKUP_KEY = STORAGE_KEY + '.bak'
-const { MAX_ITEMS, MAX_IMPORT_SIZE, MAX_FIELD_LEN, MAX_TAGS, MAX_TAG_LEN, ALLOWED_FIELDS } =
-  FAVORITES_LIMITS
+const { MAX_ITEMS, MAX_IMPORT_SIZE, MAX_FIELD_LEN, MAX_TAGS, MAX_TAG_LEN, ALLOWED_FIELDS } = FAVORITES_LIMITS
 
 // 危险键：防止原型链污染
 const DANGEROUS_KEYS = new Set(['__proto__', 'constructor', 'prototype'])

@@ -18,7 +18,7 @@ const allItems = categories.flatMap((c) =>
     return {
       ...i,
       _category: c,
-      health: h && h !== 'skip' ? h : i.health ?? 'ok',
+      health: h && h !== 'skip' ? h : (i.health ?? 'ok'),
     }
   })
 )
@@ -87,16 +87,10 @@ const filteredItems = computed(() => {
 
 const filteredCount = computed(() => filteredItems.value.length)
 // 单分类也分页（页大小翻倍），避免大分类全量渲染导致 INP 退化
-const currentPageSize = computed(() =>
-  activeCategory.value === 'all' ? PAGE_SIZE : SINGLE_CAT_PAGE_SIZE
-)
-const totalPageCount = computed(() =>
-  totalPages(filteredItems.value.length, currentPageSize.value)
-)
+const currentPageSize = computed(() => (activeCategory.value === 'all' ? PAGE_SIZE : SINGLE_CAT_PAGE_SIZE))
+const totalPageCount = computed(() => totalPages(filteredItems.value.length, currentPageSize.value))
 
-const paginatedItems = computed(() =>
-  paginate(filteredItems.value, currentPage.value, currentPageSize.value)
-)
+const paginatedItems = computed(() => paginate(filteredItems.value, currentPage.value, currentPageSize.value))
 
 const currentCategory = computed(() => {
   if (activeCategory.value === 'all') return null

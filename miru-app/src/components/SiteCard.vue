@@ -96,11 +96,7 @@ const ariaLabel = computed(() => {
 </script>
 
 <template>
-  <div
-    class="card-paper-wrap"
-    :data-url="item.url"
-    :style="{ animationDelay: Math.min(index, 24) * 0.04 + 's' }"
-  >
+  <div class="card-paper-wrap" :data-url="item.url" :style="{ animationDelay: Math.min(index, 24) * 0.04 + 's' }">
     <!-- 收藏状态 sr-only 通告，供屏幕阅读器感知收藏/取消/配额满 -->
     <span class="sr-only" role="status" aria-live="polite">{{ favoriteStatus }}</span>
     <button

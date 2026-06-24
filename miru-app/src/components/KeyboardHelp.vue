@@ -23,9 +23,7 @@ useEventListener(typeof document !== 'undefined' ? document : null, 'keydown', (
     const panel = dialogRef.value
     if (!panel) return
     const focusable = Array.from(
-      panel.querySelectorAll(
-        'a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])'
-      )
+      panel.querySelectorAll('a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])')
     ).filter((el) => !el.disabled && el.offsetParent !== null)
     if (focusable.length < 2) {
       e.preventDefault()
@@ -123,7 +121,12 @@ const onBackdrop = (e) => {
           </div>
 
           <ul class="kb-list">
-            <li v-for="s in shortcuts" :key="s.desc" class="kb-item" :class="{ 'kb-item--disabled': s.single && !shortcutsEnabled }">
+            <li
+              v-for="s in shortcuts"
+              :key="s.desc"
+              class="kb-item"
+              :class="{ 'kb-item--disabled': s.single && !shortcutsEnabled }"
+            >
               <div class="kb-keys">
                 <kbd v-for="k in s.keys" :key="k" class="kb-key">{{ k }}</kbd>
               </div>

@@ -1,6 +1,7 @@
-import { createApp, ref } from 'vue'
+import { createApp } from 'vue'
 import App from './App.vue'
 import './style.css'
+import { useOffline } from './composables/useOffline.js'
 
 // 异步加载霞鹜文楷屏幕阅读版字体（避开 CSP 对内联事件处理器的限制）
 function loadFont(href, fallbackHref) {
@@ -26,18 +27,8 @@ loadFont(
   'https://unpkg.com/lxgw-wenkai-screen-webfont@1.7.0/style.css'
 )
 
-// 全局网络状态（SSR 安全）
-export const isOffline = ref(typeof navigator !== 'undefined' ? !navigator.onLine : false)
-
-if (typeof window !== 'undefined') {
-  window.addEventListener('online', () => {
-    isOffline.value = false
-  })
-
-  window.addEventListener('offline', () => {
-    isOffline.value = true
-  })
-}
+// 初始化全局网络状态监听
+useOffline()
 
 createApp(App).mount('#app')
 

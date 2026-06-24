@@ -15,12 +15,7 @@ function makeAsync(loader) {
     timeout: 10000,
     loadingComponent: { render: () => null },
     errorComponent: {
-      setup: () => () =>
-        h(
-          'div',
-          { class: 'async-fallback', role: 'alert' },
-          '组件加载失败，请检查网络后重试'
-        ),
+      setup: () => () => h('div', { class: 'async-fallback', role: 'alert' }, '组件加载失败，请检查网络后重试'),
     },
     onError(err, retry, fail, attempts) {
       if (attempts <= 2) retry()
@@ -32,7 +27,7 @@ function makeAsync(loader) {
 const SiteModal = makeAsync(() => import('./components/SiteModal.vue'))
 const KeyboardHelp = makeAsync(() => import('./components/KeyboardHelp.vue'))
 const PwaInstallPrompt = makeAsync(() => import('./components/PwaInstallPrompt.vue'))
-import { isOffline } from './main.js'
+import { isOffline } from './composables/useOffline.js'
 import { APP_CONFIG, STORAGE_KEYS, SITE_BASE } from './config/constants.js'
 import { useScrollPosition } from './composables/useScrollPosition.js'
 import { useAppState } from './composables/useAppState.js'
@@ -49,9 +44,7 @@ const helpOpen = ref(false)
 const loaded = ref(false)
 
 const SIDEBAR_KEY = STORAGE_KEYS.SIDEBAR_COLLAPSED
-const sidebarCollapsed = ref(
-  typeof localStorage !== 'undefined' && localStorage.getItem(SIDEBAR_KEY) === 'true'
-)
+const sidebarCollapsed = ref(typeof localStorage !== 'undefined' && localStorage.getItem(SIDEBAR_KEY) === 'true')
 
 const appState = useAppState()
 const recent = useRecentSearches()
@@ -504,7 +497,7 @@ onUnmounted(() => {
 
 <template>
   <ErrorBoundary>
-    <div class="layout" :inert="modalItem || helpOpen || drawerOpen ? '' : undefined">
+    <div class="layout" :inert="!!(modalItem || helpOpen || drawerOpen)">
       <!-- =================== Skip Navigation 链接 =================== -->
       <a href="#main-content" class="skip-nav">跳转到主要内容</a>
 
@@ -817,7 +810,9 @@ onUnmounted(() => {
                 导入收藏
               </button>
               <input ref="importInputRef" type="file" accept="application/json" class="hidden" @change="onImportFile" />
-              <span v-if="importStatus" class="filter-chip__status" role="status" aria-live="polite">{{ importStatus }}</span>
+              <span v-if="importStatus" class="filter-chip__status" role="status" aria-live="polite">{{
+                importStatus
+              }}</span>
             </div>
           </div>
 
