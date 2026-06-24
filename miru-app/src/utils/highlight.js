@@ -14,7 +14,12 @@ export function getHighlightedParts(text, query) {
   // 缓存 key：使用不可打印分隔符，避免 text 含 || 时冲突
   const cacheKey = `${text}\0${query}`
   const cached = highlightCache.get(cacheKey)
-  if (cached) return cached
+  if (cached) {
+    // 真 LRU：访问时 delete-then-set 将其移到最后
+    highlightCache.delete(cacheKey)
+    highlightCache.set(cacheKey, cached)
+    return cached
+  }
 
   // 按空白拆分多个关键词，过滤空串，统一小写
   const needles = query

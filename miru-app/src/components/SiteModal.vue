@@ -1,7 +1,6 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { GH_MIRRORS, ghMirror, healthOf } from '../utils/mirror.js'
-import { useEventListener } from '../composables/useEventListener.js'
 
 const props = defineProps({
   item: { type: Object, required: true },
@@ -15,9 +14,6 @@ const copied = ref(false)
 const mirrorOpen = ref(false)
 const selectedMirror = ref(GH_MIRRORS[0] || null)
 
-// 焦点恢复：保存打开前的活动元素
-let lastFocusedElement = null
-// 复制成功标志的定时器，组件卸载时清理避免操作已卸载实例
 let copyTimer = null
 
 function clearCopyTimer() {
@@ -30,7 +26,6 @@ function clearCopyTimer() {
 const health = computed(() => healthOf(props.item))
 const isGitHub = computed(() => Boolean(props.item.url?.includes('github.com')))
 
-// 安全的 dialog ID：用 URL 派生，避免 name 含空格或特殊字符导致 aria-labelledby 非法
 const safeId = computed(() => {
   const base = props.item.url || props.item.name || 'item'
   return (
@@ -47,39 +42,18 @@ const mirrorUrl = computed(() => {
 })
 
 function onBackdropClick(e) {
-  if (e.target === e.currentTarget) emit('close')
+  if (e.target === dialogRef.value) emit('close')
 }
 
-function onKeydown(e) {
-  if (e.key === 'Escape') {
-    if (mirrorOpen.value) {
-      mirrorOpen.value = false
-      return
-    }
-    emit('close')
-  }
-  if (e.key === 'Tab') trapFocus(e)
+function onDialogClose() {
+  emit('close')
 }
 
-function trapFocus(e) {
-  if (!dialogRef.value) return
-  const focusable = Array.from(
-    dialogRef.value.querySelectorAll(
-      'a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
-    )
-  ).filter((el) => !el.disabled && el.offsetParent !== null)
-  if (focusable.length < 2) {
+function onDialogCancel(e) {
+  // 保留两段 Esc：先关闭 mirror listbox，再关闭 dialog
+  if (mirrorOpen.value) {
     e.preventDefault()
-    return
-  }
-  const first = focusable[0]
-  const last = focusable[focusable.length - 1]
-  if (e.shiftKey && document.activeElement === first) {
-    e.preventDefault()
-    last.focus()
-  } else if (!e.shiftKey && document.activeElement === last) {
-    e.preventDefault()
-    first.focus()
+    mirrorOpen.value = false
   }
 }
 
@@ -91,7 +65,6 @@ async function doCopy(text, flagRef) {
     await navigator.clipboard.writeText(text)
     success = true
   } catch {
-    // 降级方案
     const ta = document.createElement('textarea')
     ta.value = text
     ta.style.position = 'fixed'
@@ -102,7 +75,7 @@ async function doCopy(text, flagRef) {
     try {
       success = document.execCommand('copy')
     } catch {
-      /* execCommand 失败，success 保持 false */
+      /* execCommand 失败 */
     }
     document.body.removeChild(ta)
   }
@@ -125,7 +98,6 @@ function selectMirror(m) {
   mirrorOpen.value = false
 }
 
-// listbox 方向键导航：符合 ARIA listbox 模式，↑↓ 在选项间移动
 function handleMirrorKeydown(e, m) {
   if (e.key === 'Enter' || e.key === ' ') {
     e.preventDefault()
@@ -141,322 +113,388 @@ function handleMirrorKeydown(e, m) {
 }
 
 onMounted(() => {
-  // 保存当前焦点以便关闭时恢复
-  lastFocusedElement = document.activeElement
   nextTick(() => {
-    // 弹窗打开时回到顶部，避免底部按钮聚焦导致标题被卷走
-    if (dialogRef.value) dialogRef.value.scrollTop = 0
+    const dialog = dialogRef.value
+    if (!dialog) return
+    dialog.addEventListener('close', onDialogClose)
+    dialog.addEventListener('cancel', onDialogCancel)
+    dialog.showModal()
+    dialog.scrollTop = 0
     closeBtnRef.value?.focus()
   })
 })
 
-// 改用 useEventListener 避免手动 cleanup
-useEventListener(typeof document !== 'undefined' ? document : null, 'keydown', onKeydown)
-
 onBeforeUnmount(() => {
   clearCopyTimer()
-  // 恢复焦点
-  if (lastFocusedElement && typeof lastFocusedElement.focus === 'function') {
-    lastFocusedElement.focus()
+  const dialog = dialogRef.value
+  if (dialog) {
+    dialog.removeEventListener('close', onDialogClose)
+    dialog.removeEventListener('cancel', onDialogCancel)
+    dialog.close()
   }
 })
 </script>
 
 <template>
-  <Teleport to="body">
+  <dialog
+    ref="dialogRef"
+    class="site-modal"
+    :aria-labelledby="`${safeId}-title`"
+    :aria-describedby="item.desc ? `${safeId}-desc` : undefined"
+    @click="onBackdropClick"
+  >
     <div
-      class="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-6 modal-backdrop"
-      style="background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(12px)"
-      role="dialog"
-      aria-modal="true"
-      :aria-labelledby="`${safeId}-title`"
-      :aria-describedby="item.desc ? `${safeId}-desc` : undefined"
-      @click="onBackdropClick"
+      class="modal-screen relative w-full sm:max-w-2xl max-h-[94vh] overflow-y-auto modal-panel"
+      style="
+        background: linear-gradient(180deg, #f3ece0 0%, #e6dcc8 100%);
+        color: #1a1410;
+        border-radius: 4px;
+        box-shadow:
+          inset 0 0 0 1px rgba(243, 236, 224, 0.5),
+          0 30px 80px rgba(0, 0, 0, 0.7),
+          0 0 0 1px rgba(255, 77, 79, 0.3);
+      "
     >
+      <div aria-hidden="true" class="absolute inset-0 pointer-events-none rounded-[4px] washi"></div>
       <div
-        ref="dialogRef"
-        class="modal-screen relative w-full sm:max-w-2xl max-h-[94vh] overflow-y-auto modal-panel"
+        aria-hidden="true"
+        class="absolute top-0 left-0 right-0 h-[3px] z-10"
         style="
-          background: linear-gradient(180deg, #f3ece0 0%, #e6dcc8 100%);
-          color: #1a1410;
-          border-radius: 4px;
-          box-shadow:
-            inset 0 0 0 1px rgba(243, 236, 224, 0.5),
-            0 30px 80px rgba(0, 0, 0, 0.7),
-            0 0 0 1px rgba(255, 77, 79, 0.3);
+          background: linear-gradient(
+            90deg,
+            #ff4d4f 0%,
+            #ff4d4f 30%,
+            transparent 30%,
+            transparent 36%,
+            #ff4d4f 36%,
+            #ff4d4f 44%,
+            transparent 44%
+          );
+          background-size: 12px 3px;
         "
-      >
-        <div aria-hidden="true" class="absolute inset-0 pointer-events-none rounded-[4px] washi"></div>
-        <div
-          aria-hidden="true"
-          class="absolute top-0 left-0 right-0 h-[3px] z-10"
-          style="
-            background: linear-gradient(
-              90deg,
-              #ff4d4f 0%,
-              #ff4d4f 30%,
-              transparent 30%,
-              transparent 36%,
-              #ff4d4f 36%,
-              #ff4d4f 44%,
-              transparent 44%
-            );
-            background-size: 12px 3px;
-          "
-        ></div>
+      ></div>
 
-        <div class="relative">
-          <button
-            ref="closeBtnRef"
-            type="button"
-            @click="emit('close')"
-            aria-label="关闭对话框（按 Esc 退出）"
-            class="modal-close absolute top-3 right-3 w-10 h-10 rounded-full flex items-center justify-center transition z-20"
+      <div class="relative">
+        <button
+          ref="closeBtnRef"
+          type="button"
+          @click="emit('close')"
+          aria-label="关闭对话框（按 Esc 退出）"
+          class="modal-close absolute top-3 right-3 w-10 h-10 rounded-full flex items-center justify-center transition z-20"
+        >
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            aria-hidden="true"
           >
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2.5"
-              stroke-linecap="round"
-              aria-hidden="true"
-            >
-              <line x1="6" y1="6" x2="18" y2="18" />
-              <line x1="18" y1="6" x2="6" y2="18" />
-            </svg>
-          </button>
+            <line x1="6" y1="6" x2="18" y2="18" />
+            <line x1="18" y1="6" x2="6" y2="18" />
+          </svg>
+        </button>
 
-          <div class="modal-header px-6 sm:px-10 pt-10 sm:pt-12 pb-5 border-b border-[#1a1410]/10">
-            <div class="flex items-center gap-2 mb-5 flex-wrap">
-              <div class="hanko text-xs px-2.5 py-1 stamp-anim" v-if="category">
-                <span class="mr-1">{{ category.icon }}</span
-                >{{ category.name }}
-              </div>
+        <div class="modal-header px-6 sm:px-10 pt-10 sm:pt-12 pb-5 border-b border-[#1a1410]/10">
+          <div class="flex items-center gap-2 mb-5 flex-wrap">
+            <div class="hanko text-xs px-2.5 py-1 stamp-anim" v-if="category">
+              <span class="mr-1">{{ category.icon }}</span
+              >{{ category.name }}
+            </div>
+            <div
+              class="font-serif-cn text-xs px-2.5 py-1 rounded-sm inline-flex items-center gap-1.5"
+              :style="{
+                background: health.bg,
+                color: health.color,
+                border: '1px solid ' + health.color + '66',
+              }"
+              :title="`健康状态: ${health.label}`"
+            >
+              <span :style="{ color: health.color, fontSize: '10px' }" aria-hidden="true">{{ health.icon }}</span>
+              <span>{{ health.label }}</span>
+            </div>
+            <div
+              v-if="item.proxy"
+              class="font-serif-cn text-xs px-2.5 py-1 rounded-sm"
+              style="background: rgba(201, 165, 92, 0.2); color: #7a5e20; border: 1px solid rgba(122, 94, 32, 0.4)"
+            >
+              需梯子
+            </div>
+          </div>
+
+          <h2
+            :id="`${safeId}-title`"
+            class="font-serif-cn text-3xl sm:text-4xl font-black text-[#1a1410] leading-tight pr-10 tracking-tight"
+          >
+            {{ item.name }}
+          </h2>
+          <p
+            v-if="item.desc"
+            :id="`${safeId}-desc`"
+            class="mt-3 font-kai-cn text-[#3a2e22] text-base sm:text-lg leading-relaxed"
+          >
+            {{ item.desc }}
+          </p>
+        </div>
+
+        <div class="px-6 sm:px-10 py-6 sm:py-8 space-y-7">
+          <section v-if="item.tags?.length">
+            <div class="flex items-center gap-2 mb-3">
+              <div class="font-mono text-[10px] tracking-[0.3em] text-[#a8161a]">▎印 · TAGS</div>
               <div
-                class="font-serif-cn text-xs px-2.5 py-1 rounded-sm inline-flex items-center gap-1.5"
-                :style="{
-                  background: health.bg,
-                  color: health.color,
-                  border: '1px solid ' + health.color + '66',
-                }"
-                :title="`健康状态: ${health.label}`"
+                class="flex-1 h-px"
+                style="background: linear-gradient(90deg, rgba(168, 22, 26, 0.3), transparent)"
+              ></div>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <span
+                v-for="t in item.tags"
+                :key="t"
+                class="tag-stamp"
+                style="
+                  background: rgba(168, 22, 26, 0.1);
+                  border-color: rgba(168, 22, 26, 0.4);
+                  color: #a8161a;
+                  font-size: 0.78rem;
+                  padding: 0.3rem 0.65rem;
+                "
+                >#{{ t }}</span
               >
-                <span :style="{ color: health.color, fontSize: '10px' }" aria-hidden="true">{{ health.icon }}</span>
-                <span>{{ health.label }}</span>
-              </div>
+            </div>
+          </section>
+
+          <section v-if="item.fullDesc">
+            <div class="flex items-center gap-2 mb-3">
+              <div class="font-mono text-[10px] tracking-[0.3em] text-[#a8161a]">▎叙 · INTRO</div>
               <div
-                v-if="item.proxy"
-                class="font-serif-cn text-xs px-2.5 py-1 rounded-sm"
-                style="background: rgba(201, 165, 92, 0.2); color: #7a5e20; border: 1px solid rgba(122, 94, 32, 0.4)"
+                class="flex-1 h-px"
+                style="background: linear-gradient(90deg, rgba(168, 22, 26, 0.3), transparent)"
+              ></div>
+            </div>
+            <p class="font-kai-cn text-[#1a1410] leading-[1.95] text-[15px] sm:text-[16px]">
+              {{ item.fullDesc }}
+            </p>
+          </section>
+
+          <section v-if="item.features?.length">
+            <div class="flex items-center gap-2 mb-3">
+              <div class="font-mono text-[10px] tracking-[0.3em] text-[#a8161a]">▎特 · FEATURES</div>
+              <div
+                class="flex-1 h-px"
+                style="background: linear-gradient(90deg, rgba(168, 22, 26, 0.3), transparent)"
+              ></div>
+            </div>
+            <ul class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              <li
+                v-for="(f, i) in item.features"
+                :key="i"
+                class="font-kai-cn text-[#1a1410] text-sm flex items-center gap-2 px-3 py-2 rounded-sm"
+                style="background: rgba(201, 165, 92, 0.08); border: 1px solid rgba(201, 165, 92, 0.25)"
               >
-                需梯子
-              </div>
+                <span class="text-[#a8161a] font-serif-cn font-bold" aria-hidden="true">·</span>
+                <span>{{ f }}</span>
+              </li>
+            </ul>
+          </section>
+
+          <section>
+            <div class="flex items-center gap-2 mb-3">
+              <div class="font-mono text-[10px] tracking-[0.3em] text-[#a8161a]">▎址 · URL</div>
+              <div
+                class="flex-1 h-px"
+                style="background: linear-gradient(90deg, rgba(168, 22, 26, 0.3), transparent)"
+              ></div>
             </div>
 
-            <h2
-              :id="`${safeId}-title`"
-              class="font-serif-cn text-3xl sm:text-4xl font-black text-[#1a1410] leading-tight pr-10 tracking-tight"
+            <code
+              class="block bg-[#0a0a0a] border border-[#1a1410] rounded-sm px-4 py-3 text-[#c9a55c] text-xs sm:text-sm break-all font-mono"
             >
-              {{ item.name }}
-            </h2>
-            <p
-              v-if="item.desc"
-              :id="`${safeId}-desc`"
-              class="mt-3 font-kai-cn text-[#3a2e22] text-base sm:text-lg leading-relaxed"
+              {{ item.url }}
+            </code>
+
+            <div
+              v-if="isGitHub"
+              class="mt-4 rounded-sm overflow-hidden"
+              style="border: 1px solid rgba(201, 165, 92, 0.3); background: rgba(201, 165, 92, 0.05)"
             >
-              {{ item.desc }}
-            </p>
-          </div>
-
-          <div class="px-6 sm:px-10 py-6 sm:py-8 space-y-7">
-            <section v-if="item.tags?.length">
-              <div class="flex items-center gap-2 mb-3">
-                <div class="font-mono text-[10px] tracking-[0.3em] text-[#a8161a]">▎印 · TAGS</div>
-                <div
-                  class="flex-1 h-px"
-                  style="background: linear-gradient(90deg, rgba(168, 22, 26, 0.3), transparent)"
-                ></div>
-              </div>
-              <div class="flex flex-wrap gap-2">
-                <span
-                  v-for="t in item.tags"
-                  :key="t"
-                  class="tag-stamp"
-                  style="
-                    background: rgba(168, 22, 26, 0.1);
-                    border-color: rgba(168, 22, 26, 0.4);
-                    color: #a8161a;
-                    font-size: 0.78rem;
-                    padding: 0.3rem 0.65rem;
-                  "
-                  >#{{ t }}</span
-                >
-              </div>
-            </section>
-
-            <section v-if="item.fullDesc">
-              <div class="flex items-center gap-2 mb-3">
-                <div class="font-mono text-[10px] tracking-[0.3em] text-[#a8161a]">▎叙 · INTRO</div>
-                <div
-                  class="flex-1 h-px"
-                  style="background: linear-gradient(90deg, rgba(168, 22, 26, 0.3), transparent)"
-                ></div>
-              </div>
-              <p class="font-kai-cn text-[#1a1410] leading-[1.95] text-[15px] sm:text-[16px]">
-                {{ item.fullDesc }}
-              </p>
-            </section>
-
-            <section v-if="item.features?.length">
-              <div class="flex items-center gap-2 mb-3">
-                <div class="font-mono text-[10px] tracking-[0.3em] text-[#a8161a]">▎特 · FEATURES</div>
-                <div
-                  class="flex-1 h-px"
-                  style="background: linear-gradient(90deg, rgba(168, 22, 26, 0.3), transparent)"
-                ></div>
-              </div>
-              <ul class="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                <li
-                  v-for="(f, i) in item.features"
-                  :key="i"
-                  class="font-kai-cn text-[#1a1410] text-sm flex items-center gap-2 px-3 py-2 rounded-sm"
-                  style="background: rgba(201, 165, 92, 0.08); border: 1px solid rgba(201, 165, 92, 0.25)"
-                >
-                  <span class="text-[#a8161a] font-serif-cn font-bold" aria-hidden="true">·</span>
-                  <span>{{ f }}</span>
-                </li>
-              </ul>
-            </section>
-
-            <section>
-              <div class="flex items-center gap-2 mb-3">
-                <div class="font-mono text-[10px] tracking-[0.3em] text-[#a8161a]">▎址 · URL</div>
-                <div
-                  class="flex-1 h-px"
-                  style="background: linear-gradient(90deg, rgba(168, 22, 26, 0.3), transparent)"
-                ></div>
-              </div>
-
-              <code
-                class="block bg-[#0a0a0a] border border-[#1a1410] rounded-sm px-4 py-3 text-[#c9a55c] text-xs sm:text-sm break-all font-mono"
+              <button
+                type="button"
+                @click="mirrorOpen = !mirrorOpen"
+                class="mirror-toggle w-full flex items-center justify-between gap-2 px-4 py-2.5 font-serif-cn text-sm transition"
+                :aria-expanded="mirrorOpen"
+                aria-haspopup="listbox"
+                :aria-controls="`${safeId}-mirror-listbox`"
+                aria-label="切换镜像选择"
               >
-                {{ item.url }}
-              </code>
+                <span class="flex items-center gap-2">
+                  <span class="font-mono text-[10px] tracking-[0.2em] text-[#a8161a]">▎镜 · MIRROR</span>
+                  <span>{{ selectedMirror?.name || '选择镜像' }}</span>
+                </span>
+                <span class="text-[10px] transition" :class="{ 'rotate-180': mirrorOpen }" aria-hidden="true">▾</span>
+              </button>
 
               <div
-                v-if="isGitHub"
-                class="mt-4 rounded-sm overflow-hidden"
-                style="border: 1px solid rgba(201, 165, 92, 0.3); background: rgba(201, 165, 92, 0.05)"
+                v-if="mirrorOpen"
+                :id="`${safeId}-mirror-listbox`"
+                class="border-t"
+                style="border-color: rgba(201, 165, 92, 0.2)"
+                role="listbox"
+                aria-label="GitHub 镜像源"
               >
-                <button
-                  type="button"
-                  @click="mirrorOpen = !mirrorOpen"
-                  class="mirror-toggle w-full flex items-center justify-between gap-2 px-4 py-2.5 font-serif-cn text-sm transition"
-                  :aria-expanded="mirrorOpen"
-                  aria-haspopup="listbox"
-                  :aria-controls="`${safeId}-mirror-listbox`"
-                  aria-label="切换镜像选择"
-                >
-                  <span class="flex items-center gap-2">
-                    <span class="font-mono text-[10px] tracking-[0.2em] text-[#a8161a]">▎镜 · MIRROR</span>
-                    <span>{{ selectedMirror?.name || '选择镜像' }}</span>
-                  </span>
-                  <span class="text-[10px] transition" :class="{ 'rotate-180': mirrorOpen }" aria-hidden="true">▾</span>
-                </button>
-
                 <div
-                  v-if="mirrorOpen"
-                  :id="`${safeId}-mirror-listbox`"
-                  class="border-t"
-                  style="border-color: rgba(201, 165, 92, 0.2)"
-                  role="listbox"
-                  aria-label="GitHub 镜像源"
+                  v-for="m in GH_MIRRORS"
+                  :key="m.id"
+                  @click="selectMirror(m)"
+                  class="mirror-option px-4 py-2 text-xs font-mono cursor-pointer transition flex items-center gap-2"
+                  :class="{ 'is-active': selectedMirror?.id === m.id }"
+                  role="option"
+                  :aria-selected="selectedMirror?.id === m.id"
+                  tabindex="0"
+                  @keydown="handleMirrorKeydown($event, m)"
                 >
-                  <div
-                    v-for="m in GH_MIRRORS"
-                    :key="m.id"
-                    @click="selectMirror(m)"
-                    class="mirror-option px-4 py-2 text-xs font-mono cursor-pointer transition flex items-center gap-2"
-                    :class="{ 'is-active': selectedMirror?.id === m.id }"
-                    role="option"
-                    :aria-selected="selectedMirror?.id === m.id"
-                    tabindex="0"
-                    @keydown="handleMirrorKeydown($event, m)"
+                  <span :class="selectedMirror?.id === m.id ? 'text-[#a8161a]' : 'opacity-30'" aria-hidden="true"
+                    >●</span
                   >
-                    <span :class="selectedMirror?.id === m.id ? 'text-[#a8161a]' : 'opacity-30'" aria-hidden="true"
-                      >●</span
-                    >
-                    <span class="flex-1">{{ m.name }}</span>
-                    <span class="opacity-50 text-[10px]">{{ m.id }}</span>
-                  </div>
-                  <div
-                    class="flex items-center justify-between gap-2 px-4 py-2 text-[10px] sm:text-[11px] break-all font-mono"
-                    style="
-                      background: rgba(0, 0, 0, 0.05);
-                      color: #5a4a3a;
-                      border-top: 1px dashed rgba(201, 165, 92, 0.3);
-                    "
+                  <span class="flex-1">{{ m.name }}</span>
+                  <span class="opacity-50 text-[10px]">{{ m.id }}</span>
+                </div>
+                <div
+                  class="flex items-center justify-between gap-2 px-4 py-2 text-[10px] sm:text-[11px] break-all font-mono"
+                  style="
+                    background: rgba(0, 0, 0, 0.05);
+                    color: #5a4a3a;
+                    border-top: 1px dashed rgba(201, 165, 92, 0.3);
+                  "
+                >
+                  <code class="flex-1 break-all">{{ mirrorUrl }}</code>
+                  <a
+                    :href="mirrorUrl"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="shrink-0 px-2 py-1 rounded-sm font-serif-cn transition"
+                    style="color: #7a5e20; border: 1px solid rgba(122, 94, 32, 0.4)"
+                    title="通过当前选中镜像访问（国内友好）"
                   >
-                    <code class="flex-1 break-all">{{ mirrorUrl }}</code>
-                    <a
-                      :href="mirrorUrl"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      class="shrink-0 px-2 py-1 rounded-sm font-serif-cn transition"
-                      style="color: #7a5e20; border: 1px solid rgba(122, 94, 32, 0.4)"
-                      title="通过当前选中镜像访问（国内友好）"
-                    >
-                      镜像访问
-                    </a>
-                  </div>
+                    镜像访问
+                  </a>
                 </div>
               </div>
-            </section>
-          </div>
+            </div>
+          </section>
+        </div>
 
-          <div
-            class="modal-footer px-6 sm:px-10 py-6 sm:py-8 border-t border-[#1a1410]/10 flex flex-col sm:flex-row flex-wrap gap-3"
-          >
-            <a
-              :href="item.url"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="flex-1 text-center px-6 py-3.5 font-serif-cn font-bold text-base transition stamp-anim flex items-center justify-center gap-2"
-              style="
-                background: linear-gradient(180deg, #ff4d4f 0%, #a8161a 100%);
-                color: #f3ece0;
-                border: 1px solid #a8161a;
-                box-shadow:
-                  0 4px 14px rgba(255, 77, 79, 0.35),
+        <div
+          class="modal-footer px-6 sm:px-10 py-6 sm:py-8 border-t border-[#1a1410]/10 flex flex-col sm:flex-row flex-wrap gap-3"
+        >
+          <a
+            :href="item.url"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="flex-1 text-center px-6 py-3.5 font-serif-cn font-bold text-base transition stamp-anim flex items-center justify-center gap-2"
+            style="
+              background: linear-gradient(180deg, #ff4d4f 0%, #a8161a 100%);
+              color: #f3ece0;
+              border: 1px solid #a8161a;
+              box-shadow:
+                0 4px 14px rgba(255, 77, 79, 0.35),
                   inset 0 1px 0 rgba(255, 255, 255, 0.15);
-                border-radius: 2px;
-                letter-spacing: 0.1em;
-                cursor: pointer;
-              "
-            >
-              <span>入</span>
-              <span class="text-sm opacity-80" aria-hidden="true">→</span>
-              <span>覌</span>
-            </a>
-            <button
-              type="button"
-              @click="copyUrl"
-              class="btn-dark px-6 py-3.5 font-serif-cn font-bold text-base transition flex items-center justify-center gap-2"
-              :title="isGitHub ? '复制当前镜像 URL' : '复制站点 URL'"
-            >
-              <span v-if="!copied">抄 · 录</span>
-              <span v-else class="text-[#a8161a]">已抄 ✓</span>
-            </button>
-          </div>
+              border-radius: 2px;
+              letter-spacing: 0.1em;
+              cursor: pointer;
+            "
+          >
+            <span>入</span>
+            <span class="text-sm opacity-80" aria-hidden="true">→</span>
+            <span>覌</span>
+          </a>
+          <button
+            type="button"
+            @click="copyUrl"
+            class="btn-dark px-6 py-3.5 font-serif-cn font-bold text-base transition flex items-center justify-center gap-2"
+            :title="isGitHub ? '复制当前镜像 URL' : '复制站点 URL'"
+          >
+            <span v-if="!copied">抄 · 录</span>
+            <span v-else class="text-[#a8161a]">已抄 ✓</span>
+          </button>
         </div>
       </div>
     </div>
-  </Teleport>
+  </dialog>
 </template>
 
+<style>
+/* ::backdrop 需要在非 scoped 块中定义 */
+.site-modal::backdrop {
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(12px);
+  animation: backdrop-fade 0.25s ease;
+}
+
+/* 不支持 backdrop-filter 时的深度不透明降级 */
+@supports not (backdrop-filter: blur(1px)) {
+  .site-modal::backdrop {
+    background: rgba(0, 0, 0, 0.85);
+  }
+}
+
+/* 用户偏好减少动画时移除模糊 */
+@media (prefers-reduced-motion: reduce) {
+  .site-modal::backdrop {
+    backdrop-filter: none;
+    animation: none;
+  }
+}
+
+@keyframes backdrop-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes screen-open {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.97);
+  }
+}
+</style>
+
 <style scoped>
+.site-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: none;
+  background: transparent;
+  overflow: hidden;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+}
+
+@media (min-width: 640px) {
+  .site-modal {
+    align-items: center;
+    padding: 1.5rem;
+  }
+}
+
+.site-modal[open] .modal-screen {
+  animation: screen-open 0.25s ease;
+}
+
+.modal-screen {
+  margin: 0;
+}
+
 .washi {
   background:
     radial-gradient(circle at 20% 30%, rgba(168, 22, 26, 0.025) 0, transparent 50%),
@@ -501,5 +539,11 @@ onBeforeUnmount(() => {
 }
 .btn-dark:hover {
   background: rgba(0, 0, 0, 0.05);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-modal[open] .modal-screen {
+    animation: none;
+  }
 }
 </style>

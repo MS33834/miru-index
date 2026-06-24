@@ -19,7 +19,7 @@ export default [
       'no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
       'vue/multi-word-component-names': 'off',
       'vue/require-default-prop': 'off',
-      'vue/no-v-html': 'off',
+      'vue/no-v-html': 'error',
       'vue/max-attributes-per-line': 'off',
       'vue/attributes-order': 'off',
       'vue/html-self-closing': 'off',

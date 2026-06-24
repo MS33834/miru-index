@@ -1,6 +1,5 @@
 <script setup>
-import { ref, onMounted, onBeforeUnmount, watch } from 'vue'
-import { useEventListener } from '../composables/useEventListener.js'
+import { ref, watch, nextTick } from 'vue'
 
 const props = defineProps({
   open: { type: Boolean, default: false },
@@ -9,59 +8,26 @@ const props = defineProps({
 const emit = defineEmits(['close', 'toggle-shortcuts'])
 
 const dialogRef = ref(null)
-let lastFocus = null
 
-useEventListener(typeof document !== 'undefined' ? document : null, 'keydown', (e) => {
-  if (!props.open) return
-  if (e.key === 'Escape') {
-    e.stopPropagation()
-    emit('close')
-    return
-  }
-  // 焦点陷阱：Tab 在对话框内循环，避免跳出到背景
-  if (e.key === 'Tab') {
-    const panel = dialogRef.value
-    if (!panel) return
-    const focusable = Array.from(
-      panel.querySelectorAll('a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])')
-    ).filter((el) => !el.disabled && el.offsetParent !== null)
-    if (focusable.length < 2) {
-      e.preventDefault()
-      return
-    }
-    const first = focusable[0]
-    const last = focusable[focusable.length - 1]
-    if (e.shiftKey && document.activeElement === first) {
-      e.preventDefault()
-      last.focus()
-    } else if (!e.shiftKey && document.activeElement === last) {
-      e.preventDefault()
-      first.focus()
-    }
-  }
-})
-
-function focusDialog() {
-  if (props.open) {
-    lastFocus = document.activeElement
-    requestAnimationFrame(() => dialogRef.value?.focus())
-  } else if (lastFocus?.focus) {
-    lastFocus.focus()
-    lastFocus = null
-  }
+function onBackdrop(e) {
+  if (e.target === dialogRef.value) emit('close')
 }
 
-watch(() => props.open, focusDialog, { flush: 'post' })
+function onDialogClose() {
+  emit('close')
+}
 
-onMounted(() => {
-  if (props.open) focusDialog()
-})
-
-onBeforeUnmount(() => {
-  if (lastFocus?.focus) {
-    lastFocus.focus()
-  }
-})
+watch(
+  () => props.open,
+  async (val) => {
+    if (val) {
+      await nextTick()
+      dialogRef.value?.showModal()
+    } else {
+      dialogRef.value?.close()
+    }
+  },
+)
 
 const shortcuts = [
   { keys: ['Ctrl', 'K'], desc: '聚焦搜索框', single: false },
@@ -74,92 +40,142 @@ const shortcuts = [
   { keys: ['Enter'], desc: '打开卡片详情', single: false },
   { keys: ['Space'], desc: '打开卡片详情', single: false },
 ]
-
-const onBackdrop = (e) => {
-  if (e.target === e.currentTarget) emit('close')
-}
 </script>
 
 <template>
-  <Teleport to="body">
-    <Transition name="modal-fade">
-      <div
-        v-if="open"
-        class="fixed inset-0 z-50 flex items-center justify-center p-4"
-        style="background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(8px)"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="kb-title"
-        @click="onBackdrop"
-      >
-        <div ref="dialogRef" tabindex="-1" class="kb-panel">
-          <div class="flex items-center justify-between mb-5">
-            <h2 id="kb-title" class="font-serif-cn text-xl font-black text-[#1a1410]">
-              <span class="text-[#a8161a]">⌨</span> 键 · 盤 · 速
-            </h2>
-            <button
-              type="button"
-              @click="emit('close')"
-              class="w-9 h-9 rounded-full flex items-center justify-center transition"
-              style="background: rgba(184, 35, 31, 0.08); border: 1px solid rgba(184, 35, 31, 0.3); color: #a8161a"
-              aria-label="关闭"
-            >
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2.5"
-                stroke-linecap="round"
-                aria-hidden="true"
-              >
-                <line x1="6" y1="6" x2="18" y2="18" />
-                <line x1="18" y1="6" x2="6" y2="18" />
-              </svg>
-            </button>
-          </div>
-
-          <ul class="kb-list">
-            <li
-              v-for="s in shortcuts"
-              :key="s.desc"
-              class="kb-item"
-              :class="{ 'kb-item--disabled': s.single && !shortcutsEnabled }"
-            >
-              <div class="kb-keys">
-                <kbd v-for="k in s.keys" :key="k" class="kb-key">{{ k }}</kbd>
-              </div>
-              <span class="kb-desc">{{ s.desc }}</span>
-              <span v-if="s.single" class="kb-tag" :class="shortcutsEnabled ? 'kb-tag--on' : 'kb-tag--off'">
-                {{ shortcutsEnabled ? '已启用' : '已停用' }}
-              </span>
-            </li>
-          </ul>
-
-          <label class="kb-toggle">
-            <input
-              type="checkbox"
-              :checked="shortcutsEnabled"
-              @change="emit('toggle-shortcuts', $event.target.checked)"
-            />
-            <span class="kb-toggle__label">启用单字符快捷键（? / v / f）</span>
-          </label>
-          <p class="kb-toggle__hint">关闭后仅保留 Ctrl+K 与 Esc 等修饰键快捷键，避免与屏幕阅读器冲突</p>
-
-          <p
-            class="mt-5 pt-4 text-center font-kai-cn text-[#5a4a3a] text-xs"
-            style="border-top: 1px solid rgba(168, 22, 26, 0.15)"
+  <dialog
+    v-if="open"
+    ref="dialogRef"
+    class="kb-dialog"
+    aria-labelledby="kb-title"
+    @click="onBackdrop"
+    @close="onDialogClose"
+  >
+    <div class="kb-panel">
+      <div class="flex items-center justify-between mb-5">
+        <h2 id="kb-title" class="font-serif-cn text-xl font-black text-[#1a1410]">
+          <span class="text-[#a8161a]">⌨</span> 键 · 盤 · 速
+        </h2>
+        <button
+          type="button"
+          @click="emit('close')"
+          class="w-9 h-9 rounded-full flex items-center justify-center transition"
+          style="background: rgba(184, 35, 31, 0.08); border: 1px solid rgba(184, 35, 31, 0.3); color: #a8161a"
+          aria-label="关闭"
+        >
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            aria-hidden="true"
           >
-            按 <kbd class="kb-key">?</kbd> 再次唤出 · 按 <kbd class="kb-key">Esc</kbd> 关闭
-          </p>
-        </div>
+            <line x1="6" y1="6" x2="18" y2="18" />
+            <line x1="18" y1="6" x2="6" y2="18" />
+          </svg>
+        </button>
       </div>
-    </Transition>
-  </Teleport>
+
+      <ul class="kb-list">
+        <li
+          v-for="s in shortcuts"
+          :key="s.desc"
+          class="kb-item"
+          :class="{ 'kb-item--disabled': s.single && !shortcutsEnabled }"
+        >
+          <div class="kb-keys">
+            <kbd v-for="k in s.keys" :key="k" class="kb-key">{{ k }}</kbd>
+          </div>
+          <span class="kb-desc">{{ s.desc }}</span>
+          <span v-if="s.single" class="kb-tag" :class="shortcutsEnabled ? 'kb-tag--on' : 'kb-tag--off'">
+            {{ shortcutsEnabled ? '已启用' : '已停用' }}
+          </span>
+        </li>
+      </ul>
+
+      <label class="kb-toggle">
+        <input
+          type="checkbox"
+          :checked="shortcutsEnabled"
+          @change="emit('toggle-shortcuts', $event.target.checked)"
+        />
+        <span class="kb-toggle__label">启用单字符快捷键（? / v / f）</span>
+      </label>
+      <p class="kb-toggle__hint">关闭后仅保留 Ctrl+K 与 Esc 等修饰键快捷键，避免与屏幕阅读器冲突</p>
+
+      <p
+        class="mt-5 pt-4 text-center font-kai-cn text-[#5a4a3a] text-xs"
+        style="border-top: 1px solid rgba(168, 22, 26, 0.15)"
+      >
+        按 <kbd class="kb-key">?</kbd> 再次唤出 · 按 <kbd class="kb-key">Esc</kbd> 关闭
+      </p>
+    </div>
+  </dialog>
 </template>
 
+<style>
+/* ::backdrop 需要在非 scoped 块中定义 */
+.kb-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  animation: backdrop-fade 0.2s ease;
+}
+
+/* 不支持 backdrop-filter 时的深度不透明降级 */
+@supports not (backdrop-filter: blur(1px)) {
+  .kb-dialog::backdrop {
+    background: rgba(0, 0, 0, 0.85);
+  }
+}
+
+/* 用户偏好减少动画时移除模糊 */
+@media (prefers-reduced-motion: reduce) {
+  .kb-dialog::backdrop {
+    backdrop-filter: none;
+    animation: none;
+  }
+}
+
+@keyframes backdrop-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes kb-open {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}
+</style>
+
 <style scoped>
+.kb-dialog {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: 1rem;
+  border: none;
+  background: transparent;
+  overflow: hidden;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+}
+
+.kb-dialog[open] {
+  animation: kb-open 0.2s ease;
+}
+
 .kb-panel {
   max-width: 460px;
   width: 100%;
@@ -265,18 +281,10 @@ const onBackdrop = (e) => {
   color: #5a4a3a;
   text-align: center;
 }
-.modal-fade-enter-active,
-.modal-fade-leave-active {
-  transition: opacity 0.2s ease;
-}
-.modal-fade-enter-from,
-.modal-fade-leave-to {
-  opacity: 0;
-}
+
 @media (prefers-reduced-motion: reduce) {
-  .modal-fade-enter-active,
-  .modal-fade-leave-active {
-    transition: none;
+  .kb-dialog[open] {
+    animation: none;
   }
 }
 </style>
