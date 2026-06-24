@@ -210,7 +210,7 @@ onBeforeUnmount(() => {
                 color: health.color,
                 border: '1px solid ' + health.color + '66',
               }"
-              :title="`健康状态: ${health.label}`"
+              :title="health.tip"
             >
               <span :style="{ color: health.color, fontSize: '10px' }" aria-hidden="true">{{ health.icon }}</span>
               <span>{{ health.label }}</span>
@@ -240,6 +240,32 @@ onBeforeUnmount(() => {
         </div>
 
         <div class="px-6 sm:px-10 py-6 sm:py-8 space-y-7">
+          <!-- 国内访问警告 -->
+          <section
+            v-if="item.health === 'blocked' || item.health === 'restricted' || item.proxy"
+            class="rounded-sm px-4 py-3"
+            :style="{
+              background: item.health === 'blocked' ? 'rgba(184,92,26,0.1)' : 'rgba(201,165,92,0.1)',
+              border: '1px solid ' + (item.health === 'blocked' ? 'rgba(184,92,26,0.35)' : 'rgba(201,165,92,0.35)'),
+            }"
+          >
+            <div class="flex items-start gap-2.5">
+              <span class="text-lg shrink-0" aria-hidden="true">{{ item.health === 'blocked' ? '⊘' : '⚠' }}</span>
+              <div>
+                <p class="font-serif-cn font-bold text-sm mb-1" :style="{ color: item.health === 'blocked' ? '#b85c1a' : '#7a5e20' }">
+                  {{ item.health === 'blocked' ? '⚠ 国内无法直接访问' : item.health === 'restricted' ? '⚠ 国内访问受限' : '⚠ 需要代理/梯子' }}
+                </p>
+                <p class="font-kai-cn text-xs leading-relaxed" style="color: #5a4a3a">
+                  {{ item.health === 'blocked'
+                    ? '此站点在大陆被屏蔽，需使用代理/梯子才能访问。'
+                    : item.health === 'restricted'
+                    ? '此站点在大陆访问受限，部分内容可能不可用，建议使用代理获得完整体验。'
+                    : '此站点需要代理或梯子才能访问，国内直连可能无法打开。' }}
+                </p>
+              </div>
+            </div>
+          </section>
+
           <section v-if="item.tags?.length">
             <div class="flex items-center gap-2 mb-3">
               <div class="font-mono text-[10px] tracking-[0.3em] text-[#a8161a]">▎印 · TAGS</div>

@@ -89,6 +89,8 @@ const descParts = computed(() => getHighlightedParts(props.item.desc, props.sear
 const healthInfo = computed(() => healthOf(props.item))
 // 缓存收藏状态，避免模板中多次调用 isFavorite
 const isFav = computed(() => isFavorite(props.item))
+// 当前健康状态的简短 ID（用于条件样式）
+const health = computed(() => props.item.health || 'ok')
 // aria-label 精简：名称 + 截断描述，避免屏幕阅读器朗读过长文本
 const ariaLabel = computed(() => {
   if (!props.item.desc) return `${props.item.name}，点击查看详情`
@@ -165,11 +167,24 @@ const ariaLabel = computed(() => {
             <span v-if="item.tags?.length > 1" class="tag-stamp tag-extra" :class="compact ? 'tag-sm' : 'tag-normal'">
               +{{ item.tags.length - 1 }}
             </span>
-            <span class="card-proxy" :class="{ 'is-proxy': item.proxy }">
+            <span class="card-proxy" :class="{ 'is-proxy': item.proxy, 'is-blocked': health === 'blocked' || health === 'restricted' }">
               {{ item.proxy ? '需梯' : '直连' }}
             </span>
+            <span v-if="health === 'blocked' || health === 'restricted'" class="card-gfw-tip" :title="healthInfo.tip">
+              {{ healthInfo.label }}
+            </span>
           </div>
-          <div class="text-[#a8161a] font-serif-cn tracking-wider text-sm font-bold">覌 →</div>
+          <a
+            :href="item.url"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="card-direct-link"
+            :title="'直达 ' + item.name"
+            @click.stop
+            @keydown.enter.stop
+          >
+            入 →
+          </a>
         </div>
       </div>
     </button>
@@ -439,5 +454,56 @@ const ariaLabel = computed(() => {
   width: 5px;
   height: 5px;
   border-radius: 50%;
+}
+
+/* 直达链接 — 独立于卡片按钮，悬浮可见 */
+.card-direct-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  font-family: var(--serif);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #a8161a;
+  background: rgba(168, 22, 26, 0.06);
+  border: 1px solid rgba(168, 22, 26, 0.18);
+  border-radius: 50%;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 3;
+}
+.card-direct-link:hover {
+  background: rgba(168, 22, 26, 0.15);
+  color: #fff;
+  border-color: #a8161a;
+  transform: scale(1.1);
+}
+.card-direct-link:focus-visible {
+  outline: 2px solid #ff4d4f;
+  outline-offset: 2px;
+}
+
+/* 被墙/受限标记 */
+.card-gfw-tip {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  color: #b85c1a;
+  background: rgba(184, 92, 26, 0.1);
+  border: 1px solid rgba(184, 92, 26, 0.25);
+  border-radius: 2px;
+  padding: 0.1rem 0.35rem;
+  white-space: nowrap;
+  cursor: help;
+}
+.card-proxy.is-blocked {
+  color: #b85c1a;
+  background: rgba(184, 92, 26, 0.12);
+  border-color: rgba(184, 92, 26, 0.3);
 }
 </style>

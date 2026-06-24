@@ -107,11 +107,13 @@ export function ghMirror(url, mirrorId = 'jsdelivr') {
  * 对比度均按 WCAG AA（浅色 washi #f3ece0 背景上 ≥ 4.5:1）校准
  */
 export const HEALTH_MAP = {
-  ok: { color: '#2d6b2d', bg: 'rgba(45, 107, 45, 0.12)', label: '在线', icon: '●' },
-  mirror: { color: '#7a5e20', bg: 'rgba(122, 94, 32, 0.14)', label: '需镜像', icon: '◇' },
-  crawl: { color: '#6b5215', bg: 'rgba(107, 82, 21, 0.14)', label: '反爬', icon: '◐' },
-  unstable: { color: '#a8161a', bg: 'rgba(168, 22, 26, 0.12)', label: '不稳定', icon: '○' },
-  dead: { color: '#666666', bg: 'rgba(102, 102, 102, 0.15)', label: '失效', icon: '✕' },
+  ok: { color: '#2d6b2d', bg: 'rgba(45, 107, 45, 0.12)', label: '在线', icon: '●', tip: '国内可直接访问' },
+  mirror: { color: '#7a5e20', bg: 'rgba(122, 94, 32, 0.14)', label: '需镜像', icon: '◇', tip: '建议使用镜像站访问' },
+  crawl: { color: '#6b5215', bg: 'rgba(107, 82, 21, 0.14)', label: '反爬', icon: '◐', tip: '可能需验证或代理' },
+  unstable: { color: '#a8161a', bg: 'rgba(168, 22, 26, 0.12)', label: '不稳定', icon: '○', tip: '站点可能间歇性不可用' },
+  dead: { color: '#666666', bg: 'rgba(102, 102, 102, 0.15)', label: '失效', icon: '✕', tip: '站点已无法访问' },
+  blocked: { color: '#b85c1a', bg: 'rgba(184, 92, 26, 0.14)', label: '被墙', icon: '⊘', tip: '国内无法直接访问，需代理/梯子' },
+  restricted: { color: '#8a6d20', bg: 'rgba(138, 109, 32, 0.14)', label: '受限', icon: '⚠', tip: '国内访问受限，部分内容不可用' },
 }
 
 export function healthOf(item) {
