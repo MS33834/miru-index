@@ -275,26 +275,26 @@ watch(
       </div>
 
       <!-- 各分类：点击即切换分类，不再展开混淆的手风琴资源列表 -->
-      <button
-        v-for="c in categories"
-        :key="c.id"
-        v-if="c.items.length > 0"
-        type="button"
-        @click="emit('select', c.id)"
-        :class="['sidebar-item', activeCategory === c.id ? 'is-active' : '']"
-        :title="collapsed ? c.name : ''"
-        :aria-label="collapsed ? c.name : undefined"
-        :aria-current="activeCategory === c.id ? 'page' : undefined"
-      >
-        <div class="sidebar-item__lead">
-          <span class="sidebar-item__icon" aria-hidden="true">{{ c.icon }}</span>
-          <span v-if="!collapsed" class="sidebar-item__name">{{ c.name }}</span>
-        </div>
-        <div v-if="!collapsed" class="sidebar-item__trail">
-          <span class="sidebar-item__count">{{ c.items.length }}</span>
-        </div>
-        <span v-if="activeCategory === c.id" class="sidebar-item__indicator"></span>
-      </button>
+      <template v-for="c in categories" :key="c.id">
+        <button
+          v-if="c.items.length > 0"
+          type="button"
+          @click="emit('select', c.id)"
+          :class="['sidebar-item', activeCategory === c.id ? 'is-active' : '']"
+          :title="collapsed ? c.name : ''"
+          :aria-label="collapsed ? c.name : undefined"
+          :aria-current="activeCategory === c.id ? 'page' : undefined"
+        >
+          <div class="sidebar-item__lead">
+            <span class="sidebar-item__icon" aria-hidden="true">{{ c.icon }}</span>
+            <span v-if="!collapsed" class="sidebar-item__name">{{ c.name }}</span>
+          </div>
+          <div v-if="!collapsed" class="sidebar-item__trail">
+            <span class="sidebar-item__count">{{ c.items.length }}</span>
+          </div>
+          <span v-if="activeCategory === c.id" class="sidebar-item__indicator"></span>
+        </button>
+      </template>
     </nav>
 
     <!-- 底部：统计 + 印章 -->
