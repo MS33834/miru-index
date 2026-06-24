@@ -278,6 +278,7 @@ watch(
       <button
         v-for="c in categories"
         :key="c.id"
+        v-if="c.items.length > 0"
         type="button"
         @click="emit('select', c.id)"
         :class="['sidebar-item', activeCategory === c.id ? 'is-active' : '']"
@@ -420,6 +421,13 @@ watch(
   background: #ff4d4f;
   border-radius: 1px;
   box-shadow: 0 0 8px rgba(255, 77, 79, 0.5);
+}
+
+/* 禁用态防御 */
+.sidebar-item.is-disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  pointer-events: none;
 }
 
 /* 折叠态 */
@@ -577,12 +585,5 @@ watch(
 }
 .filter-section__chip.is-active .filter-section__count {
   color: #f3ece0;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .expand-enter-active,
-  .expand-leave-active {
-    transition-duration: 0.01ms;
-  }
 }
 </style>

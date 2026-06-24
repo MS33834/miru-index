@@ -31,8 +31,6 @@
 
   --shadow-seal: 0 0 0 1px rgba(255, 77, 79, 0.3), 0 4px 12px rgba(255, 77, 79, 0.18);
   --shadow-paper: 0 1px 0 rgba(243, 236, 224, 0.05), 0 8px 24px rgba(0, 0, 0, 0.4);
-  --shadow-paper-hover:
-    0 1px 0 rgba(243, 236, 224, 0.08), 0 18px 48px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(201, 165, 92, 0.25);
 }
 
 html {
@@ -93,14 +91,6 @@ body::after {
   mix-blend-mode: overlay;
   contain: strict;
   transform: translateZ(0);
-}
-
-/* 减少动画模式 */
-@media (prefers-reduced-motion: reduce) {
-  body::before,
-  body::after {
-    display: none;
-  }
 }
 
 #app {
@@ -334,12 +324,17 @@ body::after {
   font-weight: 900;
   line-height: 0.9;
   letter-spacing: -0.02em;
+  color: #d4c8b0; /* 降级纯色：不支持 background-clip 时回退 */
   background: linear-gradient(180deg, #fefcf6 0%, #d4c8b0 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
   text-shadow: 0 0 40px rgba(255, 77, 79, 0.18);
   position: relative;
+}
+@supports (background-clip: text) or (-webkit-background-clip: text) {
+  .hero-title {
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
 }
 
 .hero-title-sub {
@@ -552,11 +547,6 @@ body::after {
 .card-rise {
   animation: card-rise 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
 }
-@media (prefers-reduced-motion: reduce) {
-  .card-rise {
-    animation: none;
-  }
-}
 
 /* ----------------------------------------------------------------------------
    进度 — 朱墨笔
@@ -602,36 +592,6 @@ body::after {
 }
 
 /* ----------------------------------------------------------------------------
-   减少动效
----------------------------------------------------------------------------- */
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-}
-
-/* ----------------------------------------------------------------------------
-   响应式
----------------------------------------------------------------------------- */
-@media (max-width: 640px) {
-  .hero-kanji {
-    font-size: clamp(3rem, 18vw, 5.5rem);
-  }
-  .kanji-num {
-    font-size: 2.5rem;
-  }
-}
-@media (min-width: 641px) {
-  .hero-kanji {
-    font-size: clamp(4rem, 12vw, 8.5rem);
-  }
-}
-
-/* ----------------------------------------------------------------------------
    减少动画偏好支持
 ---------------------------------------------------------------------------- */
 @media (prefers-reduced-motion: reduce) {
@@ -658,6 +618,10 @@ body::after {
     animation: none;
     opacity: 1;
     transform: none;
+  }
+  .expand-enter-active,
+  .expand-leave-active {
+    transition-duration: 0.01ms;
   }
 }
 

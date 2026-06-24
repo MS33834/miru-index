@@ -943,7 +943,11 @@ onUnmounted(() => {
 
           <div v-if="isEmpty" class="empty">
             <div class="hanko-circle w-20 h-20 mx-auto mb-6 text-2xl">空</div>
-            <p class="font-kai-cn text-[#8a7a68] text-lg mb-6">卷帙浩繁，未寻得所求之物……</p>
+            <p class="font-kai-cn text-[#8a7a68] text-lg mb-6">
+              <template v-if="searchQuery">未找到与「{{ searchQuery }}」相关的结果</template>
+              <template v-else-if="selectedTags.size > 0 || proxyFilter !== 'all' || showFavoritesOnly">当前筛选条件下无匹配站点</template>
+              <template v-else>卷帙浩繁，未寻得所求之物……</template>
+            </p>
             <div class="empty__actions">
               <button v-if="searchQuery" type="button" class="empty__btn" @click="onClearSearch">清空搜索</button>
               <button v-if="selectedTags.size > 0" type="button" class="empty__btn" @click="clearTags">清除标签</button>

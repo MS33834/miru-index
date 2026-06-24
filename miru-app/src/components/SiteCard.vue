@@ -89,9 +89,10 @@ const descParts = computed(() => getHighlightedParts(props.item.desc, props.sear
 const healthInfo = computed(() => healthOf(props.item))
 // aria-label 精简：名称 + 截断描述，避免屏幕阅读器朗读过长文本
 const ariaLabel = computed(() => {
-  if (!props.item.desc) return props.item.name
+  if (!props.item.desc) return `${props.item.name}，点击查看详情`
   const d = props.item.desc
-  return d.length > 40 ? `${props.item.name}，${d.slice(0, 40)}…` : `${props.item.name}，${d}`
+  const desc = d.length > 40 ? `${d.slice(0, 40)}…` : d
+  return `${props.item.name}，${desc}，点击查看详情`
 })
 </script>
 

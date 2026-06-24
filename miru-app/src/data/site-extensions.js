@@ -2826,7 +2826,7 @@ export const extensionCategories = [
     ],
   },
   {
-    id: 'podcast_more',
+    id: 'podcast',
     name: '播客 / 电台',
     icon: '🎙️',
     items: [
@@ -2848,16 +2848,6 @@ export const extensionCategories = [
           '喜马拉雅（ximalaya）国内最大音频平台，有声书 / 相声 / 评书 / 知识付费 / 播客 / 广播剧 / ASMR 全覆盖，资源量国内第一。',
         tags: ['喜马拉雅', '有声', '综合'],
         features: ['有声书', '综合', '免费+付费'],
-        proxy: false,
-      },
-      {
-        name: '网易云音乐',
-        url: 'https://music.163.com/',
-        desc: '云村播客',
-        fullDesc:
-          '网易云音乐（music.163.com）国内主流音乐平台，近年加大播客 / 电台 / 有声内容投入，ACG 翻唱、广播剧、电台节目丰富。',
-        tags: ['网易云', '音乐', '播客'],
-        features: ['音乐', '电台', '翻唱'],
         proxy: false,
       },
       {
@@ -2918,92 +2908,6 @@ export const extensionCategories = [
           'Pocket Casts 是一款跨平台（iOS / Android / Web）的高级播客 App，订阅 / 同步 / 变速 / 睡眠定时 / 智能播放列表，播客爱好者口碑之选。',
         tags: ['Pocket Casts', '跨平台', '高级'],
         features: ['跨平台', '变速', '同步'],
-        proxy: true,
-      },
-    ],
-  },
-  {
-    id: 'image_search',
-    name: '以图搜图',
-    icon: '🔍',
-    items: [
-      {
-        name: 'SauceNAO',
-        url: 'https://saucenao.com/',
-        desc: '动漫反向搜图',
-        fullDesc:
-          'SauceNAO 是 ACG 圈最常用的反向图片搜索引擎，针对 Pixiv、Danbooru、Niconico、DeviantArt 等站点建立索引，识别准确率最高。',
-        tags: ['SauceNAO', '反向搜图', 'ACG'],
-        features: ['ACG 强', '来源精确', '批量'],
-        proxy: false,
-      },
-      {
-        name: 'ASCII2D',
-        url: 'https://ascii2d.net/',
-        desc: '二次元搜图',
-        fullDesc:
-          'ASCII2D 是日本 ACG 圈主流反向搜图站，专注于二次元插画识别，按 Pixiv / ニコニコ / 二次元画像 / 色彩排序，结果准确。',
-        tags: ['ASCII2D', '二次元', '日本'],
-        features: ['二次元', '色彩', 'Pixiv'],
-        proxy: true,
-      },
-      {
-        name: 'IQDB',
-        url: 'https://www.iqdb.org/',
-        desc: '多源聚合',
-        fullDesc:
-          'IQDB 是聚合多个图源（Danbooru / Konachan / yande.re / Gelbooru / Sankaku）的反向搜图站，无需注册，对欧美图库识别率高。',
-        tags: ['IQDB', '聚合', '欧美'],
-        features: ['多源', '聚合', '无注册'],
-        proxy: true,
-      },
-      {
-        name: 'Yandex Images',
-        url: 'https://yandex.com/images/',
-        desc: 'Yandex 搜图',
-        fullDesc:
-          'Yandex Images 是俄罗斯 Yandex 搜索引擎的图像搜索，以图搜图能力极强，对二次元、插画、欧美图识别率都极佳，是 Google 搜图的优秀替代。',
-        tags: ['Yandex', '以图搜图', '强'],
-        features: ['搜图强', '二次元', '替代 Google'],
-        proxy: false,
-      },
-      {
-        name: '3D IQDB',
-        url: 'https://3d.iqdb.org/',
-        desc: '3D 搜图',
-        fullDesc:
-          '3D IQDB 是 IQDB 的 3D 站版本，专注搜索 3D 模型（sketchfab / 3dwarehouse），对 MMD / 3D 角色识别效果好。',
-        tags: ['3D', 'IQDB', '模型'],
-        features: ['3D 模型', 'MMD', 'sketchfab'],
-        proxy: true,
-      },
-      {
-        name: 'Soutubot',
-        url: 'https://soutubot.moe/',
-        desc: '视频帧搜图',
-        fullDesc:
-          'Soutubot 是 ACG 视频帧反向搜图工具，上传视频或截图，自动提取关键帧到 SauceNAO / trace.moe 检索，识别动漫出处必备。',
-        tags: ['Soutubot', '视频帧', '动画'],
-        features: ['视频帧', '动画识别', '自动提取'],
-        proxy: false,
-      },
-      {
-        name: 'Trace.moe',
-        url: 'https://trace.moe/',
-        desc: '动画出处查询',
-        fullDesc:
-          'Trace.moe 是基于深度学习的动画截图出处查询站，上传截图自动匹配具体番剧集数 / 时间码，识别率业内领先。',
-        tags: ['trace', '动画', '出处'],
-        features: ['深度学习', '时间码', '高准确率'],
-        proxy: true,
-      },
-      {
-        name: '谷歌以图搜图',
-        url: 'https://www.google.com/imghp?gl=zh-CN',
-        desc: 'Google 搜图',
-        fullDesc: 'Google Images 谷歌以图搜图，全球最大综合图源，识别度综合最强，是核实图片来源、查找原图的首选。',
-        tags: ['Google', '搜图', '综合'],
-        features: ['综合', '来源全', '准确'],
         proxy: true,
       },
     ],
