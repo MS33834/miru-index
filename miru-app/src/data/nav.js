@@ -2765,11 +2765,19 @@ const baseCategories = [
 function mergeCategories(base, extensionCats, extensionItemsMap) {
   // 分类内按 URL 去重（同一分类中不出现重复 URL），但允许同一站点跨分类出现。
   // 同时给缺失 health 的条目填充默认值。
-  const normalize = (items) => {
+  const drops = [] // 收集被丢弃的条目，供审计使用
+  const normalize = (items, catId = 'unknown') => {
     const seen = new Set()
     return items
       .filter((item) => {
-        if (!item.url || seen.has(item.url)) return false
+        if (!item.url) {
+          drops.push({ reason: 'no_url', cat: catId, name: item.name })
+          return false
+        }
+        if (seen.has(item.url)) {
+          drops.push({ reason: 'intra_cat_dup', cat: catId, name: item.name, url: item.url })
+          return false
+        }
         seen.add(item.url)
         return true
       })
@@ -2784,7 +2792,7 @@ function mergeCategories(base, extensionCats, extensionItemsMap) {
     const extra = extensionItemsMap[cat.id] || []
     return {
       ...cat,
-      items: normalize([...cat.items, ...extra]),
+      items: normalize([...cat.items, ...extra], cat.id),
     }
   })
 
@@ -2792,9 +2800,17 @@ function mergeCategories(base, extensionCats, extensionItemsMap) {
   for (const cat of extensionCats) {
     const existing = merged.find((c) => c.id === cat.id)
     if (existing) {
-      existing.items = normalize([...existing.items, ...cat.items])
+      existing.items = normalize([...existing.items, ...cat.items], cat.id)
     } else {
-      merged.push({ ...cat, items: normalize([...cat.items]) })
+      merged.push({ ...cat, items: normalize([...cat.items], cat.id) })
+    }
+  }
+
+  // 开发模式下报告被丢弃的条目（仅在非生产构建时）
+  if (typeof process !== 'undefined' && process.env.NODE_ENV !== 'production' && drops.length > 0) {
+    console.warn(`[miru-index] mergeCategories 丢弃了 ${drops.length} 个条目：`)
+    for (const d of drops) {
+      console.warn(`  [${d.reason}] 分类=${d.cat} 名称=${d.name} ${d.url || '(无URL)'}`)
     }
   }
 

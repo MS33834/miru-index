@@ -33,6 +33,10 @@ jobs:
         working-directory: miru-app
         run: npm ci
 
+      - name: Audit data integrity
+        working-directory: miru-app
+        run: npm run audit
+
       - name: Build
         working-directory: miru-app
         run: npm run build
