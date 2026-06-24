@@ -33,7 +33,7 @@ const SiteModal = makeAsync(() => import('./components/SiteModal.vue'))
 const KeyboardHelp = makeAsync(() => import('./components/KeyboardHelp.vue'))
 const PwaInstallPrompt = makeAsync(() => import('./components/PwaInstallPrompt.vue'))
 import { isOffline } from './main.js'
-import { APP_CONFIG } from './config/constants.js'
+import { APP_CONFIG, STORAGE_KEYS, SITE_BASE } from './config/constants.js'
 import { useScrollPosition } from './composables/useScrollPosition.js'
 import { useAppState } from './composables/useAppState.js'
 import { useRecentSearches } from './composables/useRecentSearches.js'
@@ -48,8 +48,10 @@ const drawerOpen = ref(false)
 const helpOpen = ref(false)
 const loaded = ref(false)
 
-const SIDEBAR_KEY = 'miru-sidebar-collapsed'
-const sidebarCollapsed = ref(localStorage.getItem(SIDEBAR_KEY) === 'true')
+const SIDEBAR_KEY = STORAGE_KEYS.SIDEBAR_COLLAPSED
+const sidebarCollapsed = ref(
+  typeof localStorage !== 'undefined' && localStorage.getItem(SIDEBAR_KEY) === 'true'
+)
 
 const appState = useAppState()
 const recent = useRecentSearches()
@@ -104,11 +106,40 @@ const {
 const totalCount = computed(() => allItems.value.length)
 const favoritesCount = computed(() => favorites.value.length)
 
+// 单字符快捷键开关（WCAG 2.1.4）：默认启用，可在键盘帮助面板关闭以避免与 SR 冲突
+const SHORTCUTS_KEY = STORAGE_KEYS.SHORTCUTS_ENABLED
+const shortcutsEnabled = ref(
+  typeof localStorage !== 'undefined' ? localStorage.getItem(SHORTCUTS_KEY) !== 'false' : true
+)
+function onToggleShortcuts(val) {
+  shortcutsEnabled.value = val
+  try {
+    localStorage.setItem(SHORTCUTS_KEY, String(val))
+  } catch {
+    /* 忽略存储错误 */
+  }
+}
+
+// 全局 Toast：收藏配额超限等事件通告
+const toastMessage = ref('')
+let toastTimer = null
+function showToast(msg) {
+  if (toastTimer) clearTimeout(toastTimer)
+  toastMessage.value = msg
+  toastTimer = setTimeout(() => {
+    toastMessage.value = ''
+    toastTimer = null
+  }, APP_CONFIG.UI.TOAST_DURATION)
+}
+function onQuotaExceeded() {
+  showToast(APP_CONFIG.UI.FAVORITES_QUOTA_MSG)
+}
+
 // 首屏快捷标签：高频 + 有特色，点击直接筛选
 const quickTags = computed(() => {
   const preferred = ['开源', '教程', 'VTuber', 'Cosplay', 'MMD', '同人音乐', '正版', '声优']
   const available = new Set(appState.allTags.value.map((t) => t.name))
-  return preferred.filter((t) => available.has(t)).slice(0, 7)
+  return preferred.filter((t) => available.has(t)).slice(0, APP_CONFIG.UI.QUICK_TAGS_COUNT)
 })
 
 const urlSync = useUrlSync({
@@ -151,15 +182,53 @@ function onSearchCommit(q) {
   recent.add(q)
 }
 
-// 切换时重置 + 清缓存 + 更新页面标题
+// SEO 工具：动态更新 meta 标签，避免搜索页被索引产生低质量重复内容
+function upsertMeta(name, content, attr = 'name') {
+  if (typeof document === 'undefined') return
+  let el = document.head.querySelector(`meta[${attr}="${name}"]`)
+  if (!el) {
+    el = document.createElement('meta')
+    el.setAttribute(attr, name)
+    document.head.appendChild(el)
+  }
+  el.setAttribute('content', content)
+}
+
+function upsertCanonical(href) {
+  if (typeof document === 'undefined') return
+  let el = document.head.querySelector('link[rel="canonical"]')
+  if (!el) {
+    el = document.createElement('link')
+    el.setAttribute('rel', 'canonical')
+    document.head.appendChild(el)
+  }
+  el.setAttribute('href', href)
+}
+
+// 切换时重置 + 清缓存 + 更新 SEO 元数据（title/canonical/robots/og）
 watch([searchQuery, activeCategory], () => {
+  let title, canonical, robots
   if (searchQuery.value) {
-    document.title = `搜索: ${searchQuery.value} - 漫藏阁`
+    // 搜索页：noindex,follow，canonical 回首页，避免搜索 spam 污染索引
+    title = `搜索: ${searchQuery.value} - 漫藏阁`
+    canonical = SITE_BASE
+    robots = 'noindex, follow'
   } else if (activeCategory.value !== 'all') {
     const cat = categories.find((c) => c.id === activeCategory.value)
-    document.title = `${cat?.name || ''} - 漫藏阁`
+    title = `${cat?.name || ''} - 漫藏阁`
+    canonical = `${SITE_BASE}?cat=${activeCategory.value}`
+    robots = 'index, follow'
   } else {
-    document.title = '漫藏阁 - ACGN 资源导航'
+    title = '漫藏阁 - ACGN 资源导航'
+    canonical = SITE_BASE
+    robots = 'index, follow'
+  }
+  if (typeof document !== 'undefined') {
+    document.title = title
+    upsertCanonical(canonical)
+    upsertMeta('robots', robots)
+    upsertMeta('og:url', canonical, 'property')
+    upsertMeta('og:title', title, 'property')
   }
 })
 
@@ -207,15 +276,35 @@ const singleCategory = computed(() => {
   if (activeCategory.value === 'all') return null
   const cat = currentCategory.value
   if (!cat) return null
-  return [{ ...cat, items: paginatedItems.value }]
+  // 仅取展示所需字段 + 当前页 items，避免携带原分类全量 items 引用
+  return [{ id: cat.id, icon: cat.icon, name: cat.name, items: paginatedItems.value }]
 })
 
-const isEmpty = computed(() => {
-  if (activeCategory.value === 'all') {
-    return !groupedByVolume.value?.length
-  }
-  return !singleCategory.value?.[0]?.items?.length
+const isEmpty = computed(() => filteredCount.value === 0)
+
+// SR 通告：分类/标签/过滤变化时播报当前结果数（搜索时由 search-result 区已有 aria-live 覆盖）
+const filterAnnouncement = computed(() => {
+  if (searchQuery.value) return ''
+  const cat = activeCategory.value === 'all' ? '全部' : currentCategory.value?.name || ''
+  const parts = [`当前：${cat}，共 ${filteredCount.value} 条`]
+  if (selectedTags.value.size > 0) parts.push(`标签 ${[...selectedTags.value].join('、')}`)
+  if (proxyFilter.value === 'direct') parts.push('仅直连')
+  else if (proxyFilter.value === 'proxy') parts.push('仅需梯')
+  if (showFavoritesOnly.value) parts.push('仅收藏')
+  return parts.join('，')
 })
+
+// 尊重 prefers-reduced-motion 的滚动辅助
+function prefersReducedMotion() {
+  return (
+    typeof window !== 'undefined' &&
+    typeof window.matchMedia === 'function' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  )
+}
+function smoothScrollIntoView(el) {
+  el.scrollIntoView({ behavior: prefersReducedMotion() ? 'auto' : 'smooth', block: 'start' })
+}
 
 function openModal(item, category) {
   modalItem.value = item
@@ -243,9 +332,8 @@ function onPrevPage() {
   scrollToTop()
 }
 function scrollToTop() {
-  if (typeof window !== 'undefined') {
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
+  if (typeof window === 'undefined') return
+  window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? 'auto' : 'smooth' })
 }
 function focusSearch() {
   sidebarCollapsed.value = false
@@ -258,6 +346,8 @@ function focusSearch() {
 }
 
 const drawerPanelRef = ref(null)
+const drawerToggleRef = ref(null)
+let drawerLastFocus = null
 function handleDrawerKeydown(e) {
   if (e.key === 'Escape') {
     drawerOpen.value = false
@@ -298,7 +388,15 @@ function focusDrawerPanel() {
 watch(
   () => drawerOpen.value,
   (open) => {
-    if (open) focusDrawerPanel()
+    if (open) {
+      // 打开时记录当前焦点，便于关闭时还原
+      drawerLastFocus = document.activeElement
+      focusDrawerPanel()
+    } else if (drawerLastFocus && typeof drawerLastFocus.focus === 'function') {
+      // 关闭时还原焦点到触发按钮，避免键盘用户丢失位置
+      drawerLastFocus.focus()
+      drawerLastFocus = null
+    }
   }
 )
 
@@ -332,47 +430,46 @@ function handleKeydown(e) {
     return
   }
 
-  // 按 ? 打开帮助
-  if (e.key === '?' && !inInput) {
+  // 按 ? 打开帮助（单字符快捷键，受 shortcutsEnabled 控制）
+  if (e.key === '?' && !inInput && shortcutsEnabled.value) {
     e.preventDefault()
     helpOpen.value = !helpOpen.value
     return
   }
 
-  // v 切换视图
-  if ((e.key === 'v' || e.key === 'V') && !inInput) {
+  // v 切换视图（单字符快捷键，受 shortcutsEnabled 控制）
+  if ((e.key === 'v' || e.key === 'V') && !inInput && shortcutsEnabled.value) {
     e.preventDefault()
     toggleViewMode()
     return
   }
 
-  // f 切换仅收藏
-  if ((e.key === 'f' || e.key === 'F') && !inInput) {
+  // f 切换仅收藏（单字符快捷键，受 shortcutsEnabled 控制）
+  if ((e.key === 'f' || e.key === 'F') && !inInput && shortcutsEnabled.value) {
     e.preventDefault()
     toggleFavoritesOnly()
     return
   }
 
-  // 上下方向键在分类间切换
-  if (e.key === 'ArrowDown' && !inInput && activeCategory.value === 'all') {
-    // 滚到下一卷
+  // Alt+上下方向键在分类间切换卷册（需修饰键，避免与 SR 朗读冲突）
+  if (e.altKey && e.key === 'ArrowDown' && !inInput && activeCategory.value === 'all') {
     e.preventDefault()
     const volumes = document.querySelectorAll('.volume')
     const scrollY = window.scrollY
     for (const v of volumes) {
       if (v.offsetTop > scrollY + 100) {
-        v.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        smoothScrollIntoView(v)
         break
       }
     }
   }
-  if (e.key === 'ArrowUp' && !inInput && activeCategory.value === 'all') {
+  if (e.altKey && e.key === 'ArrowUp' && !inInput && activeCategory.value === 'all') {
     e.preventDefault()
     const volumes = Array.from(document.querySelectorAll('.volume'))
     const scrollY = window.scrollY
     for (let i = volumes.length - 1; i >= 0; i--) {
       if (volumes[i].offsetTop < scrollY - 100) {
-        volumes[i].scrollIntoView({ behavior: 'smooth', block: 'start' })
+        smoothScrollIntoView(volumes[i])
         break
       }
     }
@@ -383,6 +480,15 @@ onMounted(() => {
   // 数据同步 import 已就绪，下一帧切换避免骨架屏闪烁
   requestAnimationFrame(() => (loaded.value = true))
   window.addEventListener('keydown', handleKeydown)
+  // 收藏配额超限事件：useFavorites 在达到上限时派发，此处显示全局 Toast
+  window.addEventListener('favorites-quota-exceeded', onQuotaExceeded)
+  // PWA shortcuts 的 ?focus=search 参数：直接聚焦搜索框
+  if (typeof window !== 'undefined') {
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('focus') === 'search') {
+      focusSearch()
+    }
+  }
 })
 
 onBeforeUnmount(() => {
@@ -391,12 +497,14 @@ onBeforeUnmount(() => {
 
 onUnmounted(() => {
   window.removeEventListener('keydown', handleKeydown)
+  window.removeEventListener('favorites-quota-exceeded', onQuotaExceeded)
+  if (toastTimer) clearTimeout(toastTimer)
 })
 </script>
 
 <template>
   <ErrorBoundary>
-    <div class="layout">
+    <div class="layout" :inert="modalItem || helpOpen || drawerOpen ? '' : undefined">
       <!-- =================== Skip Navigation 链接 =================== -->
       <a href="#main-content" class="skip-nav">跳转到主要内容</a>
 
@@ -424,6 +532,7 @@ onUnmounted(() => {
       <header class="mobile-topbar lg:hidden">
         <div class="flex items-center gap-2">
           <button
+            ref="drawerToggleRef"
             @click="drawerOpen = true"
             class="w-11 h-11 flex items-center justify-center text-[#f3ece0] hover:bg-[#ff4d4f]/10 rounded-sm"
             aria-label="打开目录"
@@ -558,28 +667,30 @@ onUnmounted(() => {
           </section>
 
           <!-- 面包屑 -->
-          <div v-if="!searchQuery" class="breadcrumb">
+          <nav v-if="!searchQuery" class="breadcrumb" aria-label="面包屑">
             <button
               type="button"
               @click="onSelectCategory('all')"
               class="breadcrumb__item"
               :class="{ 'is-current': activeCategory === 'all' }"
+              :aria-current="activeCategory === 'all' ? 'page' : undefined"
             >
-              <span>⌘</span> 總藏
+              <span aria-hidden="true">⌘</span> 總藏
             </button>
             <template v-if="currentCategory">
-              <span class="breadcrumb__sep">/</span>
-              <span class="breadcrumb__item is-current">
-                <span>{{ currentCategory.icon }}</span> {{ currentCategory.name }}
+              <span class="breadcrumb__sep" aria-hidden="true">/</span>
+              <span class="breadcrumb__item is-current" aria-current="page">
+                <span aria-hidden="true">{{ currentCategory.icon }}</span> {{ currentCategory.name }}
               </span>
             </template>
             <span class="breadcrumb__count">
               <span class="font-mono">{{ filteredCount }}</span> 帖
             </span>
-          </div>
+          </nav>
 
           <!-- 搜索结果条 -->
-          <div v-if="searchQuery" class="search-result">
+          <div v-if="searchQuery" class="search-result" role="status" aria-live="polite">
+            <h1 class="sr-only">搜索：{{ searchQuery }} - 漫藏阁</h1>
             <div class="flex items-center justify-between gap-3 flex-wrap">
               <div>
                 <div class="font-mono text-[10px] tracking-[0.3em] text-[#c9a55c]">▎索 · 寻 「{{ searchQuery }}」</div>
@@ -604,6 +715,11 @@ onUnmounted(() => {
                 </svg>
               </button>
             </div>
+          </div>
+
+          <!-- SR 通告：分类/标签/过滤变化时播报结果数（搜索时由上方 search-result 覆盖） -->
+          <div class="sr-only" role="status" aria-live="polite" aria-atomic="true">
+            {{ filterAnnouncement }}
           </div>
 
           <!-- 过滤与视图工具条：收藏/直连/需梯过滤已集中到侧边栏“快速过滤”，此处保留视图切换与批量操作 -->
@@ -701,7 +817,7 @@ onUnmounted(() => {
                 导入收藏
               </button>
               <input ref="importInputRef" type="file" accept="application/json" class="hidden" @change="onImportFile" />
-              <span v-if="importStatus" class="filter-chip__status">{{ importStatus }}</span>
+              <span v-if="importStatus" class="filter-chip__status" role="status" aria-live="polite">{{ importStatus }}</span>
             </div>
           </div>
 
@@ -797,10 +913,10 @@ onUnmounted(() => {
                   <div class="volume-num font-serif-cn">{{ CHINESE_NUMS[gi + 1] || '壹' }}</div>
                   <div class="flex-1 pb-1">
                     <div class="chapter-num text-[#8a7a68] mb-1">CHAPTER · {{ String(gi + 1).padStart(2, '0') }}</div>
-                    <h2 class="font-serif-cn text-2xl sm:text-3xl text-[#f3ece0] font-bold tracking-wide">
+                    <h1 class="font-serif-cn text-2xl sm:text-3xl text-[#f3ece0] font-bold tracking-wide">
                       <span class="text-[#ff4d4f] mr-2">{{ group.icon }}</span
                       >{{ group.name }}
-                    </h2>
+                    </h1>
                     <div class="mt-1.5 text-[#8a7a68] font-mono text-[10px] tracking-[0.2em]">
                       共 {{ group.items.length }} 帖
                     </div>
@@ -823,6 +939,7 @@ onUnmounted(() => {
                   :index="idx"
                   :search-query="searchQuery"
                   :view-mode="viewMode"
+                  :heading-level="2"
                   @open="openModal"
                 />
               </div>
@@ -850,8 +967,8 @@ onUnmounted(() => {
             </div>
           </div>
 
-          <!-- 分页控件 -->
-          <nav v-if="activeCategory === 'all' && totalPageCount > 1" class="pagination" aria-label="分页导航">
+          <!-- 分页控件（全部视图与单分类视图均适用，页大小由 currentPageSize 决定） -->
+          <nav v-if="totalPageCount > 1" class="pagination" aria-label="分页导航">
             <button
               type="button"
               @click="onPrevPage"
@@ -920,7 +1037,7 @@ onUnmounted(() => {
 
       <!-- 离线状态提示 -->
       <Transition name="fade">
-        <div v-if="isOffline" class="offline-banner" role="alert" aria-live="polite">
+        <div v-if="isOffline" class="offline-banner" role="status" aria-live="polite">
           <svg
             width="16"
             height="16"
@@ -952,10 +1069,22 @@ onUnmounted(() => {
       </Transition>
 
       <!-- 快捷键帮助 -->
-      <KeyboardHelp :open="helpOpen" @close="helpOpen = false" />
+      <KeyboardHelp
+        :open="helpOpen"
+        :shortcuts-enabled="shortcutsEnabled"
+        @close="helpOpen = false"
+        @toggle-shortcuts="onToggleShortcuts"
+      />
 
       <!-- PWA 安装提示 -->
       <PwaInstallPrompt />
+
+      <!-- 全局 Toast（收藏配额等事件通告） -->
+      <Transition name="fade">
+        <div v-if="toastMessage" class="app-toast" role="status" aria-live="polite">
+          {{ toastMessage }}
+        </div>
+      </Transition>
     </div>
   </ErrorBoundary>
 </template>
@@ -1010,8 +1139,8 @@ onUnmounted(() => {
   position: sticky;
   top: 0;
   z-index: 30;
-  background: rgba(10, 10, 10, 0.92);
-  backdrop-filter: blur(10px);
+  /* 移除 backdrop-filter: blur(10px)，避免滚动时每帧 GPU 重算；改用高不透明度纯色 */
+  background: rgba(10, 10, 10, 0.98);
   border-bottom: 1px solid rgba(255, 77, 79, 0.15);
   padding: 0.75rem 1rem;
   display: flex;
@@ -1367,7 +1496,8 @@ onUnmounted(() => {
   border-radius: 2px;
   transition: all 0.2s;
   white-space: nowrap;
-  min-height: 36px;
+  /* WCAG 2.5.5：触摸目标至少 44px */
+  min-height: 44px;
   display: inline-flex;
   align-items: center;
 }
@@ -1677,26 +1807,6 @@ onUnmounted(() => {
   flex-shrink: 0;
 }
 
-/* ============== 跳过链接 ============== */
-.skip-link {
-  position: absolute;
-  top: -40px;
-  left: 0.75rem;
-  z-index: 100;
-  padding: 0.5rem 0.75rem;
-  background: #c9a55c;
-  color: #1a1410;
-  font-family: var(--serif);
-  font-size: 0.8rem;
-  font-weight: 700;
-  border-radius: 0 0 2px 2px;
-  text-decoration: none;
-  transition: top 0.2s;
-}
-.skip-link:focus {
-  top: 0;
-}
-
 /* ============== PWA 更新提示 ============== */
 .update-banner {
   position: fixed;
@@ -1735,5 +1845,25 @@ onUnmounted(() => {
 .update-banner__btn:hover {
   background: #fff;
   color: #1a1410;
+}
+
+/* ============== 全局 Toast ============== */
+.app-toast {
+  position: fixed;
+  top: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 70;
+  max-width: calc(100vw - 2rem);
+  padding: 0.85rem 1.25rem;
+  background: rgba(26, 20, 16, 0.96);
+  color: var(--washi);
+  border: 1px solid rgba(255, 77, 79, 0.5);
+  border-radius: 4px;
+  font-family: var(--kai);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5);
+  text-align: center;
 }
 </style>

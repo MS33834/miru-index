@@ -14,9 +14,28 @@ const closeBtnRef = ref(null)
 const copied = ref(false)
 const mirrorOpen = ref(false)
 const selectedMirror = ref(GH_MIRRORS[0] || null)
+// 弹窗被浏览器拦截时的内联提示，替代 alert()，避免阻塞与上下文丢失
+const popupBlocked = ref(false)
 
 // 焦点恢复：保存打开前的活动元素
 let lastFocusedElement = null
+// 复制成功标志的定时器，组件卸载时清理避免操作已卸载实例
+let copyTimer = null
+let popupTimer = null
+
+function clearCopyTimer() {
+  if (copyTimer) {
+    clearTimeout(copyTimer)
+    copyTimer = null
+  }
+}
+
+function clearPopupTimer() {
+  if (popupTimer) {
+    clearTimeout(popupTimer)
+    popupTimer = null
+  }
+}
 
 const health = computed(() => healthOf(props.item))
 const isGitHub = computed(() => Boolean(props.item.url?.includes('github.com')))
@@ -78,12 +97,11 @@ function trapFocus(e) {
 
 async function doCopy(text, flagRef) {
   if (!text) return
+  clearCopyTimer()
+  let success = false
   try {
     await navigator.clipboard.writeText(text)
-    flagRef.value = true
-    setTimeout(() => {
-      flagRef.value = false
-    }, 1500)
+    success = true
   } catch {
     // 降级方案
     const ta = document.createElement('textarea')
@@ -94,15 +112,18 @@ async function doCopy(text, flagRef) {
     document.body.appendChild(ta)
     ta.select()
     try {
-      document.execCommand('copy')
-      flagRef.value = true
-      setTimeout(() => {
-        flagRef.value = false
-      }, 1500)
+      success = document.execCommand('copy')
     } catch {
-      // 静默
+      /* execCommand 失败，success 保持 false */
     }
     document.body.removeChild(ta)
+  }
+  if (success) {
+    flagRef.value = true
+    copyTimer = setTimeout(() => {
+      flagRef.value = false
+      copyTimer = null
+    }, 1500)
   }
 }
 
@@ -111,27 +132,48 @@ async function copyUrl() {
 }
 
 function isValidUrl(url) {
-  if (!url) return false
-  return /^https?:\/\//.test(url)
+  if (typeof url !== 'string' || !url) return false
+  try {
+    const u = new URL(url)
+    return u.protocol === 'http:' || u.protocol === 'https:'
+  } catch {
+    return false
+  }
 }
 
-function openInNewTab() {
-  if (!isValidUrl(effectiveUrl.value)) return
-  const w = window.open(effectiveUrl.value, '_blank')
-  if (w) w.opener = null
-  else window.location.href = effectiveUrl.value
-}
-
-function openOriginal() {
-  if (!isValidUrl(props.item.url)) return
-  const w = window.open(props.item.url, '_blank')
-  if (w) w.opener = null
-  else window.location.href = props.item.url
+// 合并 openInNewTab / openOriginal：弹窗被拦截时内联提示用户，避免静默跳走丢失上下文
+function openUrl(url) {
+  if (!isValidUrl(url)) return
+  const w = window.open(url, '_blank', 'noopener,noreferrer')
+  if (!w) {
+    // 弹窗被拦截：内联提示而非 alert 阻塞，保留应用状态；4 秒后自动消失
+    clearPopupTimer()
+    popupBlocked.value = true
+    popupTimer = setTimeout(() => {
+      popupBlocked.value = false
+      popupTimer = null
+    }, 4000)
+  }
 }
 
 function selectMirror(m) {
   selectedMirror.value = m
   mirrorOpen.value = false
+}
+
+// listbox 方向键导航：符合 ARIA listbox 模式，↑↓ 在选项间移动
+function handleMirrorKeydown(e, m) {
+  if (e.key === 'Enter' || e.key === ' ') {
+    e.preventDefault()
+    selectMirror(m)
+    return
+  }
+  if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return
+  e.preventDefault()
+  const idx = GH_MIRRORS.indexOf(m)
+  const next = e.key === 'ArrowDown' ? (idx + 1) % GH_MIRRORS.length : (idx - 1 + GH_MIRRORS.length) % GH_MIRRORS.length
+  const target = dialogRef.value?.querySelectorAll('.mirror-option')[next]
+  if (target) target.focus()
 }
 
 onMounted(() => {
@@ -148,6 +190,8 @@ onMounted(() => {
 useEventListener(typeof document !== 'undefined' ? document : null, 'keydown', onKeydown)
 
 onBeforeUnmount(() => {
+  clearCopyTimer()
+  clearPopupTimer()
   // 恢复焦点
   if (lastFocusedElement && typeof lastFocusedElement.focus === 'function') {
     lastFocusedElement.focus()
@@ -163,6 +207,7 @@ onBeforeUnmount(() => {
       role="dialog"
       aria-modal="true"
       :aria-labelledby="`${safeId}-title`"
+      :aria-describedby="item.desc ? `${safeId}-desc` : undefined"
       @click="onBackdropClick"
     >
       <div
@@ -241,7 +286,7 @@ onBeforeUnmount(() => {
               <div
                 v-if="item.proxy"
                 class="font-serif-cn text-xs px-2.5 py-1 rounded-sm"
-                style="background: rgba(201, 165, 92, 0.2); color: #a4853e; border: 1px solid rgba(201, 165, 92, 0.4)"
+                style="background: rgba(201, 165, 92, 0.2); color: #7a5e20; border: 1px solid rgba(122, 94, 32, 0.4)"
               >
                 需梯子
               </div>
@@ -253,7 +298,7 @@ onBeforeUnmount(() => {
             >
               {{ item.name }}
             </h2>
-            <p v-if="item.desc" class="mt-3 font-kai-cn text-[#3a2e22] text-base sm:text-lg leading-relaxed">
+            <p v-if="item.desc" :id="`${safeId}-desc`" class="mt-3 font-kai-cn text-[#3a2e22] text-base sm:text-lg leading-relaxed">
               {{ item.desc }}
             </p>
           </div>
@@ -343,6 +388,8 @@ onBeforeUnmount(() => {
                   @click="mirrorOpen = !mirrorOpen"
                   class="mirror-toggle w-full flex items-center justify-between gap-2 px-4 py-2.5 font-serif-cn text-sm transition"
                   :aria-expanded="mirrorOpen"
+                  aria-haspopup="listbox"
+                  :aria-controls="`${safeId}-mirror-listbox`"
                   aria-label="切换镜像选择"
                 >
                   <span class="flex items-center gap-2">
@@ -352,7 +399,14 @@ onBeforeUnmount(() => {
                   <span class="text-[10px] transition" :class="{ 'rotate-180': mirrorOpen }" aria-hidden="true">▾</span>
                 </button>
 
-                <div v-if="mirrorOpen" class="border-t" style="border-color: rgba(201, 165, 92, 0.2)" role="listbox">
+                <div
+                  v-if="mirrorOpen"
+                  :id="`${safeId}-mirror-listbox`"
+                  class="border-t"
+                  style="border-color: rgba(201, 165, 92, 0.2)"
+                  role="listbox"
+                  aria-label="GitHub 镜像源"
+                >
                   <div
                     v-for="m in GH_MIRRORS"
                     :key="m.id"
@@ -362,8 +416,7 @@ onBeforeUnmount(() => {
                     role="option"
                     :aria-selected="selectedMirror?.id === m.id"
                     tabindex="0"
-                    @keydown.enter="selectMirror(m)"
-                    @keydown.space.prevent="selectMirror(m)"
+                    @keydown="handleMirrorKeydown($event, m)"
                   >
                     <span :class="selectedMirror?.id === m.id ? 'text-[#a8161a]' : 'opacity-30'" aria-hidden="true"
                       >●</span
@@ -382,9 +435,9 @@ onBeforeUnmount(() => {
                     <code class="flex-1 break-all">{{ mirrorUrl }}</code>
                     <button
                       type="button"
-                      @click="openOriginal"
+                      @click="openUrl(item.url)"
                       class="shrink-0 px-2 py-1 rounded-sm font-serif-cn transition"
-                      style="color: #a4853e; border: 1px solid rgba(164, 133, 62, 0.4)"
+                      style="color: #7a5e20; border: 1px solid rgba(122, 94, 32, 0.4)"
                       title="打开 GitHub 原链（需梯子）"
                     >
                       原链
@@ -400,7 +453,7 @@ onBeforeUnmount(() => {
           >
             <button
               type="button"
-              @click="openInNewTab"
+              @click="openUrl(effectiveUrl)"
               class="flex-1 text-center px-6 py-3.5 font-serif-cn font-bold text-base transition stamp-anim flex items-center justify-center gap-2"
               style="
                 background: linear-gradient(180deg, #ff4d4f 0%, #a8161a 100%);
@@ -428,6 +481,17 @@ onBeforeUnmount(() => {
               <span v-else class="text-[#a8161a]">已抄 ✓</span>
             </button>
           </div>
+
+          <!-- 弹窗被浏览器拦截时的内联提示，替代 alert() -->
+          <div
+            v-if="popupBlocked"
+            class="modal-popup-blocked"
+            role="alert"
+            aria-live="assertive"
+          >
+            <span class="modal-popup-blocked__icon" aria-hidden="true">⚠</span>
+            <span>弹窗被浏览器拦截，请允许弹窗后重试，或使用「抄 · 录」复制链接手动打开</span>
+          </div>
         </div>
       </div>
     </div>
@@ -453,7 +517,7 @@ onBeforeUnmount(() => {
   background: rgba(168, 22, 26, 0.22);
 }
 .mirror-toggle {
-  color: #a4853e;
+  color: #7a5e20;
   background: transparent;
 }
 .mirror-toggle:hover {
@@ -479,5 +543,30 @@ onBeforeUnmount(() => {
 }
 .btn-dark:hover {
   background: rgba(0, 0, 0, 0.05);
+}
+
+/* 弹窗被拦截的内联提示 */
+.modal-popup-blocked {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 1.5rem 1.5rem;
+  padding: 0.75rem 1rem;
+  background: rgba(168, 22, 26, 0.1);
+  border: 1px solid rgba(168, 22, 26, 0.4);
+  border-radius: 2px;
+  color: #a8161a;
+  font-family: var(--kai);
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+.modal-popup-blocked__icon {
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+@media (min-width: 640px) {
+  .modal-popup-blocked {
+    margin: 0 2.5rem 2rem;
+  }
 }
 </style>

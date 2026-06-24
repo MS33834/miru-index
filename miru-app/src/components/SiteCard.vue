@@ -1,8 +1,9 @@
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, ref, onBeforeUnmount } from 'vue'
 import { healthOf } from '../utils/mirror.js'
 import { getHighlightedParts } from '../utils/highlight.js'
 import { useFavorites } from '../composables/useFavorites.js'
+import { APP_CONFIG } from '../config/constants.js'
 
 const props = defineProps({
   item: { type: Object, required: true },
@@ -10,12 +11,18 @@ const props = defineProps({
   index: { type: Number, default: 0 },
   compact: { type: Boolean, default: false },
   searchQuery: { type: String, default: '' },
+  // 标题层级：全部视图用 4，单分类视图用 2（紧随 h1 分类标题）
+  headingLevel: { type: Number, default: 4 },
 })
 
 const emit = defineEmits(['open'])
 
 const { isFavorite, toggleFavorite } = useFavorites()
 const favoriteAnimating = ref(false)
+// 收藏状态变化的 sr-only 通告，供屏幕阅读器感知
+const favoriteStatus = ref('')
+let animTimer = null
+let statusTimer = null
 
 function handleClick() {
   emit('open', props.item, props.category)
@@ -31,11 +38,30 @@ function handleKeydown(e) {
 function handleFavoriteClick(e) {
   e.stopPropagation()
   e.preventDefault()
-  toggleFavorite(props.item)
+  const wasFavorite = isFavorite(props.item)
+  const ok = toggleFavorite(props.item)
+  if (!ok) {
+    // 配额已满：通告提示（全局 toast 由 App.vue 监听事件处理，此处局部通告）
+    favoriteStatus.value = '收藏已满，无法添加'
+    if (statusTimer) clearTimeout(statusTimer)
+    statusTimer = setTimeout(() => {
+      favoriteStatus.value = ''
+      statusTimer = null
+    }, 2000)
+    return
+  }
   favoriteAnimating.value = true
-  setTimeout(() => {
+  favoriteStatus.value = wasFavorite ? `已取消收藏 ${props.item.name}` : `已收藏 ${props.item.name}`
+  if (animTimer) clearTimeout(animTimer)
+  animTimer = setTimeout(() => {
     favoriteAnimating.value = false
-  }, 400)
+    animTimer = null
+  }, APP_CONFIG.UI.FAVORITE_ANIM_DURATION)
+  if (statusTimer) clearTimeout(statusTimer)
+  statusTimer = setTimeout(() => {
+    favoriteStatus.value = ''
+    statusTimer = null
+  }, 2000)
 }
 
 function handleFavoriteKeydown(e) {
@@ -46,10 +72,27 @@ function handleFavoriteKeydown(e) {
   }
 }
 
+onBeforeUnmount(() => {
+  if (animTimer) {
+    clearTimeout(animTimer)
+    animTimer = null
+  }
+  if (statusTimer) {
+    clearTimeout(statusTimer)
+    statusTimer = null
+  }
+})
+
 const nameParts = computed(() => getHighlightedParts(props.item.name, props.searchQuery))
 const descParts = computed(() => getHighlightedParts(props.item.desc, props.searchQuery))
 // 缓存健康状态信息，避免模板中重复调用 healthOf
 const healthInfo = computed(() => healthOf(props.item))
+// aria-label 精简：名称 + 截断描述，避免屏幕阅读器朗读过长文本
+const ariaLabel = computed(() => {
+  if (!props.item.desc) return props.item.name
+  const d = props.item.desc
+  return d.length > 40 ? `${props.item.name}，${d.slice(0, 40)}…` : `${props.item.name}，${d}`
+})
 </script>
 
 <template>
@@ -58,25 +101,31 @@ const healthInfo = computed(() => healthOf(props.item))
     :data-url="item.url"
     :style="{ animationDelay: Math.min(index, 24) * 0.04 + 's' }"
   >
+    <!-- 收藏状态 sr-only 通告，供屏幕阅读器感知收藏/取消/配额满 -->
+    <span class="sr-only" role="status" aria-live="polite">{{ favoriteStatus }}</span>
     <button
       type="button"
       @click="handleClick"
       @keydown="handleKeydown"
-      class="card-paper card-rise focus:outline-none focus:ring-2 focus:ring-[#ff4d4f] focus:ring-offset-2 focus:ring-offset-[#0a0a0a] relative"
+      class="card-paper card-rise focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff4d4f] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a] relative"
       :class="compact ? 'p-4 sm:p-5' : 'p-5 sm:p-6'"
-      :aria-label="item.desc ? `${item.name} — ${item.desc}` : item.name"
+      :aria-label="ariaLabel"
     >
       <div class="flex flex-col gap-3">
         <div class="flex items-start justify-between gap-3 pr-10">
-          <h4 class="font-serif-cn text-lg sm:text-xl font-bold text-[#1a1410] leading-tight line-clamp-1 flex-1">
-            <template v-for="(part, idx) in nameParts" :key="idx">
+          <span
+            class="font-serif-cn text-lg sm:text-xl font-bold text-[#1a1410] leading-tight line-clamp-1 flex-1"
+            role="heading"
+            :aria-level="headingLevel"
+          >
+            <template v-for="(part, idx) in nameParts" :key="`${idx}-${part.highlight}`">
               <mark v-if="part.highlight" class="search-highlight">{{ part.text }}</mark>
               <template v-else>{{ part.text }}</template>
             </template>
-          </h4>
+          </span>
           <div class="flex items-center gap-1.5 shrink-0">
             <span v-if="category" class="cat-badge" :title="category.name">
-              <span class="cat-badge__icon">{{ category.icon }}</span>
+              <span class="cat-badge__icon" aria-hidden="true">{{ category.icon }}</span>
               <span class="cat-badge__name">{{ category.name }}</span>
             </span>
             <span
@@ -84,9 +133,9 @@ const healthInfo = computed(() => healthOf(props.item))
               :title="`健康: ${healthInfo.label}`"
               class="health-badge"
               :style="{ color: healthInfo.color, background: healthInfo.bg }"
-              aria-hidden="true"
+              :aria-label="`健康状态：${healthInfo.label}`"
             >
-              <span class="health-badge__dot" :style="{ background: healthInfo.color }"></span>
+              <span class="health-badge__dot" :style="{ background: healthInfo.color }" aria-hidden="true"></span>
               {{ healthInfo.label }}
             </span>
           </div>
@@ -97,7 +146,7 @@ const healthInfo = computed(() => healthOf(props.item))
           class="font-kai-cn text-[#3a2e22] leading-relaxed line-clamp-2 text-sm"
           :class="compact ? 'text-[13px] sm:text-sm' : 'text-sm sm:text-base'"
         >
-          <template v-for="(part, idx) in descParts" :key="idx">
+          <template v-for="(part, idx) in descParts" :key="`${idx}-${part.highlight}`">
             <mark v-if="part.highlight" class="search-highlight">{{ part.text }}</mark>
             <template v-else>{{ part.text }}</template>
           </template>
@@ -167,9 +216,9 @@ const healthInfo = computed(() => healthOf(props.item))
   color: #a8161a;
 }
 .tag-extra {
-  background: rgba(201, 165, 92, 0.1);
-  border-color: rgba(201, 165, 92, 0.3);
-  color: #a4853e;
+  background: rgba(122, 94, 32, 0.1);
+  border-color: rgba(122, 94, 32, 0.3);
+  color: #7a5e20;
 }
 
 .cat-badge {
@@ -225,9 +274,9 @@ const healthInfo = computed(() => healthOf(props.item))
   white-space: nowrap;
 }
 .card-proxy.is-proxy {
-  color: #a4853e;
-  background: rgba(201, 165, 92, 0.08);
-  border-color: rgba(201, 165, 92, 0.2);
+  color: #7a5e20;
+  background: rgba(122, 94, 32, 0.08);
+  border-color: rgba(122, 94, 32, 0.2);
 }
 
 /* 卡片包装器 - 支持悬浮收藏按钮。
@@ -238,18 +287,19 @@ const healthInfo = computed(() => healthOf(props.item))
   position: relative;
 }
 
-/* 悬浮收藏按钮 - 独立元素，避免 button 嵌套 */
+/* 悬浮收藏按钮 - 独立元素，避免 button 嵌套。
+ * 触摸目标 ≥44px（WCAG 2.5.5），移除 backdrop-filter 避免滚动时每帧重算 GPU 合成。
+ */
 .favorite-btn-floating {
   position: absolute;
   top: 0.35rem;
   right: 0.35rem;
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(243, 236, 224, 0.85);
-  backdrop-filter: blur(4px);
+  background: rgba(243, 236, 224, 0.95);
   border: 1px solid rgba(168, 22, 26, 0.15);
   color: #8a7a68;
   cursor: pointer;
@@ -262,18 +312,18 @@ const healthInfo = computed(() => healthOf(props.item))
   -webkit-appearance: none;
 }
 .favorite-btn-floating:hover {
-  background: rgba(243, 236, 224, 0.95);
-  color: #c9a55c;
+  background: rgba(243, 236, 224, 1);
+  color: #8a6d20;
   transform: scale(1.1);
-  border-color: rgba(201, 165, 92, 0.4);
+  border-color: rgba(138, 109, 32, 0.4);
 }
 .favorite-btn-floating:focus-visible {
   outline: 2px solid #ff4d4f;
   outline-offset: 2px;
 }
 .favorite-btn-floating.is-favorite {
-  color: #c9a55c;
-  background: rgba(243, 236, 224, 0.95);
+  color: #8a6d20;
+  background: rgba(243, 236, 224, 1);
 }
 .favorite-btn-floating.is-animating {
   animation: favorite-bounce 0.4s ease;
@@ -282,8 +332,8 @@ const healthInfo = computed(() => healthOf(props.item))
   .favorite-btn-floating {
     top: 0.5rem;
     right: 0.5rem;
-    width: 34px;
-    height: 34px;
+    width: 44px;
+    height: 44px;
   }
 }
 @keyframes favorite-bounce {

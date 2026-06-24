@@ -1,4 +1,26 @@
 // 全局常量配置
+export const SITE_BASE = 'https://MS33834.github.io/miru-index/'
+
+// localStorage key 集中管理，避免散落各处
+export const STORAGE_KEYS = {
+  FAVORITES: 'miru-favorites',
+  RECENT_SEARCHES: 'miru-recent-searches',
+  VIEW_MODE: 'miru-view-mode',
+  SIDEBAR_COLLAPSED: 'miru-sidebar-collapsed',
+  PWA_DISMISSED: 'miru-pwa-dismissed',
+  SHORTCUTS_ENABLED: 'miru-shortcuts-enabled',
+}
+
+// 收藏夹安全约束
+export const FAVORITES_LIMITS = {
+  MAX_ITEMS: 1000,
+  MAX_IMPORT_SIZE: 5 * 1024 * 1024, // 5MB
+  MAX_FIELD_LEN: { name: 120, url: 2048, desc: 500, fullDesc: 2000 },
+  MAX_TAGS: 20,
+  MAX_TAG_LEN: 30,
+  ALLOWED_FIELDS: ['name', 'url', 'desc', 'fullDesc', 'tags', 'features', 'proxy', 'health', 'mirrors'],
+}
+
 export const APP_CONFIG = {
   NAME: '漫藏阁',
   SUBTITLE: 'MIRU INDEX',
@@ -63,11 +85,23 @@ export const APP_CONFIG = {
     ANIMATION_DELAY_STEP: 0.04,
     MAX_ANIMATION_DELAY: 24,
     PAGE_SIZE: 24,
+    TOP_TAGS_COUNT: 24,
+    QUICK_TAGS_COUNT: 7,
+    MAX_RECENT_SEARCHES: 8,
+    COPY_FEEDBACK_DURATION: 1500,
+    PWA_PROMPT_DELAY: 3000,
+    PWA_DISMISS_TTL: 24 * 60 * 60 * 1000,
+    VOLUME_SCROLL_OFFSET: 100,
+    FAVORITE_ANIM_DURATION: 400,
+    // Toast 反馈持续时间
+    TOAST_DURATION: 5000,
+    // 收藏配额上限提示
+    FAVORITES_QUOTA_MSG: '收藏已满（上限 1000 条），请先导出或清理后再试',
   },
 
   // 缓存配置（与 public/sw.js 保持一致）
   CACHE: {
-    VERSION: 'v6',
+    VERSION: 'v8',
     NAME_PREFIX: 'miru-index-',
     PRECACHE_ASSETS: [
       '/miru-index/',
@@ -76,6 +110,8 @@ export const APP_CONFIG = {
       '/miru-index/robots.txt',
       '/miru-index/sitemap.xml',
       '/miru-index/favicon.svg',
+      '/miru-index/offline.html',
+      '/miru-index/frame-buster.js',
       '/miru-index/og-image.png',
     ],
   },

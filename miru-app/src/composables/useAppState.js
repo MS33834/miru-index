@@ -1,21 +1,26 @@
 import { ref, computed, shallowRef } from 'vue'
 import { categories } from '../data/nav.js'
 import { APP_CONFIG } from '../config/constants.js'
-import { clearHighlightCache } from '../utils/highlight.js'
 import SearchIndex from '../utils/searchIndex.js'
 import { paginate, totalPages } from '../utils/paginate.js'
 import { useFavorites } from './useFavorites.js'
 import healthMap from '../data/health.json' with { type: 'json' }
 
 const PAGE_SIZE = APP_CONFIG.UI.PAGE_SIZE || 24
+// 单分类页大小：限制首屏 DOM 数量，避免大分类（如 github 40+ 条）全量渲染卡顿
+const SINGLE_CAT_PAGE_SIZE = PAGE_SIZE * 2
 
 // 预构建一次，避免重复 flatMap；用 health.json 的自动检测结果覆盖手动标注
+// 注意：health.json 中值为 "skip" 表示自动检测跳过，应回退到手动标注，避免误显示为在线
 const allItems = categories.flatMap((c) =>
-  c.items.map((i) => ({
-    ...i,
-    _category: c,
-    health: healthMap[i.url] ?? i.health ?? 'ok',
-  }))
+  c.items.map((i) => {
+    const h = healthMap[i.url]
+    return {
+      ...i,
+      _category: c,
+      health: h && h !== 'skip' ? h : i.health ?? 'ok',
+    }
+  })
 )
 const categoryIdSet = new Set(categories.map((c) => c.id))
 const searchIndex = new SearchIndex(allItems)
@@ -81,12 +86,17 @@ const filteredItems = computed(() => {
 })
 
 const filteredCount = computed(() => filteredItems.value.length)
-const totalPageCount = computed(() => totalPages(filteredItems.value.length, PAGE_SIZE))
+// 单分类也分页（页大小翻倍），避免大分类全量渲染导致 INP 退化
+const currentPageSize = computed(() =>
+  activeCategory.value === 'all' ? PAGE_SIZE : SINGLE_CAT_PAGE_SIZE
+)
+const totalPageCount = computed(() =>
+  totalPages(filteredItems.value.length, currentPageSize.value)
+)
 
-const paginatedItems = computed(() => {
-  if (activeCategory.value !== 'all') return filteredItems.value
-  return paginate(filteredItems.value, currentPage.value, PAGE_SIZE)
-})
+const paginatedItems = computed(() =>
+  paginate(filteredItems.value, currentPage.value, currentPageSize.value)
+)
 
 const currentCategory = computed(() => {
   if (activeCategory.value === 'all') return null
@@ -100,12 +110,11 @@ function resetPage() {
 function setSearch(q) {
   searchQuery.value = q
   resetPage()
-  clearHighlightCache()
+  // 不再 clearHighlightCache：缓存 key 含 query，LRU 自然淘汰旧查询，连续相似查询可复用分段
 }
 
 function clearSearch() {
   searchQuery.value = ''
-  clearHighlightCache()
 }
 
 function selectCategory(id) {
@@ -162,6 +171,7 @@ const sharedState = {
   // 计算
   filteredItems,
   filteredCount,
+  currentPageSize,
   totalPageCount,
   paginatedItems,
   currentCategory,

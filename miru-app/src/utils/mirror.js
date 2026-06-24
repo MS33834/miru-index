@@ -77,19 +77,25 @@ export function ghMirror(url, mirrorId = 'jsdelivr') {
   }
 
   // raw/blob/tree: 转成 raw.githubusercontent.com 然后代理
-  const rawUrl = url.replace('https://github.com/', 'https://raw.githubusercontent.com/').replace('/blob/', '/')
+  // 同时替换 /blob/ 和 /tree/ 为 /，避免 tree 段残留导致 raw URL 非法 404
+  const rawUrl = url
+    .replace('https://github.com/', 'https://raw.githubusercontent.com/')
+    .replace('/blob/', '/')
+    .replace('/tree/', '/')
 
   return base + rawUrl
 }
 
 /**
  * 健康状态 -> 颜色 + 中文标签 + 图标
+ * 对比度均按 WCAG AA（浅色 washi #f3ece0 背景上 ≥ 4.5:1）校准
  */
 export const HEALTH_MAP = {
-  ok: { color: '#3a8a3a', bg: 'rgba(58, 138, 58, 0.12)', label: '在线', icon: '●' },
-  mirror: { color: '#c9a55c', bg: 'rgba(201, 165, 92, 0.15)', label: '需镜像', icon: '◇' },
-  crawl: { color: '#a4853e', bg: 'rgba(164, 133, 62, 0.15)', label: '反爬', icon: '◐' },
+  ok: { color: '#2d6b2d', bg: 'rgba(45, 107, 45, 0.12)', label: '在线', icon: '●' },
+  mirror: { color: '#7a5e20', bg: 'rgba(122, 94, 32, 0.14)', label: '需镜像', icon: '◇' },
+  crawl: { color: '#6b5215', bg: 'rgba(107, 82, 21, 0.14)', label: '反爬', icon: '◐' },
   unstable: { color: '#a8161a', bg: 'rgba(168, 22, 26, 0.12)', label: '不稳定', icon: '○' },
+  dead: { color: '#666666', bg: 'rgba(102, 102, 102, 0.15)', label: '失效', icon: '✕' },
 }
 
 export function healthOf(item) {

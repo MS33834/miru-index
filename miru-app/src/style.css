@@ -43,6 +43,21 @@ html {
   letter-spacing: 0.01em;
 }
 
+/* ----------------------------------------------------------------------------
+   全局键盘焦点指示器（WCAG 2.4.7 Focus Visible）
+   为所有交互元素统一提供可见焦点，避免遗漏。鼠标点击不显示（:focus-visible）。
+---------------------------------------------------------------------------- */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--seal);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
 body {
   background: var(--ink);
   color: var(--washi);
@@ -145,7 +160,8 @@ body::after {
 /* 性能 */
 .content-auto {
   content-visibility: auto;
-  contain-intrinsic-size: 200px;
+  /* auto 让浏览器记住上次渲染尺寸，800px 为卷册内容高度的合理估计，减少滚动条抖动 */
+  contain-intrinsic-size: auto 800px;
 }
 
 /* ----------------------------------------------------------------------------
@@ -430,7 +446,7 @@ body::after {
   border-color: var(--gold);
   background: var(--ink-3);
   box-shadow: 0 0 0 3px rgba(201, 165, 92, 0.1);
-  outline: none;
+  /* 不再 outline: none：让全局 input:focus-visible 的朱砂描边在键盘聚焦时可见（WCAG 2.4.7） */
 }
 .scroll-input:focus + .scroll-end,
 .scroll-input:not(:placeholder-shown) + .scroll-end {
@@ -667,6 +683,21 @@ body::after {
 }
 
 /* ----------------------------------------------------------------------------
+   屏幕阅读器专用（视觉隐藏但可访问）
+---------------------------------------------------------------------------- */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ----------------------------------------------------------------------------
    搜索清空按钮
 ---------------------------------------------------------------------------- */
 .search-clear-btn {
@@ -683,7 +714,8 @@ body::after {
   border-radius: 2px;
   cursor: pointer;
   transition: all 0.2s;
-  min-height: 36px;
+  /* WCAG 2.5.5：触摸目标至少 44px */
+  min-height: 44px;
 }
 .search-clear-btn:hover {
   background: rgba(255, 77, 79, 0.2);
@@ -718,7 +750,8 @@ body::after {
   cursor: pointer;
   transition: all 0.2s;
   letter-spacing: 0.05em;
-  min-height: 40px;
+  /* WCAG 2.5.5：触摸目标至少 44px */
+  min-height: 44px;
   display: inline-flex;
   align-items: center;
   justify-content: center;

@@ -38,7 +38,9 @@ async function getFirstCardInfo(page) {
   const wrap = card.locator('..')
   const url = await wrap.getAttribute('data-url')
   const title = await card.getAttribute('aria-label')
-  return { card, url, title }
+  // 卡片可见标题文本（role=heading span），用于与弹窗 h2 比对，避免依赖 aria-label 格式
+  const name = (await card.locator('[role="heading"]').textContent())?.trim() || title
+  return { card, url, title, name }
 }
 
 test.describe('用户行为模拟 - 桌面端完整链路', () => {
@@ -74,7 +76,7 @@ test.describe('用户行为模拟 - 桌面端完整链路', () => {
       const name = (await cat.locator('.sidebar-item__name').textContent()).trim()
       await cat.click()
       await closeSidebarIfMobile(page)
-      await expect(page.locator('.single-cat .volume__header h2')).toContainText(name)
+      await expect(page.locator('.single-cat .volume__header h1')).toContainText(name)
       await page.locator('.breadcrumb__item').first().click()
       await expect(page.locator('.volume').first()).toBeVisible()
     }
@@ -110,14 +112,14 @@ test.describe('用户行为模拟 - 桌面端完整链路', () => {
     await page.goto(BASE)
     await captureWindowOpen(page)
 
-    const { card, url, title } = await getFirstCardInfo(page)
+    const { card, url, title, name } = await getFirstCardInfo(page)
     expect(url).toMatch(/^https?:\/\//)
     expect(title?.length).toBeGreaterThan(0)
 
     await card.click()
     const dialog = page.locator('[role="dialog"]')
     await expect(dialog).toBeVisible()
-    await expect(dialog.locator('h2')).toContainText(title.split(' — ')[0])
+    await expect(dialog.locator('h2')).toContainText(name)
 
     await dialog.locator('[aria-label="关闭对话框（按 Esc 退出）"]').click()
     await expect(dialog).not.toBeVisible()

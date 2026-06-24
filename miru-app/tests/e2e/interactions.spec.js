@@ -31,7 +31,7 @@ test.describe('交互与过滤功能', () => {
     const firstCategory = sidebar.locator('.sidebar-item').nth(1)
     const categoryName = await firstCategory.locator('.sidebar-item__name').textContent()
     await firstCategory.click()
-    await expect(page.locator('.single-cat .volume__header h2')).toContainText(categoryName)
+    await expect(page.locator('.single-cat .volume__header h1')).toContainText(categoryName)
   })
 
   test('收藏过滤开关', async ({ page }) => {

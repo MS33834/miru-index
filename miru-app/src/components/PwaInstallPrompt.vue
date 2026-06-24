@@ -1,13 +1,15 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { STORAGE_KEYS, APP_CONFIG } from '../config/constants.js'
 
 const show = ref(false)
 const installed = ref(false)
 let deferredPrompt = null
 let dismissTimer = null
 
-const DISMISS_KEY = 'miru-pwa-dismissed'
-const DISMISS_TTL = 24 * 60 * 60 * 1000
+const DISMISS_KEY = STORAGE_KEYS.PWA_DISMISSED
+const DISMISS_TTL = APP_CONFIG.UI.PWA_DISMISS_TTL
+const PROMPT_DELAY = APP_CONFIG.UI.PWA_PROMPT_DELAY
 
 function isRecentlyDismissed() {
   try {
@@ -27,7 +29,7 @@ function onBeforeInstallPrompt(e) {
   // 延迟显示（避免首屏干扰）
   dismissTimer = setTimeout(() => {
     show.value = true
-  }, 3000)
+  }, PROMPT_DELAY)
 }
 
 function onAppInstalled() {
@@ -59,10 +61,14 @@ onBeforeUnmount(() => {
 
 async function install() {
   if (!deferredPrompt) return
-  deferredPrompt.prompt()
-  const { outcome } = await deferredPrompt.userChoice
-  if (outcome === 'accepted') {
-    show.value = false
+  try {
+    deferredPrompt.prompt()
+    const { outcome } = await deferredPrompt.userChoice
+    if (outcome === 'accepted') {
+      show.value = false
+    }
+  } catch {
+    // 浏览器策略变更或用户取消可能导致抛错，静默处理避免未捕获 rejection
   }
   deferredPrompt = null
 }

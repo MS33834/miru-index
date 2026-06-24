@@ -3,6 +3,8 @@ import { ref, computed, watch } from 'vue'
 import { categories } from '../data/nav.js'
 import { useDebounce } from '../composables/useDebounce.js'
 import { useRecentSearches } from '../composables/useRecentSearches.js'
+import { useAppState } from '../composables/useAppState.js'
+import { APP_CONFIG } from '../config/constants.js'
 
 const props = defineProps({
   activeCategory: { type: String, required: true },
@@ -29,24 +31,12 @@ const showTags = ref(false)
 
 const { recentSearches, add: addRecent, clear: clearRecent } = useRecentSearches()
 
-// 热门标签
-const topTags = computed(() => {
-  const map = new Map()
-  for (const c of categories) {
-    for (const item of c.items) {
-      for (const tag of item.tags || []) {
-        map.set(tag, (map.get(tag) || 0) + 1)
-      }
-    }
-  }
-  return [...map.entries()]
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 24)
-    .map(([name, count]) => ({ name, count }))
-})
+// 复用 useAppState 模块级单例的 allTags，避免重复遍历全部 items
+const { allTags } = useAppState()
+const topTags = computed(() => allTags.value.slice(0, APP_CONFIG.UI.TOP_TAGS_COUNT))
 
 // 使用防抖 composable
-const { debouncedValue, setDebouncedValue } = useDebounce(300)
+const { debouncedValue, setDebouncedValue } = useDebounce(APP_CONFIG.UI.SEARCH_DEBOUNCE_DELAY)
 const localSearchQuery = ref(props.searchQuery)
 
 function commitSearch(value) {
@@ -187,10 +177,11 @@ watch(
         @click="emit('select', 'all')"
         :class="['sidebar-item', activeCategory === 'all' ? 'is-active' : '']"
         :title="collapsed ? '全部' : ''"
+        :aria-label="collapsed ? '全部 · 總藏' : undefined"
         :aria-current="activeCategory === 'all' ? 'page' : undefined"
       >
         <div class="sidebar-item__lead">
-          <span class="sidebar-item__icon">⌘</span>
+          <span class="sidebar-item__icon" aria-hidden="true">⌘</span>
           <span v-if="!collapsed" class="sidebar-item__name">全部 · 總藏</span>
         </div>
         <div v-if="!collapsed" class="sidebar-item__trail">
@@ -205,11 +196,17 @@ watch(
 
       <!-- 快速过滤 -->
       <div v-if="!collapsed" class="filter-section">
-        <button type="button" class="filter-section__title" @click="showFilters = !showFilters">
+        <button
+          type="button"
+          class="filter-section__title"
+          @click="showFilters = !showFilters"
+          :aria-expanded="showFilters"
+          aria-controls="filter-panel-quick"
+        >
           <span>快速过滤</span>
-          <span class="filter-section__chevron" :class="{ 'is-open': showFilters }">▾</span>
+          <span class="filter-section__chevron" :class="{ 'is-open': showFilters }" aria-hidden="true">▾</span>
         </button>
-        <div v-if="showFilters" class="filter-section__body">
+        <div v-if="showFilters" id="filter-panel-quick" class="filter-section__body">
           <button
             type="button"
             class="filter-section__chip"
@@ -227,7 +224,7 @@ watch(
             :class="{ 'is-active': proxyFilter === 'direct' }"
             @click="emit('set-proxy-filter', proxyFilter === 'direct' ? 'all' : 'direct')"
             :aria-pressed="proxyFilter === 'direct'"
-            title="仅显示国内可直接访问的站点"
+            aria-label="仅显示国内可直接访问的站点"
             data-testid="filter-direct"
           >
             <span>直连</span>
@@ -238,7 +235,7 @@ watch(
             :class="{ 'is-active': proxyFilter === 'proxy' }"
             @click="emit('set-proxy-filter', proxyFilter === 'proxy' ? 'all' : 'proxy')"
             :aria-pressed="proxyFilter === 'proxy'"
-            title="仅显示需要代理/梯子访问的站点"
+            aria-label="仅显示需要代理/梯子访问的站点"
             data-testid="filter-proxy"
           >
             <span>需梯</span>
@@ -248,11 +245,18 @@ watch(
 
       <!-- 标签云 -->
       <div v-if="!collapsed" class="filter-section">
-        <button type="button" class="filter-section__title" @click="showTags = !showTags" data-testid="tags-toggle">
+        <button
+          type="button"
+          class="filter-section__title"
+          @click="showTags = !showTags"
+          :aria-expanded="showTags"
+          aria-controls="filter-panel-tags"
+          data-testid="tags-toggle"
+        >
           <span>标签云</span>
-          <span class="filter-section__chevron" :class="{ 'is-open': showTags }">▾</span>
+          <span class="filter-section__chevron" :class="{ 'is-open': showTags }" aria-hidden="true">▾</span>
         </button>
-        <div v-if="showTags" class="filter-section__body filter-section__body--tags">
+        <div v-if="showTags" id="filter-panel-tags" class="filter-section__body filter-section__body--tags">
           <button
             v-for="t in topTags"
             :key="t.name"
@@ -261,7 +265,7 @@ watch(
             :class="{ 'is-active': selectedTags.has(t.name) }"
             @click="emit('toggle-tag', t.name)"
             :aria-pressed="selectedTags.has(t.name)"
-            :title="`出现 ${t.count} 次`"
+            :aria-label="`标签 ${t.name}，出现 ${t.count} 次`"
             data-testid="tag-chip"
           >
             <span>#{{ t.name }}</span>
@@ -278,10 +282,11 @@ watch(
         @click="emit('select', c.id)"
         :class="['sidebar-item', activeCategory === c.id ? 'is-active' : '']"
         :title="collapsed ? c.name : ''"
+        :aria-label="collapsed ? c.name : undefined"
         :aria-current="activeCategory === c.id ? 'page' : undefined"
       >
         <div class="sidebar-item__lead">
-          <span class="sidebar-item__icon">{{ c.icon }}</span>
+          <span class="sidebar-item__icon" aria-hidden="true">{{ c.icon }}</span>
           <span v-if="!collapsed" class="sidebar-item__name">{{ c.name }}</span>
         </div>
         <div v-if="!collapsed" class="sidebar-item__trail">

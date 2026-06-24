@@ -1,6 +1,7 @@
 import { ref, watch } from 'vue'
+import { STORAGE_KEYS } from '../config/constants.js'
 
-const STORAGE_KEY = 'miru-view-mode'
+const STORAGE_KEY = STORAGE_KEYS.VIEW_MODE
 const VALID_MODES = ['grid', 'list']
 
 function load() {

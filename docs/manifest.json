@@ -1,12 +1,15 @@
 {
+  "id": "/miru-index/",
   "name": "漫藏阁 - ACGN 资源导航",
   "short_name": "漫藏阁",
   "description": "ACGN 资源导航站，收录各类动漫、游戏、小说、工具等资源网站",
   "start_url": "/miru-index/",
+  "scope": "/miru-index/",
   "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone"],
   "background_color": "#0a0a0a",
   "theme_color": "#0a0a0a",
-  "orientation": "portrait-primary",
+  "orientation": "any",
   "icons": [
     {
       "src": "/miru-index/favicon.svg",
@@ -31,6 +34,26 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "搜索资源",
+      "short_name": "搜索",
+      "description": "直接进入搜索",
+      "url": "/miru-index/?focus=search"
+    },
+    {
+      "name": "我的收藏",
+      "short_name": "收藏",
+      "description": "查看收藏的站点",
+      "url": "/miru-index/?fav=1"
+    },
+    {
+      "name": "全部资源",
+      "short_name": "全部",
+      "description": "浏览全部资源",
+      "url": "/miru-index/?cat=all"
     }
   ],
   "categories": ["entertainment", "education"],
