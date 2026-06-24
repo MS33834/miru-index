@@ -22,15 +22,26 @@ const GH_PROXY_BASES = {
 const JSDELIVR_BASE = 'https://cdn.jsdelivr.net/gh/'
 
 /**
- * 判断 URL 是否为 GitHub 仓库主页（无 /blob/ /tree/ /releases/ /raw/ 等路径）
+ * 判断 URL 是否为 GitHub 仓库主页（无 /blob/ /tree/ /releases/ 等路径）
  */
 function isRepoHome(url) {
   return /^https:\/\/github\.com\/[^/]+\/[^/]+\/?(\?.*)?$/.test(url)
 }
 
 /**
+ * 判断路径是否为 GitHub 页面路径（不能转成 raw 文件路径）
+ * 例如 /releases、/tags、/issues、/pulls、/actions 等
+ */
+function isGitHubPagePath(url) {
+  const pagePaths =
+    /\/((releases|tags|issues|pulls|projects|actions|security|insights|commits|compare|wiki)(\/|$)|search\?)/
+  return pagePaths.test(url)
+}
+
+/**
  * 从 GitHub 文件 URL 提取 owner/repo@ref/path，用于 jsDelivr
- * 支持 github.com/owner/repo/blob/ref/path 与 raw.githubusercontent.com/owner/repo/ref/path
+ * 支持 github.com/owner/repo/blob/ref/path、/tree/ref/path
+ * 与 raw.githubusercontent.com/owner/repo/ref/path
  */
 function extractGhPath(url) {
   let path = null
@@ -39,6 +50,12 @@ function extractGhPath(url) {
   const blobMatch = url.match(/^https:\/\/github\.com\/([^/]+\/[^/]+)\/blob\/(.+)$/)
   if (blobMatch) {
     path = `${blobMatch[1]}@${blobMatch[2]}`
+  }
+
+  // github.com/owner/repo/tree/ref/path → owner/repo@ref/path
+  const treeMatch = url.match(/^https:\/\/github\.com\/([^/]+\/[^/]+)\/tree\/(.+)$/)
+  if (treeMatch) {
+    path = `${treeMatch[1]}@${treeMatch[2]}`
   }
 
   // raw.githubusercontent.com/owner/repo/ref/path → owner/repo@ref/path
@@ -52,7 +69,7 @@ function extractGhPath(url) {
 
 /**
  * 把 GitHub URL 转为镜像 URL
- *  - fmt=raw (jsDelivr): 仅对 blob/raw 文件 URL 生效，返回 cdn.jsdelivr.net/gh/owner/repo@ref/path
+ *  - fmt=raw (jsDelivr): 仅对 blob/tree/raw 文件 URL 生效，返回 cdn.jsdelivr.net/gh/owner/repo@ref/path
  *  - fmt=proxy: 把 GitHub URL 当成代理前缀拼接，适用于任意 GitHub 页面
  */
 export function ghMirror(url, mirrorId = 'jsdelivr') {
@@ -62,22 +79,21 @@ export function ghMirror(url, mirrorId = 'jsdelivr') {
 
   if (m.fmt === 'raw') {
     const path = extractGhPath(url)
-    // jsDelivr 只能代理 raw 文件，仓库主页回退到默认 proxy
+    // jsDelivr 只能代理 blob/tree/raw 路径
     if (path) return JSDELIVR_BASE + path
-    // 仓库主页没有合适 raw 路径，fallback 到 proxy
+    // 仓库主页或页面路径 fallback 到默认 proxy
     return GH_PROXY_BASES.ghproxy + url
   }
 
   // proxy 镜像：base + 原 URL（gh-proxy 风格）
   const base = GH_PROXY_BASES[mirrorId] || GH_PROXY_BASES.ghproxy
 
-  // 仓库主页 → 直接代理 GitHub 仓库主页
-  if (isRepoHome(url)) {
+  // 仓库主页或页面类路径 → 直接代理 GitHub 页面
+  if (isRepoHome(url) || isGitHubPagePath(url)) {
     return base + url
   }
 
-  // raw/blob/tree: 转成 raw.githubusercontent.com 然后代理
-  // 同时替换 /blob/ 和 /tree/ 为 /，避免 tree 段残留导致 raw URL 非法 404
+  // blob/tree/raw: 转成 raw.githubusercontent.com 然后代理
   const rawUrl = url
     .replace('https://github.com/', 'https://raw.githubusercontent.com/')
     .replace('/blob/', '/')

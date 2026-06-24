@@ -14,26 +14,16 @@ const closeBtnRef = ref(null)
 const copied = ref(false)
 const mirrorOpen = ref(false)
 const selectedMirror = ref(GH_MIRRORS[0] || null)
-// 弹窗被浏览器拦截时的内联提示，替代 alert()，避免阻塞与上下文丢失
-const popupBlocked = ref(false)
 
 // 焦点恢复：保存打开前的活动元素
 let lastFocusedElement = null
 // 复制成功标志的定时器，组件卸载时清理避免操作已卸载实例
 let copyTimer = null
-let popupTimer = null
 
 function clearCopyTimer() {
   if (copyTimer) {
     clearTimeout(copyTimer)
     copyTimer = null
-  }
-}
-
-function clearPopupTimer() {
-  if (popupTimer) {
-    clearTimeout(popupTimer)
-    popupTimer = null
   }
 }
 
@@ -55,8 +45,6 @@ const mirrorUrl = computed(() => {
   if (!isGitHub.value || !selectedMirror.value) return null
   return ghMirror(props.item.url, selectedMirror.value.id)
 })
-// 当前实际要打开/复制的 URL：GitHub 使用镜像，其它使用原链
-const effectiveUrl = computed(() => (isGitHub.value ? mirrorUrl.value : props.item.url))
 
 function onBackdropClick(e) {
   if (e.target === e.currentTarget) emit('close')
@@ -128,32 +116,8 @@ async function doCopy(text, flagRef) {
 }
 
 async function copyUrl() {
-  await doCopy(effectiveUrl.value, copied)
-}
-
-function isValidUrl(url) {
-  if (typeof url !== 'string' || !url) return false
-  try {
-    const u = new URL(url)
-    return u.protocol === 'http:' || u.protocol === 'https:'
-  } catch {
-    return false
-  }
-}
-
-// 合并 openInNewTab / openOriginal：弹窗被拦截时内联提示用户，避免静默跳走丢失上下文
-function openUrl(url) {
-  if (!isValidUrl(url)) return
-  const w = window.open(url, '_blank', 'noopener,noreferrer')
-  if (!w) {
-    // 弹窗被拦截：内联提示而非 alert 阻塞，保留应用状态；4 秒后自动消失
-    clearPopupTimer()
-    popupBlocked.value = true
-    popupTimer = setTimeout(() => {
-      popupBlocked.value = false
-      popupTimer = null
-    }, 4000)
-  }
+  const url = isGitHub.value ? mirrorUrl.value : props.item.url
+  await doCopy(url, copied)
 }
 
 function selectMirror(m) {
@@ -191,7 +155,6 @@ useEventListener(typeof document !== 'undefined' ? document : null, 'keydown', o
 
 onBeforeUnmount(() => {
   clearCopyTimer()
-  clearPopupTimer()
   // 恢复焦点
   if (lastFocusedElement && typeof lastFocusedElement.focus === 'function') {
     lastFocusedElement.focus()
@@ -437,15 +400,16 @@ onBeforeUnmount(() => {
                     "
                   >
                     <code class="flex-1 break-all">{{ mirrorUrl }}</code>
-                    <button
-                      type="button"
-                      @click="openUrl(item.url)"
+                    <a
+                      :href="mirrorUrl"
+                      target="_blank"
+                      rel="noopener noreferrer"
                       class="shrink-0 px-2 py-1 rounded-sm font-serif-cn transition"
                       style="color: #7a5e20; border: 1px solid rgba(122, 94, 32, 0.4)"
-                      title="打开 GitHub 原链（需梯子）"
+                      title="通过当前选中镜像访问（国内友好）"
                     >
-                      原链
-                    </button>
+                      镜像访问
+                    </a>
                   </div>
                 </div>
               </div>
@@ -455,9 +419,10 @@ onBeforeUnmount(() => {
           <div
             class="modal-footer px-6 sm:px-10 py-6 sm:py-8 border-t border-[#1a1410]/10 flex flex-col sm:flex-row flex-wrap gap-3"
           >
-            <button
-              type="button"
-              @click="openUrl(effectiveUrl)"
+            <a
+              :href="item.url"
+              target="_blank"
+              rel="noopener noreferrer"
               class="flex-1 text-center px-6 py-3.5 font-serif-cn font-bold text-base transition stamp-anim flex items-center justify-center gap-2"
               style="
                 background: linear-gradient(180deg, #ff4d4f 0%, #a8161a 100%);
@@ -474,7 +439,7 @@ onBeforeUnmount(() => {
               <span>入</span>
               <span class="text-sm opacity-80" aria-hidden="true">→</span>
               <span>覌</span>
-            </button>
+            </a>
             <button
               type="button"
               @click="copyUrl"
@@ -484,12 +449,6 @@ onBeforeUnmount(() => {
               <span v-if="!copied">抄 · 录</span>
               <span v-else class="text-[#a8161a]">已抄 ✓</span>
             </button>
-          </div>
-
-          <!-- 弹窗被浏览器拦截时的内联提示，替代 alert() -->
-          <div v-if="popupBlocked" class="modal-popup-blocked" role="alert" aria-live="assertive">
-            <span class="modal-popup-blocked__icon" aria-hidden="true">⚠</span>
-            <span>弹窗被浏览器拦截，请允许弹窗后重试，或使用「抄 · 录」复制链接手动打开</span>
           </div>
         </div>
       </div>
@@ -542,30 +501,5 @@ onBeforeUnmount(() => {
 }
 .btn-dark:hover {
   background: rgba(0, 0, 0, 0.05);
-}
-
-/* 弹窗被拦截的内联提示 */
-.modal-popup-blocked {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin: 0 1.5rem 1.5rem;
-  padding: 0.75rem 1rem;
-  background: rgba(168, 22, 26, 0.1);
-  border: 1px solid rgba(168, 22, 26, 0.4);
-  border-radius: 2px;
-  color: #a8161a;
-  font-family: var(--kai);
-  font-size: 0.85rem;
-  line-height: 1.5;
-}
-.modal-popup-blocked__icon {
-  font-size: 1rem;
-  flex-shrink: 0;
-}
-@media (min-width: 640px) {
-  .modal-popup-blocked {
-    margin: 0 2.5rem 2rem;
-  }
 }
 </style>
