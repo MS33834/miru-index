@@ -2763,19 +2763,21 @@ const baseCategories = [
 // 4. 未来接入 CMS 时，只需把 CMS JSON 映射为 extensionCategories / extensionItems 即可
 
 function mergeCategories(base, extensionCats, extensionItemsMap) {
-  // 按 URL 去重，避免 CMS 与本地数据冲突；同时给缺失 health 的条目填充默认值
-  const seenUrls = new Set()
-  const normalize = (items) =>
-    items
+  // 分类内按 URL 去重（同一分类中不出现重复 URL），但允许同一站点跨分类出现。
+  // 同时给缺失 health 的条目填充默认值。
+  const normalize = (items) => {
+    const seen = new Set()
+    return items
       .filter((item) => {
-        if (!item.url || seenUrls.has(item.url)) return false
-        seenUrls.add(item.url)
+        if (!item.url || seen.has(item.url)) return false
+        seen.add(item.url)
         return true
       })
       .map((item) => ({
         health: 'ok',
         ...item,
       }))
+  }
 
   // 为基础分类追加扩展条目
   const merged = base.map((cat) => {

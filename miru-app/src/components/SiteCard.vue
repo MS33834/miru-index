@@ -87,6 +87,8 @@ const nameParts = computed(() => getHighlightedParts(props.item.name, props.sear
 const descParts = computed(() => getHighlightedParts(props.item.desc, props.searchQuery))
 // 缓存健康状态信息，避免模板中重复调用 healthOf
 const healthInfo = computed(() => healthOf(props.item))
+// 缓存收藏状态，避免模板中多次调用 isFavorite
+const isFav = computed(() => isFavorite(props.item))
 // aria-label 精简：名称 + 截断描述，避免屏幕阅读器朗读过长文本
 const ariaLabel = computed(() => {
   if (!props.item.desc) return `${props.item.name}，点击查看详情`
@@ -178,16 +180,16 @@ const ariaLabel = computed(() => {
       @click="handleFavoriteClick"
       @keydown="handleFavoriteKeydown"
       class="favorite-btn-floating"
-      :class="{ 'is-favorite': isFavorite(item), 'is-animating': favoriteAnimating }"
-      :aria-label="isFavorite(item) ? `取消收藏 ${item.name}` : `收藏 ${item.name}`"
-      :aria-pressed="isFavorite(item)"
+      :class="{ 'is-favorite': isFav, 'is-animating': favoriteAnimating }"
+      :aria-label="isFav ? `取消收藏 ${item.name}` : `收藏 ${item.name}`"
+      :aria-pressed="isFav"
       title="收藏"
     >
       <svg
         width="14"
         height="14"
         viewBox="0 0 24 24"
-        :fill="isFavorite(item) ? 'currentColor' : 'none'"
+        :fill="isFav ? 'currentColor' : 'none'"
         stroke="currentColor"
         stroke-width="2"
         aria-hidden="true"

@@ -6,16 +6,20 @@ import { ref } from 'vue'
  */
 export const isOffline = ref(typeof navigator !== 'undefined' ? !navigator.onLine : false)
 
+// 模块级只注册一次，避免多次调用 useOffline() 累积 listener
+let _initialized = false
+function initListeners() {
+  if (_initialized || typeof window === 'undefined') return
+  _initialized = true
+  window.addEventListener('online', () => {
+    isOffline.value = false
+  })
+  window.addEventListener('offline', () => {
+    isOffline.value = true
+  })
+}
+
 export function useOffline() {
-  if (typeof window !== 'undefined') {
-    window.addEventListener('online', () => {
-      isOffline.value = false
-    })
-
-    window.addEventListener('offline', () => {
-      isOffline.value = true
-    })
-  }
-
+  initListeners()
   return { isOffline }
 }

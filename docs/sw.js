@@ -101,6 +101,14 @@ self.addEventListener('fetch', (event) => {
   // 跨源请求默认走网络（字体等由浏览器 HTTP 缓存处理）
   if (url.origin !== location.origin) return
 
+  // SPA 导航请求（mode === 'navigate'）统一走 documents 策略，避免 query 变体无限缓存
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      networkFirstStrategy(event.request, CACHE_STRATEGIES.documents.cacheName, CACHE_STRATEGIES.documents.maxEntries)
+    )
+    return
+  }
+
   // 路由到对应策略
   for (const [key, strategy] of Object.entries(CACHE_STRATEGIES)) {
     if (strategy.match.test(url.pathname)) {

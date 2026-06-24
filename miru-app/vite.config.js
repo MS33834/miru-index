@@ -5,6 +5,10 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig({
   plugins: [vue(), tailwindcss()],
   base: '/miru-index/',
+  esbuild: {
+    // 生产构建移除 console.debug/info/log，保留 console.error/warn
+    drop: ['debug', 'info'],
+  },
   build: {
     outDir: '../docs',
     emptyOutDir: true,
