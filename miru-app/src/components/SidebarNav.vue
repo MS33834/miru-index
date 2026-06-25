@@ -1,10 +1,15 @@
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, inject } from 'vue'
 import { categories } from '../data/nav.js'
 import { useDebounce } from '../composables/useDebounce.js'
 import { useRecentSearches } from '../composables/useRecentSearches.js'
 import { useAppState } from '../composables/useAppState.js'
 import { APP_CONFIG } from '../config/constants.js'
+
+// I18n — injected from App.vue
+const i18n = inject('i18n', null)
+const t = (path, ...args) => i18n?.t(path, args) ?? path
+const tc = (catId, fallback) => i18n?.tc(catId, fallback) ?? (fallback || catId)
 
 const props = defineProps({
   activeCategory: { type: String, required: true },
@@ -88,7 +93,7 @@ watch(
           type="button"
           @click="emit('search-focus')"
           class="w-8 h-8 rounded-sm flex items-center justify-center text-[#8a7a68] hover:text-[#ff4d4f] hover:bg-[#ff4d4f]/10 transition shrink-0"
-          aria-label="展开搜索"
+          :aria-label="t('sidebar.toggleSearch')"
         >
           <svg
             width="16"
@@ -108,7 +113,7 @@ watch(
           type="button"
           @click="emit('toggle')"
           class="w-8 h-8 rounded-sm flex items-center justify-center text-[#8a7a68] hover:text-[#ff4d4f] hover:bg-[#ff4d4f]/10 transition shrink-0"
-          :aria-label="collapsed ? '展开目录' : '折叠目录'"
+          :aria-label="collapsed ? t('sidebar.toggleCollapse', [true]) : t('sidebar.toggleCollapse', [false])"
         >
           <svg
             width="14"
@@ -124,6 +129,21 @@ watch(
         </button>
       </div>
 
+      <!-- 语言切换 -->
+      <div v-if="!collapsed && i18n" class="mt-2 flex items-center gap-1">
+        <button
+          v-for="loc in i18n.availableLocales"
+          :key="loc"
+          type="button"
+          class="locale-btn"
+          :class="{ 'is-active': i18n.locale.value === loc }"
+          @click="i18n.locale.value = loc"
+          :aria-label="`Switch to ${loc}`"
+        >
+          {{ i18n.localeLabel.value && i18n.locale.value === loc ? i18n.localeLabel.value : loc }}
+        </button>
+      </div>
+
       <!-- 搜索框 -->
       <div v-if="!collapsed" class="relative">
         <div class="flex items-center">
@@ -133,10 +153,10 @@ watch(
             @input="handleSearchInput"
             @keydown="handleSearchKeydown"
             type="search"
-            placeholder="以名索物…"
+            :placeholder="t('search.placeholder')"
             class="scroll-input flex-1 px-3 py-1.5 text-[13px]"
             style="border-radius: 0 2px 2px 0"
-            aria-label="搜索"
+            :aria-label="t('search.label')"
             data-testid="sidebar-search"
             autocomplete="off"
             autocapitalize="off"
@@ -151,8 +171,8 @@ watch(
       <!-- 最近搜索 -->
       <div v-if="!collapsed && recentSearches.length > 0" class="mt-3">
         <div class="flex items-center justify-between mb-1.5">
-          <span class="sidebar-section-title">最近搜索</span>
-          <button type="button" class="sidebar-text-btn" @click="clearRecent">清空</button>
+          <span class="sidebar-section-title">{{ t('search.recentTitle') }}</span>
+          <button type="button" class="sidebar-text-btn" @click="clearRecent">{{ t('search.clearRecent') }}</button>
         </div>
         <div class="flex flex-wrap gap-1.5">
           <button
@@ -176,13 +196,13 @@ watch(
         type="button"
         @click="emit('select', 'all')"
         :class="['sidebar-item', activeCategory === 'all' ? 'is-active' : '']"
-        :title="collapsed ? '全部' : ''"
-        :aria-label="collapsed ? '全部 · 總藏' : undefined"
+        :title="collapsed ? t('sidebar.all') : ''"
+        :aria-label="collapsed ? t('sidebar.all') : undefined"
         :aria-current="activeCategory === 'all' ? 'page' : undefined"
       >
         <div class="sidebar-item__lead">
           <span class="sidebar-item__icon" aria-hidden="true">⌘</span>
-          <span v-if="!collapsed" class="sidebar-item__name">全部 · 總藏</span>
+          <span v-if="!collapsed" class="sidebar-item__name">{{ t('sidebar.all') }}</span>
         </div>
         <div v-if="!collapsed" class="sidebar-item__trail">
           <span class="sidebar-item__count">{{ allCount }}</span>
@@ -191,7 +211,7 @@ watch(
       </button>
 
       <div v-if="!collapsed" class="sidebar-divider">
-        <span class="ornament">· 分卷目录 ·</span>
+        <span class="ornament">· {{ t('sidebar.volumes') }} ·</span>
       </div>
 
       <!-- 快速过滤 -->
@@ -203,7 +223,7 @@ watch(
           :aria-expanded="showFilters"
           aria-controls="filter-panel-quick"
         >
-          <span>快速过滤</span>
+          <span>{{ t('sidebar.quickFilter') }}</span>
           <span class="filter-section__chevron" :class="{ 'is-open': showFilters }" aria-hidden="true">▾</span>
         </button>
         <div v-if="showFilters" id="filter-panel-quick" class="filter-section__body">
@@ -215,7 +235,7 @@ watch(
             :aria-pressed="showFavoritesOnly"
             data-testid="filter-favorites"
           >
-            <span>★ 收藏</span>
+            <span>{{ t('sidebar.favorites') }}</span>
             <span v-if="favoritesCount > 0" class="filter-section__count">{{ favoritesCount }}</span>
           </button>
           <button
@@ -224,10 +244,10 @@ watch(
             :class="{ 'is-active': proxyFilter === 'direct' }"
             @click="emit('set-proxy-filter', proxyFilter === 'direct' ? 'all' : 'direct')"
             :aria-pressed="proxyFilter === 'direct'"
-            aria-label="仅显示国内可直接访问的站点"
+            :aria-label="t('filter.direct')"
             data-testid="filter-direct"
           >
-            <span>直连</span>
+            <span>{{ t('sidebar.directOnly') }}</span>
           </button>
           <button
             type="button"
@@ -235,10 +255,10 @@ watch(
             :class="{ 'is-active': proxyFilter === 'proxy' }"
             @click="emit('set-proxy-filter', proxyFilter === 'proxy' ? 'all' : 'proxy')"
             :aria-pressed="proxyFilter === 'proxy'"
-            aria-label="仅显示需要代理/梯子访问的站点"
+            :aria-label="t('filter.proxy')"
             data-testid="filter-proxy"
           >
-            <span>需梯</span>
+            <span>{{ t('sidebar.proxyOnly') }}</span>
           </button>
         </div>
       </div>
@@ -253,7 +273,7 @@ watch(
           aria-controls="filter-panel-tags"
           data-testid="tags-toggle"
         >
-          <span>标签云</span>
+          <span>{{ t('sidebar.tagCloud') }}</span>
           <span class="filter-section__chevron" :class="{ 'is-open': showTags }" aria-hidden="true">▾</span>
         </button>
         <div v-if="showTags" id="filter-panel-tags" class="filter-section__body filter-section__body--tags">
@@ -303,15 +323,15 @@ watch(
         <div class="ink-bar flex-1"></div>
       </div>
       <div class="font-mono text-[10px] text-[#8a7a68] tracking-[0.25em] mb-2">
-        共 {{ categories.length }} 卷 · {{ allCount }} 帖
+        {{ t('sidebar.stats', [categories.length, allCount]) }}
       </div>
       <div class="flex items-center gap-2">
-        <div class="hanko text-[10px] px-2 py-0.5">朱泥</div>
+        <div class="hanko text-[10px] px-2 py-0.5">{{ t('sidebar.sealLeft') }}</div>
         <div
           class="hanko text-[10px] px-2 py-0.5"
           style="background: #1a1410; color: #c9a55c; box-shadow: inset 0 0 0 1px rgba(201, 165, 92, 0.4)"
         >
-          御金
+          {{ t('sidebar.sealRight') }}
         </div>
       </div>
     </div>
@@ -470,6 +490,30 @@ watch(
 .scrollbar-thin {
   scrollbar-width: thin;
   scrollbar-color: #2a1e16 transparent;
+}
+
+/* 语言切换按钮 */
+.locale-btn {
+  font-family: var(--mono);
+  font-size: 9px;
+  padding: 3px 8px;
+  border-radius: 2px;
+  color: #8a7a68;
+  background: transparent;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 0.1em;
+}
+.locale-btn:hover {
+  color: #c4bba8;
+  border-color: rgba(255, 77, 79, 0.2);
+  background: rgba(255, 77, 79, 0.05);
+}
+.locale-btn.is-active {
+  color: #ff4d4f;
+  border-color: rgba(255, 77, 79, 0.4);
+  background: rgba(255, 77, 79, 0.08);
 }
 
 /* 最近搜索 */

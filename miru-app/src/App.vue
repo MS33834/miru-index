@@ -1,10 +1,11 @@
 <script setup>
-import { ref, computed, onMounted, onUnmounted, onBeforeUnmount, watch, nextTick, defineAsyncComponent, h } from 'vue'
+import { ref, computed, onMounted, onUnmounted, onBeforeUnmount, watch, nextTick, defineAsyncComponent, h, provide } from 'vue'
 import { categories } from './data/nav.js'
 import SidebarNav from './components/SidebarNav.vue'
 import SiteCard from './components/SiteCard.vue'
 import ErrorBoundary from './components/ErrorBoundary.vue'
 import AppSkeleton from './components/AppSkeleton.vue'
+import { useI18n } from './i18n/index.js'
 
 // 重型覆盖层组件按需异步加载，减少首屏 JS 体积。
 // 加载失败时（如离线）显示错误占位并自动重试，避免静默失败。
@@ -51,6 +52,11 @@ const recent = useRecentSearches()
 const { viewMode, setMode, toggle: toggleViewMode } = useViewMode()
 const { favorites, exportFavorites, importFavorites } = useFavorites()
 
+// i18n — create singleton and provide to all child components
+const i18n = useI18n()
+provide('i18n', i18n)
+const t = (path, ...args) => i18n.t(path, args)
+
 const importStatus = ref('')
 const importInputRef = ref(null)
 
@@ -63,9 +69,9 @@ async function onImportFile(event) {
   if (!file) return
   try {
     const count = await importFavorites(file)
-    importStatus.value = `已导入 ${count} 条收藏`
+    importStatus.value = t('favorites.imported', count)
   } catch (err) {
-    importStatus.value = `导入失败：${err.message}`
+    importStatus.value = t('favorites.importError', err.message)
   }
   event.target.value = ''
   setTimeout(() => {
@@ -499,7 +505,7 @@ onUnmounted(() => {
   <ErrorBoundary>
     <div class="layout" :inert="!!(modalItem || helpOpen || drawerOpen)">
       <!-- =================== Skip Navigation 链接 =================== -->
-      <a href="#main-content" class="skip-nav">跳转到主要内容</a>
+      <a href="#main-content" class="skip-nav">{{ t('general.skipNav') }}</a>
 
       <!-- =================== 桌面端侧边栏 =================== -->
       <div class="hidden lg:block sidebar-shell" :class="{ 'is-collapsed': sidebarCollapsed }">
