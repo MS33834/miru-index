@@ -742,3 +742,61 @@ body::after {
   gap: 0.5rem;
   letter-spacing: 0.1em;
 }
+
+/* ==========================================================================
+   壁纸装饰 — 随机展示二次元壁纸（仅桌面端，不阻塞内容可读性）
+   壁纸来源：全网收集的 2560×1440 高清二次元壁纸
+   ========================================================================== */
+.main {
+  position: relative;
+}
+
+/* 第一张壁纸 — 默认装饰（夜空格） */
+.main::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  background: url('/miru-index/images/wallpapers/anime_girl_night_sky.jpg') center / cover no-repeat fixed;
+  opacity: 0.06;
+  pointer-events: none;
+}
+
+/* 在 Hero 区切换为不同壁纸，增加层次感 */
+@media (min-width: 768px) {
+  /* 用 nth-child 变体给不同「卷册」轮换背景 */
+  .chapter-card:nth-child(3n+1) {
+    position: relative;
+  }
+  .chapter-card:nth-child(3n+1)::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background: url('/miru-index/images/wallpapers/anime_sakura_art.jpg') center / cover no-repeat;
+    opacity: 0.04;
+    pointer-events: none;
+    border-radius: inherit;
+  }
+  .chapter-card:nth-child(3n+2)::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background: url('/miru-index/images/wallpapers/anime_girl_umbrella_rain.jpg') center / cover no-repeat;
+    opacity: 0.04;
+    pointer-events: none;
+    border-radius: inherit;
+  }
+}
+
+/* 偏好减少动画的用户 — 降级不显示壁纸背景 */
+@media (prefers-reduced-motion: reduce) {
+  .main::before,
+  .chapter-card::after {
+    display: none;
+  }
+}
