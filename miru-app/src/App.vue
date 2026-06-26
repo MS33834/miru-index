@@ -189,7 +189,13 @@ watch(
 )
 
 // 搜索提交时记录到最近搜索
+function onSearchInput(q) {
+  // 防抖输入：仅同步搜索词，不记录最近搜索，避免中间态污染列表
+  setSearch(q)
+}
+
 function onSearchCommit(q) {
+  // Enter / 点击最近搜索：同步搜索词并记录到最近搜索
   setSearch(q)
   recent.add(q)
 }
@@ -292,7 +298,12 @@ const singleCategory = computed(() => {
   return [{ id: cat.id, icon: cat.icon, name: cat.name, items: paginatedItems.value }]
 })
 
-const isEmpty = computed(() => filteredCount.value === 0)
+// 空态判定：结果为空，或当前页因结果缩减/页码越界而无内容（避免分页器隐藏后出现既无卡片也无空态的空白页）
+const isEmpty = computed(() => filteredCount.value === 0 || paginatedItems.value.length === 0)
+
+// 浮层（弹窗/抽屉/帮助）打开时锁定主内容区，但保留浮层自身可交互。
+// 仅锁定主内容子树，而非整个 .layout，避免把 Toast/PWA安装提示/更新提示等浮层一并 inert。
+const overlayActive = computed(() => !!(modalItem.value || helpOpen.value || drawerOpen.value))
 
 // SR 通告：分类/标签/过滤变化时播报当前结果数（搜索时由 search-result 区已有 aria-live 覆盖）
 const filterAnnouncement = computed(() => {
@@ -440,8 +451,8 @@ function handleKeydown(e) {
 
   if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
     e.preventDefault()
-    const searchInput = document.querySelector('.scroll-input')
-    if (searchInput) searchInput.focus()
+    // 复用 focusSearch：会自动展开折叠的侧边栏再延迟聚焦，避免折叠态下静默失效
+    focusSearch()
     return
   }
 
@@ -521,12 +532,16 @@ onUnmounted(() => {
 
 <template>
   <ErrorBoundary>
-    <div class="layout" :inert="!!(modalItem || helpOpen || drawerOpen)">
+    <div class="layout">
       <!-- =================== Skip Navigation 链接 =================== -->
-      <a href="#main-content" class="skip-nav">{{ t('general.skipNav') }}</a>
+      <a href="#main-content" class="skip-nav" :inert="overlayActive">{{ t('general.skipNav') }}</a>
 
       <!-- =================== 桌面端侧边栏 =================== -->
-      <div class="hidden lg:block sidebar-shell" :class="{ 'is-collapsed': sidebarCollapsed }">
+      <div
+        class="hidden lg:block sidebar-shell"
+        :class="{ 'is-collapsed': sidebarCollapsed }"
+        :inert="overlayActive"
+      >
         <SidebarNav
           :active-category="activeCategory"
           :search-query="searchQuery"
@@ -536,7 +551,8 @@ onUnmounted(() => {
           :show-favorites-only="showFavoritesOnly"
           :favorites-count="favoritesCount"
           @select="onSelectCategory"
-          @search="onSearchCommit"
+          @search="onSearchInput"
+          @search-commit="onSearchCommit"
           @toggle="sidebarCollapsed = !sidebarCollapsed"
           @search-focus="focusSearch"
           @toggle-tag="toggleTag"
@@ -546,7 +562,7 @@ onUnmounted(() => {
       </div>
 
       <!-- =================== 顶栏（平板/手机） =================== -->
-      <header class="mobile-topbar lg:hidden">
+      <header class="mobile-topbar lg:hidden" :inert="overlayActive">
         <div class="flex items-center gap-2">
           <button
             ref="drawerToggleRef"
@@ -610,7 +626,8 @@ onUnmounted(() => {
                 :show-favorites-only="showFavoritesOnly"
                 :favorites-count="favoritesCount"
                 @select="onSelectCategory"
-                @search="onSearchCommit"
+                @search="onSearchInput"
+                @search-commit="onSearchCommit"
                 @toggle="drawerOpen = false"
                 @toggle-tag="toggleTag"
                 @set-proxy-filter="setProxyFilter"
@@ -622,7 +639,7 @@ onUnmounted(() => {
       </Teleport>
 
       <!-- =================== 主区 =================== -->
-      <main id="main-content" class="main">
+      <main id="main-content" class="main" :inert="overlayActive">
         <!-- 首屏骨架屏，提升加载感知性能 -->
         <AppSkeleton v-if="!loaded" />
 
@@ -1020,7 +1037,7 @@ onUnmounted(() => {
       </main>
 
       <!-- =================== FOOTER =================== -->
-      <footer class="site-footer">
+      <footer class="site-footer" :inert="overlayActive">
         <div class="site-footer__inner">
           <div class="scroll-divider mb-8">
             <span class="ornament">❀ ❀ ❀</span>

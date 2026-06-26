@@ -22,6 +22,7 @@ const props = defineProps({
 const emit = defineEmits([
   'select',
   'search',
+  'search-commit',
   'toggle',
   'search-focus',
   'toggle-tag',
@@ -33,7 +34,7 @@ const allCount = computed(() => categories.reduce((a, c) => a + c.items.length, 
 const showFilters = ref(true)
 const showTags = ref(false)
 
-const { recentSearches, add: addRecent, clear: clearRecent } = useRecentSearches()
+const { recentSearches, clear: clearRecent } = useRecentSearches()
 
 // 复用 useAppState 模块级单例的 allTags，避免重复遍历全部 items
 const { allTags } = useAppState()
@@ -43,9 +44,9 @@ const topTags = computed(() => allTags.value.slice(0, APP_CONFIG.UI.TOP_TAGS_COU
 const { debouncedValue, setDebouncedValue } = useDebounce(APP_CONFIG.UI.SEARCH_DEBOUNCE_DELAY)
 const localSearchQuery = ref(props.searchQuery)
 
+// 提交搜索（Enter / 点击最近搜索）：仅通知父级，由父级统一记录最近搜索，避免重复写入
 function commitSearch(value) {
-  addRecent(value)
-  emit('search', value)
+  emit('search-commit', value)
 }
 
 function handleSearchInput(e) {
@@ -60,8 +61,10 @@ function handleSearchKeydown(e) {
   }
 }
 
-// 监听防抖后的值并触发搜索（不重复记录）
+// 防抖后的输入仅同步搜索词，不记录最近搜索（避免中间态污染列表）。
+// 与父级 searchQuery 相同则短路，防止桌面/抽屉双实例互相回声导致重复 emit。
 watch(debouncedValue, (newVal) => {
+  if (newVal === props.searchQuery) return
   emit('search', newVal)
 })
 
@@ -139,7 +142,7 @@ watch(
           @click="i18n.locale.value = loc"
           :aria-label="`Switch to ${loc}`"
         >
-          {{ i18n.localeLabel.value && i18n.locale.value === loc ? i18n.localeLabel.value : loc }}
+          {{ i18n.getLocaleLabel(loc) }}
         </button>
       </div>
 
@@ -277,18 +280,18 @@ watch(
         </button>
         <div v-if="showTags" id="filter-panel-tags" class="filter-section__body filter-section__body--tags">
           <button
-            v-for="t in topTags"
-            :key="t.name"
+            v-for="tag in topTags"
+            :key="tag.name"
             type="button"
             class="filter-section__chip filter-section__chip--tag"
-            :class="{ 'is-active': selectedTags.has(t.name) }"
-            @click="emit('toggle-tag', t.name)"
-            :aria-pressed="selectedTags.has(t.name)"
-            :aria-label="`标签 ${t.name}，出现 ${t.count} 次`"
+            :class="{ 'is-active': selectedTags.has(tag.name) }"
+            @click="emit('toggle-tag', tag.name)"
+            :aria-pressed="selectedTags.has(tag.name)"
+            :aria-label="`标签 ${tag.name}，出现 ${tag.count} 次`"
             data-testid="tag-chip"
           >
-            <span>#{{ t.name }}</span>
-            <span class="filter-section__count">{{ t.count }}</span>
+            <span>#{{ tag.name }}</span>
+            <span class="filter-section__count">{{ tag.count }}</span>
           </button>
         </div>
       </div>

@@ -1,4 +1,4 @@
-import { ref, computed, shallowRef } from 'vue'
+import { ref, computed, shallowRef, watch } from 'vue'
 import { categories } from '../data/nav.js'
 import { APP_CONFIG } from '../config/constants.js'
 import SearchIndex from '../utils/searchIndex.js'
@@ -91,6 +91,14 @@ const currentPageSize = computed(() => (activeCategory.value === 'all' ? PAGE_SI
 const totalPageCount = computed(() => totalPages(filteredItems.value.length, currentPageSize.value))
 
 const paginatedItems = computed(() => paginate(filteredItems.value, currentPage.value, currentPageSize.value))
+
+// 页码夹紧：结果数变化（搜索/过滤/收藏增减）或 URL 直接带入越界页码时，
+// 把 currentPage 拉回合法范围，避免翻到不存在的页导致空白页。
+// 同时监听 currentPage 自身以覆盖 useUrlSync 初始化写入越界值的情况；条件不满足时不赋值，无死循环。
+watch([filteredCount, currentPageSize, currentPage], () => {
+  const max = totalPageCount.value
+  if (currentPage.value > max) currentPage.value = max
+})
 
 const currentCategory = computed(() => {
   if (activeCategory.value === 'all') return null

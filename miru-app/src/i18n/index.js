@@ -484,6 +484,11 @@ export function useI18n() {
   const localeName = computed(() => LOCALE_NAMES[locale.value] || locale.value)
   const isRtl = computed(() => RTL_LOCALES.has(locale.value))
 
+  // 按 locale 查询其短标签（供语言切换按钮每个按钮显示自身标签，而非当前 locale 的标签）
+  function getLocaleLabel(loc) {
+    return LOCALE_LABELS[loc] || loc
+  }
+
   /**
    * Translate a dotted-path key. If the value is a function, call it with args.
    * Usage: t('search.placeholder') or t('search.results', [q, n])
@@ -522,10 +527,16 @@ export function useI18n() {
     localeLabel,
     localeName,
     isRtl,
+    getLocaleLabel,
     t,
     tc,
     setCategoryNames,
   }
+
+  // 首次构造即同步 <html lang>，否则用户保存的非默认语言在首屏会被 SR 按错误语言朗读
+  try {
+    document.documentElement.lang = localeRef.value
+  } catch { /* SSR guard */ }
 
   return _instance
 }
