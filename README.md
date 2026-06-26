@@ -25,7 +25,7 @@ Everything on the site is public, hand-verified, and tagged. Sites that don't wo
 - **Filters** — One-click show only mainland-accessible sites, or only proxy-needed ones.
 - **Favorites** — Star anything. Exports to JSON. Never lose your collection again.
 - **Direct jump** — Every card has a direct link button. One click, new tab, done.
-- **Health status** — Each site marked: online, blocked in China, mirror needed, unstable, or dead.
+- **Health status** — Each site marked: online, blocked in China, restricted, mirror needed, unstable, anti-crawl, or dead.
 - **Keyboard shortcuts** — `/` to search, `Esc` to close, arrow keys to navigate.
 - **Offline support** — Service worker caches the app shell. Works without internet once loaded.
 - **Dark theme** — It's dark by default. Your eyes will thank you.
@@ -64,7 +64,7 @@ Edit `miru-app/src/data/site-extensions.js`. Add items to existing categories or
   tags: ['tag1', 'tag2'],
   features: ['Feature one', 'Feature two'],
   proxy: false,        // true if mainland China needs a VPN
-  health: 'ok',        // ok | blocked | restricted | mirror | unstable | dead
+  health: 'ok',        // ok | blocked | restricted | mirror | unstable | crawl | dead
   mirrors: ['https://mirror.example.com'],
 }
 ```

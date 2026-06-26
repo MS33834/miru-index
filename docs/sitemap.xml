@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://MS33834.github.io/miru-index/</loc>
-    <lastmod>2026-06-23</lastmod>
+    <lastmod>2026-06-26</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
@@ -27,6 +27,11 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://MS33834.github.io/miru-index/?cat=storage</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://MS33834.github.io/miru-index/?cat=ai</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -38,6 +43,36 @@
   </url>
   <url>
     <loc>https://MS33834.github.io/miru-index/?cat=tutorials</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://MS33834.github.io/miru-index/?cat=ai_chat</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://MS33834.github.io/miru-index/?cat=ai_image</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://MS33834.github.io/miru-index/?cat=ai_video</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://MS33834.github.io/miru-index/?cat=dev_tool</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://MS33834.github.io/miru-index/?cat=learn</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://MS33834.github.io/miru-index/?cat=design</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -77,6 +112,26 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://MS33834.github.io/miru-index/?cat=novel_more</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://MS33834.github.io/miru-index/?cat=anime_site_more</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://MS33834.github.io/miru-index/?cat=booru_sites</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://MS33834.github.io/miru-index/?cat=comic_database</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://MS33834.github.io/miru-index/?cat=news</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -88,6 +143,16 @@
   </url>
   <url>
     <loc>https://MS33834.github.io/miru-index/?cat=galgame_news</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://MS33834.github.io/miru-index/?cat=community_more</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://MS33834.github.io/miru-index/?cat=galgame_community</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -128,6 +193,11 @@
   </url>
   <url>
     <loc>https://MS33834.github.io/miru-index/?cat=podcast</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://MS33834.github.io/miru-index/?cat=photo</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -203,6 +273,31 @@
   </url>
   <url>
     <loc>https://MS33834.github.io/miru-index/?cat=lore</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://MS33834.github.io/miru-index/?cat=font_more</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://MS33834.github.io/miru-index/?cat=anime_wallpapers_more</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://MS33834.github.io/miru-index/?cat=game_more</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://MS33834.github.io/miru-index/?cat=acg_navigation</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://MS33834.github.io/miru-index/?cat=efficiency</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>

@@ -13,13 +13,15 @@
  */
 
 /**
- * @typedef {'ok' | 'mirror' | 'unstable' | 'crawl' | 'dead'} HealthStatus
- * 站点健康状态：
+ * @typedef {'ok' | 'mirror' | 'unstable' | 'crawl' | 'dead' | 'blocked' | 'restricted'} HealthStatus
+ * 站点健康状态（与 src/utils/mirror.js 的 HEALTH_MAP 保持一致）：
  * - ok: 可直接访问
  * - mirror: 主站不稳定，常用镜像
  * - unstable: 时好时坏
  * - crawl: 反爬严格，需特殊处理
  * - dead: 确认长期失效（建议从数据中移除或归档）
+ * - blocked: 国内被墙，需代理 / 梯子
+ * - restricted: 国内访问受限，部分内容不可用
  */
 
 /**

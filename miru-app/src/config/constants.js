@@ -27,36 +27,54 @@ export const APP_CONFIG = {
   DESCRIPTION: 'ACGN 资源导航站',
   VERSION: '2026',
 
-  // 卷册配置
+  // 卷册配置（覆盖全部 59 个分类，确保首页「全部」视图与 sitemap 均无遗漏）
   VOLUMES: [
     {
       id: 'v1',
       name: '卷壹',
       title: '網絡工具',
       sub: 'Network · Tools',
-      catIds: ['proxy', 'downloader', 'archive', 'imagesearch'],
+      catIds: ['proxy', 'downloader', 'archive', 'imagesearch', 'storage'],
     },
-    { id: 'v2', name: '卷贰', title: '工坊 · 研习', sub: 'Workshop · Study', catIds: ['ai', 'imgai', 'tutorials'] },
+    {
+      id: 'v2',
+      name: '卷贰',
+      title: '工坊 · 研习',
+      sub: 'Workshop · Study',
+      catIds: ['ai', 'imgai', 'tutorials', 'ai_chat', 'ai_image', 'ai_video', 'dev_tool', 'learn', 'design'],
+    },
     {
       id: 'v3',
       name: '卷叁',
       title: 'ACG 主场',
       sub: 'ACGN · Main',
-      catIds: ['manga', 'manga_app', 'anime_site', 'anime_app', 'galgame_res', 'novel', 'library'],
+      catIds: [
+        'manga',
+        'manga_app',
+        'anime_site',
+        'anime_app',
+        'galgame_res',
+        'novel',
+        'library',
+        'novel_more',
+        'anime_site_more',
+        'booru_sites',
+        'comic_database',
+      ],
     },
     {
       id: 'v4',
       name: '卷肆',
       title: '社区 · 资讯',
       sub: 'Community · News',
-      catIds: ['news', 'community', 'galgame_news'],
+      catIds: ['news', 'community', 'galgame_news', 'community_more', 'galgame_community'],
     },
     {
       id: 'v5',
       name: '卷伍',
       title: '视听 · 演出',
       sub: 'Audio · Visual · Performance',
-      catIds: ['music', 'draw', 'video', 'sticker', 'vtuber', 'seiyu', 'doujin_music', 'podcast'],
+      catIds: ['music', 'draw', 'video', 'sticker', 'vtuber', 'seiyu', 'doujin_music', 'podcast', 'photo'],
     },
     {
       id: 'v6',
@@ -70,7 +88,23 @@ export const APP_CONFIG = {
       name: '卷柒',
       title: '资源 · 工具',
       sub: 'Resources · Tools',
-      catIds: ['font', 'wallpaper', 'imghost', 'illust', 'subgroup', 'game', 'game_dev', 'nav', 'mmd', 'lore'],
+      catIds: [
+        'font',
+        'wallpaper',
+        'imghost',
+        'illust',
+        'subgroup',
+        'game',
+        'game_dev',
+        'nav',
+        'mmd',
+        'lore',
+        'font_more',
+        'anime_wallpapers_more',
+        'game_more',
+        'acg_navigation',
+        'efficiency',
+      ],
     },
   ],
 
@@ -97,22 +131,5 @@ export const APP_CONFIG = {
     TOAST_DURATION: 5000,
     // 收藏配额上限提示
     FAVORITES_QUOTA_MSG: '收藏已满（上限 1000 条），请先导出或清理后再试',
-  },
-
-  // 缓存配置（与 public/sw.js 保持一致）
-  CACHE: {
-    VERSION: 'v8',
-    NAME_PREFIX: 'miru-index-',
-    PRECACHE_ASSETS: [
-      '/miru-index/',
-      '/miru-index/index.html',
-      '/miru-index/manifest.json',
-      '/miru-index/robots.txt',
-      '/miru-index/sitemap.xml',
-      '/miru-index/favicon.svg',
-      '/miru-index/offline.html',
-      '/miru-index/frame-buster.js',
-      '/miru-index/og-image.png',
-    ],
   },
 }

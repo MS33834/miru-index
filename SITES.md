@@ -46,9 +46,9 @@
 
 | 名称 | 简介 | 备注 | 链接 |
 | --- | --- | --- | --- |
-| **起飞 VPN** | 多国节点商业 VPN，注册即用，按月 / 按年付费 | ★ 多国节点 | <https://goflyvpn.com/> |
+| **起飞 VPN** | 多国节点商业 VPN，注册即用，按月 / 按年付费 | ★ 多国节点 | <https://www.goflyvpn.com/> |
 | **ClashX Hub** | Clash 内核 macOS / Windows 客户端聚合下载站；需自备订阅 | 需要自配 | <https://clashxhub.com/> |
-| **绿茶 VPN** | 试用 / 短期 VPN，「连接最快」为卖点 | ★ 注册即送试用 | <https://www.lcvpn.qpon?id=177002747> |
+| **绿茶 VPN** | 试用 / 短期 VPN，「连接最快」为卖点 | ★ 注册即送试用 | <https://www.lcvpn.com/> |
 
 ### 1.2 下载加速（下载器）
 
@@ -82,7 +82,7 @@
 | --- | --- | --- |
 | **ACG 喵导航** | ACG 资源综合导航站，按类别整理好常用站点 | <https://www.miaoaaa.com/> |
 | **YOUFAV 网站集合** | 个人 / 社区收藏的资源网站合集 | <https://www.youfav.com/> |
-| **Qingse 网站集合** | 二次元 / ACG 资源导航 | <https://qingse.one/> |
+| **Qingse 网站集合** | 二次元 / ACG 资源导航 | <https://qingse.co/> |
 
 ---
 
@@ -101,15 +101,15 @@
 
 | 名称 | 简介 | 链接 |
 | --- | --- | --- |
-| **青桔网** ★ | GalGame 资源网盘聚合 | <https://www.qingju.org/> |
+| **青桔网** ★ | GalGame 资源网盘聚合 | <https://www.qingju.com/> |
 | **失落小站** ★ | 老牌 GalGame 资源站 | <https://www.shinnku.com/> |
 | **量子 ACG** | GalGame / ACG 资源站 | <https://lzacg.org/> |
 | **稻荷 ACG** | GalGame 资源 | <https://inarigal.com/> |
 | **NekoGAL** | GalGame 资源 | <https://www.nekogal.com/> |
 | **绮梦 ACG** | GalGame 资源 | <https://game.acgs.one/> |
 | **05 小站** | GalGame 资源 | <https://05fx.022016.xyz/> |
-| **岛屿 ACG** | GalGame 资源 + 论坛 | <https://www.acgwfb.com/> |
-| **次元小屋** | GalGame / 二次元资源 | <http://cyxw.xyz/> |
+| **岛屿 ACG** | GalGame 资源 + 论坛 | <https://www.2000fun.com/> |
+| **次元小屋** | GalGame / 二次元资源 | <https://www.ciyuanju.com/> |
 | **MikiACG** | GalGame 资源 | <https://www.mikiacg.org/> |
 | **御爱同萌** | GalGame 资源 | <https://www.ai2.moe/> |
 
@@ -207,7 +207,7 @@
 
 | 名称 | 简介 | 链接 |
 | --- | --- | --- |
-| **鸠摩搜索** | 电子书聚合搜索（PDF / EPUB / TXT / MOBI） | <https://www.jiumodiary.com/> |
+| **鸠摩搜索** | 电子书聚合搜索（PDF / EPUB / TXT / MOBI） | <https://www.jiumosoushu.com/> |
 | **80 电子书** ★ | TXT 格式电子书库 | <https://m.txt80.cc/> |
 | **奇书网** | 网络小说 / 完结小说资源 | <https://m.qishu99.cc/> |
 | **全本同人小说** | 同人 / 二次创作小说 | <https://www.qbtr.cc/> |

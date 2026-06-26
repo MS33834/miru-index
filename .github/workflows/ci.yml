@@ -37,6 +37,10 @@ jobs:
         working-directory: miru-app
         run: npm run audit
 
+      - name: Validate data schema
+        working-directory: miru-app
+        run: npm run validate
+
       - name: Lint
         working-directory: miru-app
         run: npm run lint

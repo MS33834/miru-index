@@ -1,4 +1,4 @@
-// Miru Index 数据：40+ 个细分分类，约 390+ 条资源
+// Miru Index 数据：59 个细分分类，651 条资源（含跨分类收录）
 // 字段：name, url, desc, fullDesc, tags, features, proxy, health, mirrors
 // proxy: true 表示需要科学上网
 //
