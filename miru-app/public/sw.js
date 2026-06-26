@@ -1,6 +1,6 @@
 // 智能预缓存清单 - install 时预缓存关键资源
 // Vite 构建产物通过 content hash，部署后由运行时缓存填充
-const CACHE_VERSION = 'v8'
+const CACHE_VERSION = 'v9'
 const CACHE_NAME = `miru-index-${CACHE_VERSION}`
 
 // 用 SW scope 动态拼接路径，避免硬编码 /miru-index/ 前缀（部署路径变更时自动适配）
@@ -143,6 +143,13 @@ async function cacheFirstStrategy(request, cacheName, maxEntries) {
     }
     return response
   } catch {
+    // JS 模块离线时返回空模块，避免 Vue 异步加载报错导致整页白屏
+    if (request.destination === 'script') {
+      return new Response('export default {};', {
+        status: 200,
+        headers: { 'Content-Type': 'application/javascript' },
+      })
+    }
     // assets/images 离线直接返回 503（document 离线 fallback 由 networkFirstStrategy 统一处理）
     return new Response('Offline', {
       status: 503,

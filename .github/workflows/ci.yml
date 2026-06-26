@@ -53,6 +53,8 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    permissions:
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
@@ -77,4 +79,4 @@ jobs:
         run: |
           npx vite preview --port 4173 &
           sleep 3
-          npx playwright test || echo "::warning::E2E tests had failures (non-blocking)"
+          npx playwright test

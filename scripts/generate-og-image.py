@@ -77,7 +77,7 @@ def main():
     # 底部装饰线
     draw.line([(340, 480), (820, 480)], fill=ASHI, width=1)
     draw.text((340, 510), '新和风杂志美学 · 精选资源索引', font=desc_font, fill=ASHI, anchor='lm')
-    draw.text((340, 560), 'badhope.github.io/miru-index', font=mono_font, fill=GOLD, anchor='lm')
+    draw.text((340, 560), 'MS33834.github.io/miru-index', font=mono_font, fill=GOLD, anchor='lm')
 
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     img.save(OUT, 'PNG')

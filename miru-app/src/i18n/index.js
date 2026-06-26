@@ -490,7 +490,10 @@ export function useI18n() {
    */
   function t(path, args) {
     const val = _resolve(locale.value, path)
-    if (typeof val === 'function') return args ? val(...args) : val('', 0)
+    if (typeof val === 'function') {
+      // 无参调用（args 为空数组或未传）时，调用函数不传参；函数自行处理默认值
+      return Array.isArray(args) && args.length > 0 ? val(...args) : val()
+    }
     return val
   }
 
@@ -526,6 +529,3 @@ export function useI18n() {
 
   return _instance
 }
-
-// Initialize on first import
-_localeRef = localeRef

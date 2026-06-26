@@ -22,8 +22,6 @@ const URL_REPLACEMENTS = {
   'https://www.mangacopy.com/': 'https://www.copymanga.site/',
   'https://motrix.app/': 'https://github.com/agalwood/Motrix/releases',
   'https://www.alibabagroup.com/': 'https://www.alibabagroup.com/zh-CN/',
-  'https://www.agedm.org/': 'https://www.agedm.tv/',
-  'https://www.mxdm.xyz/': 'https://www.mxdm999.com/',
 
   // 导航站 / 门户 / 社区
   'https://www.lcvpn.qpon?id=177002747': 'https://www.lcvpn.com/',
@@ -52,49 +50,33 @@ const URL_REPLACEMENTS = {
   'https://www.cutout.pro/': 'https://www.photoroom.com/tools/background-remover',
   'https://www.pixlr.com/': 'https://pixlr.com/editor/',
   'https://www.zihun.com/': 'https://www.izihun.com/',
-  'https://www.cnu.cc/': 'https://www.cnu.cc/',
-  'https://www.tushuoapp.com/': 'https://www.tushuoapp.com/',
 
   // 漫画 / 小说 / 动漫 / BT
   'https://www.dmzj.com/': 'https://www.idmzj.com/',
   'https://mikanani.me/': 'https://mikanime.tv/',
   'https://zimuku.org/': 'https://zimuku.org.cn/',
   'https://subhd.tv/': 'https://subhd.org/',
-  'https://www.agemys.org/': 'https://www.agedm.tv/',
+  'https://www.agemys.org/': 'https://www.agedm.io/',
   'https://www.manhuagui.com/': 'https://tw.manhuagui.com/',
   'https://www.shuxiangjia.cn/': 'https://www.shuxiangjia.com/',
   'https://www.esjzone.cc/': 'https://www.esjzone.me/',
   'https://syosetu.com/': 'https://ncode.syosetu.com/',
-  'https://www.copymanga.site/': 'https://www.mangacopy.com/',
-  'https://www.mxdm999.com/': 'https://www.mxdm.cc/',
+  'https://www.mxdm.xyz/': 'https://www.mxdm.cc/',
   'https://share.dmhy.org/': 'https://dmhy.org/',
   'https://acg.rip/': 'https://acgrip.com/',
   'https://nyaa.si/': 'https://nyaa.iss.one/',
-  'https://www.picacomic.com/': 'https://www.picacomic.com/',
-  'https://www.agedm.tv/': 'https://www.agedm.io/',
+  'https://www.agedm.org/': 'https://www.agedm.io/',
   'https://www.hifini.com/': 'https://www.hifini.io/',
-  'https://mangadex.org/': 'https://mangadex.org/',
-  'https://e-hentai.org': 'https://e-hentai.org/',
-  'https://nhentai.net/': 'https://nhentai.net/',
-  'https://hitomi.la/': 'https://hitomi.la/',
   'https://1anime2024.com/': 'https://1anime.tv/',
-  'https://acgrip.com/': 'https://acgrip.com/',
-  'https://www.dmbtl.org/': 'https://www.dmbtl.org/',
-  'https://www.ciyuanfang.com/': 'https://www.ciyuanfang.com/',
-  'https://dmhy.org/': 'https://dmhy.org/',
+  'https://www.taihe.com/': 'https://www.qianqian.com/',
+  'https://www.google.com/imghp': 'https://www.google.com/imghp?gl=zh-CN',
+  'https://mega.nz/': 'https://mega.io/',
 
   // AI 工具（被墙/失效）：保留国际站 URL，但强制走代理（统一在 ensureProxyFlag 中处理）
   'https://chat.openai.com/': 'https://chatgpt.com/',
   'https://www.seaart.ai/': 'https://www.seaart.io/',
   'https://leonardo.ai/': 'https://leonardoai.com/',
   'https://www.suno.ai/': 'https://suno.com/',
-
-  // 搜索 / 网盘
-  'https://www.taihe.com/': 'https://www.qianqian.com/',
-  'https://www.google.com/imghp': 'https://www.google.com/imghp?gl=zh-CN',
-
-  // 网盘 / 国际
-  'https://mega.nz/': 'https://mega.io/',
 }
 
 // GitHub 仓库镜像表（国内友好）：name → mirrors

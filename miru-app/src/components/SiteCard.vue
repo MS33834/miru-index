@@ -101,14 +101,15 @@ const ariaLabel = computed(() => {
 </script>
 
 <template>
-  <div class="card-paper-wrap" :data-url="item.url" :style="{ animationDelay: Math.min(index, 24) * 0.04 + 's' }">
+  <div class="card-paper-wrap" :style="{ animationDelay: Math.min(index, 24) * 0.04 + 's' }">
     <!-- 收藏状态 sr-only 通告，供屏幕阅读器感知收藏/取消/配额满 -->
     <span class="sr-only" role="status" aria-live="polite">{{ favoriteStatus }}</span>
-    <button
-      type="button"
+    <div
+      role="button"
+      tabindex="0"
       @click="handleClick"
       @keydown="handleKeydown"
-      class="card-paper card-rise focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff4d4f] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a] relative"
+      class="card-paper card-rise focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff4d4f] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a] relative cursor-pointer"
       :class="compact ? 'p-4 sm:p-5' : 'p-5 sm:p-6'"
       :aria-label="ariaLabel"
     >
@@ -187,7 +188,7 @@ const ariaLabel = computed(() => {
           </a>
         </div>
       </div>
-    </button>
+    </div>
 
     <!-- 收藏按钮：移出卡片主 button，使用独立原生 button，避免嵌套 -->
     <button

@@ -1,4 +1,4 @@
-import { ref, watch, readonly } from 'vue'
+import { ref, computed, watch, readonly } from 'vue'
 import { STORAGE_KEYS, FAVORITES_LIMITS } from '../config/constants.js'
 
 const STORAGE_KEY = STORAGE_KEYS.FAVORITES
@@ -92,8 +92,8 @@ function saveFavorites(favorites) {
 // 模块级单例 - 整个应用共享同一份 ref
 const state = ref(loadFavorites())
 
-// 缓存：收藏 URL 的 Set，state 变化时重建
-let favoriteUrlSet = new Set(state.value.map((f) => f.url))
+// 响应式缓存：收藏 URL 的 Set，state 变化时自动重建，确保依赖 isFavorite 的 computed 正确追踪
+const favoriteUrlSet = computed(() => new Set(state.value.map((f) => f.url)))
 
 // 持久化批量化：连续收藏切换时合并为单次 microtask 写入，避免同步 stringify 阻塞主线程
 let saveScheduled = false
@@ -108,7 +108,6 @@ function scheduleSave(newVal) {
 
 // 浅监听即可：所有变更都通过不可变更新产生新引用，无需 deep 遍历（省 O(n×字段)）
 watch(state, (newVal) => {
-  favoriteUrlSet = new Set(newVal.map((f) => f.url))
   scheduleSave(newVal)
 })
 
@@ -130,7 +129,7 @@ if (typeof window !== 'undefined') {
 
 function isFavorite(item) {
   if (!item?.url) return false
-  return favoriteUrlSet.has(item.url)
+  return favoriteUrlSet.value.has(item.url)
 }
 
 function toggleFavorite(item) {
@@ -169,7 +168,8 @@ function exportFavorites() {
   document.body.appendChild(a)
   a.click()
   document.body.removeChild(a)
-  URL.revokeObjectURL(url)
+  // 延迟撤销：部分浏览器下载流建立有延迟，立即 revoke 可能导致下载失败
+  setTimeout(() => URL.revokeObjectURL(url), 1000)
 }
 
 function importFavorites(file) {

@@ -113,7 +113,7 @@ watch(
           type="button"
           @click="emit('toggle')"
           class="w-8 h-8 rounded-sm flex items-center justify-center text-[#8a7a68] hover:text-[#ff4d4f] hover:bg-[#ff4d4f]/10 transition shrink-0"
-          :aria-label="collapsed ? t('sidebar.toggleCollapse', [true]) : t('sidebar.toggleCollapse', [false])"
+          :aria-label="collapsed ? t('sidebar.toggleCollapse', true) : t('sidebar.toggleCollapse', false)"
         >
           <svg
             width="14"
@@ -323,7 +323,7 @@ watch(
         <div class="ink-bar flex-1"></div>
       </div>
       <div class="font-mono text-[10px] text-[#8a7a68] tracking-[0.25em] mb-2">
-        {{ t('sidebar.stats', [categories.length, allCount]) }}
+        {{ t('sidebar.stats', categories.length, allCount) }}
       </div>
       <div class="flex items-center gap-2">
         <div class="hanko text-[10px] px-2 py-0.5">{{ t('sidebar.sealLeft') }}</div>

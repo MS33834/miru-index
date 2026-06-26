@@ -45,7 +45,13 @@ const helpOpen = ref(false)
 const loaded = ref(false)
 
 const SIDEBAR_KEY = STORAGE_KEYS.SIDEBAR_COLLAPSED
-const sidebarCollapsed = ref(typeof localStorage !== 'undefined' && localStorage.getItem(SIDEBAR_KEY) === 'true')
+const sidebarCollapsed = ref((() => {
+  try {
+    return typeof localStorage !== 'undefined' && localStorage.getItem(SIDEBAR_KEY) === 'true'
+  } catch {
+    return false
+  }
+})())
 
 const appState = useAppState()
 const recent = useRecentSearches()
@@ -58,6 +64,7 @@ provide('i18n', i18n)
 const t = (path, ...args) => i18n.t(path, args)
 
 const importStatus = ref('')
+let importStatusTimer = null
 const importInputRef = ref(null)
 
 function onExportFavorites() {
@@ -74,8 +81,10 @@ async function onImportFile(event) {
     importStatus.value = t('favorites.importError', err.message)
   }
   event.target.value = ''
-  setTimeout(() => {
+  if (importStatusTimer) clearTimeout(importStatusTimer)
+  importStatusTimer = setTimeout(() => {
     importStatus.value = ''
+    importStatusTimer = null
   }, 3000)
 }
 
@@ -107,9 +116,13 @@ const favoritesCount = computed(() => favorites.value.length)
 
 // 单字符快捷键开关（WCAG 2.1.4）：默认启用，可在键盘帮助面板关闭以避免与 SR 冲突
 const SHORTCUTS_KEY = STORAGE_KEYS.SHORTCUTS_ENABLED
-const shortcutsEnabled = ref(
-  typeof localStorage !== 'undefined' ? localStorage.getItem(SHORTCUTS_KEY) !== 'false' : true
-)
+const shortcutsEnabled = ref((() => {
+  try {
+    return typeof localStorage !== 'undefined' ? localStorage.getItem(SHORTCUTS_KEY) !== 'false' : true
+  } catch {
+    return true
+  }
+})())
 function onToggleShortcuts(val) {
   shortcutsEnabled.value = val
   try {
@@ -334,12 +347,15 @@ function scrollToTop() {
   if (typeof window === 'undefined') return
   window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? 'auto' : 'smooth' })
 }
+let focusSearchTimer = null
 function focusSearch() {
   sidebarCollapsed.value = false
+  if (focusSearchTimer) clearTimeout(focusSearchTimer)
   nextTick(() => {
-    setTimeout(() => {
+    focusSearchTimer = setTimeout(() => {
       const searchInput = document.querySelector('.scroll-input')
       if (searchInput) searchInput.focus()
+      focusSearchTimer = null
     }, 350)
   })
 }
@@ -498,6 +514,8 @@ onUnmounted(() => {
   window.removeEventListener('keydown', handleKeydown)
   window.removeEventListener('favorites-quota-exceeded', onQuotaExceeded)
   if (toastTimer) clearTimeout(toastTimer)
+  if (importStatusTimer) clearTimeout(importStatusTimer)
+  if (focusSearchTimer) clearTimeout(focusSearchTimer)
 })
 </script>
 
