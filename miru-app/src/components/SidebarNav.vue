@@ -192,7 +192,7 @@ watch(
     </div>
 
     <!-- 目录树 -->
-    <nav class="flex-1 overflow-y-auto py-2 scrollbar-thin">
+    <nav class="flex-1 overflow-y-auto py-2 scrollbar-thin" aria-label="分类目录">
       <!-- 全部 -->
       <button
         type="button"

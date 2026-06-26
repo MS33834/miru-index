@@ -184,6 +184,7 @@ const ariaLabel = computed(() => {
             rel="noopener noreferrer"
             class="card-direct-link"
             :title="'直达 ' + item.name"
+            :aria-label="'直达 ' + item.name + '（在新标签页打开）'"
             @click.stop
             @keydown.enter.stop
           >
@@ -493,11 +494,11 @@ const ariaLabel = computed(() => {
   outline-offset: 2px;
 }
 
-/* 被墙/受限标记 */
+/* 被墙/受限标记 — 文本色与 HEALTH_MAP.blocked 对齐（WCAG AA ≥ 4.5:1） */
 .card-gfw-tip {
   font-family: var(--mono);
   font-size: 0.6rem;
-  color: #b85c1a;
+  color: #8a3a0e;
   background: rgba(184, 92, 26, 0.1);
   border: 1px solid rgba(184, 92, 26, 0.25);
   border-radius: 2px;
@@ -506,7 +507,7 @@ const ariaLabel = computed(() => {
   cursor: help;
 }
 .card-proxy.is-blocked {
-  color: #b85c1a;
+  color: #8a3a0e;
   background: rgba(184, 92, 26, 0.12);
   border-color: rgba(184, 92, 26, 0.3);
 }

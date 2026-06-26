@@ -93,11 +93,12 @@ const totalPageCount = computed(() => totalPages(filteredItems.value.length, cur
 const paginatedItems = computed(() => paginate(filteredItems.value, currentPage.value, currentPageSize.value))
 
 // 页码夹紧：结果数变化（搜索/过滤/收藏增减）或 URL 直接带入越界页码时，
-// 把 currentPage 拉回合法范围，避免翻到不存在的页导致空白页。
+// 把 currentPage 拉回合法范围 [1, max]，避免翻到不存在的页导致空白页。
 // 同时监听 currentPage 自身以覆盖 useUrlSync 初始化写入越界值的情况；条件不满足时不赋值，无死循环。
 watch([filteredCount, currentPageSize, currentPage], () => {
   const max = totalPageCount.value
   if (currentPage.value > max) currentPage.value = max
+  else if (currentPage.value < 1) currentPage.value = 1
 })
 
 const currentCategory = computed(() => {

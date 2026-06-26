@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, nextTick, inject } from 'vue'
 import { GH_MIRRORS, ghMirror, healthOf } from '../utils/mirror.js'
 
 const props = defineProps({
@@ -8,13 +8,16 @@ const props = defineProps({
 })
 const emit = defineEmits(['close'])
 
+// I18n — injected from App.vue
+const i18n = inject('i18n', null)
+const t = (path, ...args) => i18n?.t(path, args) ?? path
+
 const dialogRef = ref(null)
 const closeBtnRef = ref(null)
 const copied = ref(false)
 const copyError = ref(false)
 const mirrorOpen = ref(false)
 const selectedMirror = ref(GH_MIRRORS[0] || null)
-const activeMirrorId = ref(selectedMirror.value?.id || null)
 
 let copyTimer = null
 
@@ -27,6 +30,18 @@ function clearCopyTimer() {
 
 const health = computed(() => healthOf(props.item))
 const isGitHub = computed(() => Boolean(props.item.url?.includes('github.com')))
+
+// 国内访问警告：标题 / 描述键（按 health + proxy 选取，键已在 i18n 中定义）
+const gfwTitleKey = computed(() => {
+  if (props.item.health === 'blocked') return 'modal.gfwBlocked'
+  if (props.item.health === 'restricted') return 'modal.gfwRestricted'
+  return 'modal.gfwProxy'
+})
+const gfwDescKey = computed(() => {
+  if (props.item.health === 'blocked') return 'modal.gfwBlockedDesc'
+  if (props.item.health === 'restricted') return 'modal.gfwRestrictedDesc'
+  return 'modal.gfwProxyDesc'
+})
 
 const safeId = computed(() => {
   const base = props.item.url || props.item.name || 'item'
@@ -111,10 +126,6 @@ async function copyUrl() {
 function selectMirror(m) {
   selectedMirror.value = m
   mirrorOpen.value = false
-}
-
-function onMirrorFocus(m) {
-  activeMirrorId.value = m.id
 }
 
 function handleMirrorKeydown(e, m) {
@@ -203,7 +214,7 @@ onBeforeUnmount(() => {
           ref="closeBtnRef"
           type="button"
           @click="emit('close')"
-          aria-label="关闭对话框（按 Esc 退出）"
+          :aria-label="t('modal.close')"
           class="modal-close absolute top-3 right-3 w-10 h-10 rounded-full flex items-center justify-center transition z-20"
         >
           <svg
@@ -244,7 +255,7 @@ onBeforeUnmount(() => {
               class="font-serif-cn text-xs px-2.5 py-1 rounded-sm"
               style="background: rgba(201, 165, 92, 0.2); color: #7a5e20; border: 1px solid rgba(122, 94, 32, 0.4)"
             >
-              需梯子
+              {{ t('modal.proxyNeeded') }}
             </div>
           </div>
 
@@ -278,24 +289,12 @@ onBeforeUnmount(() => {
               <div>
                 <p
                   class="font-serif-cn font-bold text-sm mb-1"
-                  :style="{ color: item.health === 'blocked' ? '#b85c1a' : '#7a5e20' }"
+                  :style="{ color: item.health === 'blocked' ? '#8a3a0e' : '#7a5e20' }"
                 >
-                  {{
-                    item.health === 'blocked'
-                      ? '⚠ 国内无法直接访问'
-                      : item.health === 'restricted'
-                        ? '⚠ 国内访问受限'
-                        : '⚠ 需要代理/梯子'
-                  }}
+                  {{ t(gfwTitleKey) }}
                 </p>
                 <p class="font-kai-cn text-xs leading-relaxed" style="color: #5a4a3a">
-                  {{
-                    item.health === 'blocked'
-                      ? '此站点在大陆被屏蔽，需使用代理/梯子才能访问。'
-                      : item.health === 'restricted'
-                        ? '此站点在大陆访问受限，部分内容可能不可用，建议使用代理获得完整体验。'
-                        : '此站点需要代理或梯子才能访问，国内直连可能无法打开。'
-                  }}
+                  {{ t(gfwDescKey) }}
                 </p>
               </div>
             </div>
@@ -303,7 +302,7 @@ onBeforeUnmount(() => {
 
           <section v-if="item.tags?.length">
             <div class="flex items-center gap-2 mb-3">
-              <div class="font-mono text-[10px] tracking-[0.3em] text-[#a8161a]">▎印 · TAGS</div>
+              <div class="font-mono text-[10px] tracking-[0.3em] text-[#a8161a]">{{ t('modal.tags') }}</div>
               <div
                 class="flex-1 h-px"
                 style="background: linear-gradient(90deg, rgba(168, 22, 26, 0.3), transparent)"
@@ -311,8 +310,8 @@ onBeforeUnmount(() => {
             </div>
             <div class="flex flex-wrap gap-2">
               <span
-                v-for="t in item.tags"
-                :key="t"
+                v-for="tag in item.tags"
+                :key="tag"
                 class="tag-stamp"
                 style="
                   background: rgba(168, 22, 26, 0.1);
@@ -321,14 +320,14 @@ onBeforeUnmount(() => {
                   font-size: 0.78rem;
                   padding: 0.3rem 0.65rem;
                 "
-                >#{{ t }}</span
+                >#{{ tag }}</span
               >
             </div>
           </section>
 
           <section v-if="item.fullDesc">
             <div class="flex items-center gap-2 mb-3">
-              <div class="font-mono text-[10px] tracking-[0.3em] text-[#a8161a]">▎叙 · INTRO</div>
+              <div class="font-mono text-[10px] tracking-[0.3em] text-[#a8161a]">{{ t('modal.intro') }}</div>
               <div
                 class="flex-1 h-px"
                 style="background: linear-gradient(90deg, rgba(168, 22, 26, 0.3), transparent)"
@@ -341,7 +340,7 @@ onBeforeUnmount(() => {
 
           <section v-if="item.features?.length">
             <div class="flex items-center gap-2 mb-3">
-              <div class="font-mono text-[10px] tracking-[0.3em] text-[#a8161a]">▎特 · FEATURES</div>
+              <div class="font-mono text-[10px] tracking-[0.3em] text-[#a8161a]">{{ t('modal.features') }}</div>
               <div
                 class="flex-1 h-px"
                 style="background: linear-gradient(90deg, rgba(168, 22, 26, 0.3), transparent)"
@@ -362,7 +361,7 @@ onBeforeUnmount(() => {
 
           <section>
             <div class="flex items-center gap-2 mb-3">
-              <div class="font-mono text-[10px] tracking-[0.3em] text-[#a8161a]">▎址 · URL</div>
+              <div class="font-mono text-[10px] tracking-[0.3em] text-[#a8161a]">{{ t('modal.url') }}</div>
               <div
                 class="flex-1 h-px"
                 style="background: linear-gradient(90deg, rgba(168, 22, 26, 0.3), transparent)"
@@ -387,11 +386,13 @@ onBeforeUnmount(() => {
                 :aria-expanded="mirrorOpen"
                 aria-haspopup="listbox"
                 :aria-controls="`${safeId}-mirror-listbox`"
-                aria-label="切换镜像选择"
+                :aria-label="'切换镜像选择，当前：' + (selectedMirror?.name || '未选择')"
               >
                 <span class="flex items-center gap-2">
-                  <span class="font-mono text-[10px] tracking-[0.2em] text-[#a8161a]">▎镜 · MIRROR</span>
-                  <span>{{ selectedMirror?.name || '选择镜像' }}</span>
+                  <span class="font-mono text-[10px] tracking-[0.2em] text-[#a8161a]">{{
+                    t('modal.mirrorLabel')
+                  }}</span>
+                  <span>{{ selectedMirror?.name || t('modal.selectMirror') }}</span>
                 </span>
                 <span class="text-[10px] transition" :class="{ 'rotate-180': mirrorOpen }" aria-hidden="true">▾</span>
               </button>
@@ -402,20 +403,18 @@ onBeforeUnmount(() => {
                 class="border-t"
                 style="border-color: rgba(201, 165, 92, 0.2)"
                 role="listbox"
-                aria-label="GitHub 镜像源"
-                :aria-activedescendant="activeMirrorId ? `${safeId}-mirror-opt-${activeMirrorId}` : undefined"
+                :aria-label="t('modal.githubMirror')"
               >
                 <div
                   v-for="m in GH_MIRRORS"
                   :key="m.id"
                   :id="`${safeId}-mirror-opt-${m.id}`"
                   @click="selectMirror(m)"
-                  @focus="onMirrorFocus(m)"
                   class="mirror-option px-4 py-2 text-xs font-mono cursor-pointer transition flex items-center gap-2"
                   :class="{ 'is-active': selectedMirror?.id === m.id }"
                   role="option"
                   :aria-selected="selectedMirror?.id === m.id"
-                  tabindex="0"
+                  :tabindex="selectedMirror?.id === m.id ? '0' : '-1'"
                   @keydown="handleMirrorKeydown($event, m)"
                 >
                   <span :class="selectedMirror?.id === m.id ? 'text-[#a8161a]' : 'opacity-30'" aria-hidden="true"
@@ -439,9 +438,9 @@ onBeforeUnmount(() => {
                     rel="noopener noreferrer"
                     class="shrink-0 px-2 py-1 rounded-sm font-serif-cn transition"
                     style="color: #7a5e20; border: 1px solid rgba(122, 94, 32, 0.4)"
-                    title="通过当前选中镜像访问（国内友好）"
+                    :title="t('modal.mirrorAccessTitle')"
                   >
-                    镜像访问
+                    {{ t('modal.mirrorAccess') }}
                   </a>
                 </div>
               </div>
@@ -457,6 +456,7 @@ onBeforeUnmount(() => {
             target="_blank"
             rel="noopener noreferrer"
             class="flex-1 text-center px-6 py-3.5 font-serif-cn font-bold text-base transition stamp-anim flex items-center justify-center gap-2"
+            :aria-label="'访问 ' + item.name + '（在新标签页打开）'"
             style="
               background: linear-gradient(180deg, #ff4d4f 0%, #a8161a 100%);
               color: #f3ece0;
@@ -477,10 +477,10 @@ onBeforeUnmount(() => {
             type="button"
             @click="copyUrl"
             class="btn-dark px-6 py-3.5 font-serif-cn font-bold text-base transition flex items-center justify-center gap-2"
-            :title="isGitHub ? '复制当前镜像 URL' : '复制站点 URL'"
+            :title="isGitHub ? t('modal.copyMirror') : t('modal.copyUrl')"
           >
             <span v-if="copyError" class="text-[#a8161a]">复制失败</span>
-            <span v-else-if="!copied">抄 · 录</span>
+            <span v-else-if="!copied">{{ t('modal.copy') }}</span>
             <span v-else class="text-[#a8161a]">已抄 ✓</span>
           </button>
         </div>

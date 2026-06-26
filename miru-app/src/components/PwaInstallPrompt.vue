@@ -1,6 +1,10 @@
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { ref, onMounted, onBeforeUnmount, inject } from 'vue'
 import { STORAGE_KEYS, APP_CONFIG } from '../config/constants.js'
+
+// I18n — injected from App.vue
+const i18n = inject('i18n', null)
+const t = (path, ...args) => i18n?.t(path, args) ?? path
 
 const show = ref(false)
 const installed = ref(false)
@@ -26,9 +30,12 @@ function onBeforeInstallPrompt(e) {
   e.preventDefault()
   if (installed.value || isRecentlyDismissed()) return
   deferredPrompt = e
+  // 多次触发先清旧定时器，避免泄漏 / 重复显示
+  if (dismissTimer) clearTimeout(dismissTimer)
   // 延迟显示（避免首屏干扰）
   dismissTimer = setTimeout(() => {
     show.value = true
+    dismissTimer = null
   }, PROMPT_DELAY)
 }
 
@@ -95,12 +102,14 @@ function dismiss() {
         </svg>
       </div>
       <div class="pwa-prompt__content">
-        <div class="pwa-prompt__title">将漫藏阁安装到桌面</div>
-        <div class="pwa-prompt__desc">离线可用 · 快速访问 · 完整体验</div>
+        <div class="pwa-prompt__title">{{ t('general.pwaInstall') }}</div>
+        <div class="pwa-prompt__desc">{{ t('general.pwaDesc') }}</div>
       </div>
       <div class="pwa-prompt__actions">
-        <button type="button" @click="install" class="pwa-prompt__install">安装</button>
-        <button type="button" @click="dismiss" class="pwa-prompt__dismiss" aria-label="关闭">×</button>
+        <button type="button" @click="install" class="pwa-prompt__install">{{ t('general.pwaInstallBtn') }}</button>
+        <button type="button" @click="dismiss" class="pwa-prompt__dismiss" :aria-label="t('general.pwaClose')">
+          ×
+        </button>
       </div>
     </div>
   </Transition>

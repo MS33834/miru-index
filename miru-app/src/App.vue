@@ -353,13 +353,29 @@ function smoothScrollIntoView(el) {
   el.scrollIntoView({ behavior: prefersReducedMotion() ? 'auto' : 'smooth', block: 'start' })
 }
 
+let modalLastFocus = null
 function openModal(item, category) {
+  // 记录触发元素，关闭时还原焦点，避免键盘用户丢失位置
+  if (typeof document !== 'undefined') modalLastFocus = document.activeElement
   modalItem.value = item
   modalCategory.value = category
 }
 function closeModal() {
   modalItem.value = null
   modalCategory.value = null
+  // 还原焦点到触发卡片，SiteModal 卸载后下一帧执行以确保可聚焦
+  if (modalLastFocus && typeof modalLastFocus.focus === 'function') {
+    const el = modalLastFocus
+    modalLastFocus = null
+    nextTick(() => {
+      // 触发元素可能已因翻页/过滤被卸载，聚焦失败时静默处理
+      try {
+        el.focus()
+      } catch {
+        /* 忽略 */
+      }
+    })
+  }
 }
 function onSelectCategory(id) {
   selectCategory(id)
@@ -705,7 +721,15 @@ onUnmounted(() => {
                 </div>
 
                 <div class="hero__shortcuts">
-                  <button v-for="tag in quickTags" :key="tag" type="button" class="hero__tag" @click="toggleTag(tag)">
+                  <button
+                    v-for="tag in quickTags"
+                    :key="tag"
+                    type="button"
+                    class="hero__tag"
+                    :class="{ 'is-active': selectedTags.has(tag) }"
+                    :aria-pressed="selectedTags.has(tag)"
+                    @click="toggleTag(tag)"
+                  >
                     #{{ tag }}
                   </button>
                 </div>
@@ -810,6 +834,7 @@ onUnmounted(() => {
                 :class="{ 'is-active': viewMode === 'grid' }"
                 @click="setMode('grid')"
                 aria-label="网格视图"
+                :aria-pressed="viewMode === 'grid'"
                 title="网格视图"
               >
                 <svg
@@ -834,6 +859,7 @@ onUnmounted(() => {
                 :class="{ 'is-active': viewMode === 'list' }"
                 @click="setMode('list')"
                 aria-label="列表视图"
+                :aria-pressed="viewMode === 'list'"
                 title="列表视图"
               >
                 <svg

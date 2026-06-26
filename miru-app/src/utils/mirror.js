@@ -104,7 +104,7 @@ export function ghMirror(url, mirrorId = 'jsdelivr') {
 
 /**
  * 健康状态 -> 颜色 + 中文标签 + 图标
- * 对比度均按 WCAG AA（浅色 washi #f3ece0 背景上 ≥ 4.5:1）校准
+ * 对比度均按 WCAG AA（浅色 washi #f3ece0 背景上 ≥ 4.5:1，小号文本）校准
  */
 export const HEALTH_MAP = {
   ok: { color: '#2d6b2d', bg: 'rgba(45, 107, 45, 0.12)', label: '在线', icon: '●', tip: '国内可直接访问' },
@@ -119,14 +119,14 @@ export const HEALTH_MAP = {
   },
   dead: { color: '#666666', bg: 'rgba(102, 102, 102, 0.15)', label: '失效', icon: '✕', tip: '站点已无法访问' },
   blocked: {
-    color: '#b85c1a',
+    color: '#8a3a0e',
     bg: 'rgba(184, 92, 26, 0.14)',
     label: '被墙',
     icon: '⊘',
     tip: '国内无法直接访问，需代理/梯子',
   },
   restricted: {
-    color: '#8a6d20',
+    color: '#6b5212',
     bg: 'rgba(138, 109, 32, 0.14)',
     label: '受限',
     icon: '⚠',

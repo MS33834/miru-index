@@ -2806,8 +2806,10 @@ function mergeCategories(base, extensionCats, extensionItemsMap) {
     }
   }
 
-  // 开发模式下报告被丢弃的条目（仅在非生产构建时）
-  if (typeof process !== 'undefined' && process.env.NODE_ENV !== 'production' && drops.length > 0) {
+  // 开发模式下报告被丢弃的条目。
+  // 注意：Vite 浏览器环境中 `process` 未定义，原 typeof process 判断会令告警在浏览器永不触发；
+  // 改用 import.meta.env.DEV，Vite 会在生产构建时静态替换为 false 并 tree-shake 掉整段。
+  if (import.meta.env?.DEV && drops.length > 0) {
     console.warn(`[miru-index] mergeCategories 丢弃了 ${drops.length} 个条目：`)
     for (const d of drops) {
       console.warn(`  [${d.reason}] 分类=${d.cat} 名称=${d.name} ${d.url || '(无URL)'}`)
