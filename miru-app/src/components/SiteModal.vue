@@ -11,8 +11,10 @@ const emit = defineEmits(['close'])
 const dialogRef = ref(null)
 const closeBtnRef = ref(null)
 const copied = ref(false)
+const copyError = ref(false)
 const mirrorOpen = ref(false)
 const selectedMirror = ref(GH_MIRRORS[0] || null)
+const activeMirrorId = ref(selectedMirror.value?.id || null)
 
 let copyTimer = null
 
@@ -86,16 +88,33 @@ async function doCopy(text, flagRef) {
       copyTimer = null
     }, 1500)
   }
+  return success
 }
 
 async function copyUrl() {
   const url = isGitHub.value ? mirrorUrl.value : props.item.url
-  await doCopy(url, copied)
+  // 重置上一次反馈状态，避免 success/failure 切换时旧标志残留导致显示错乱
+  clearCopyTimer()
+  copied.value = false
+  copyError.value = false
+  const ok = await doCopy(url, copied)
+  if (!ok) {
+    // 复制失败时给用户明确反馈，避免点击无响应
+    copyError.value = true
+    copyTimer = setTimeout(() => {
+      copyError.value = false
+      copyTimer = null
+    }, 1500)
+  }
 }
 
 function selectMirror(m) {
   selectedMirror.value = m
   mirrorOpen.value = false
+}
+
+function onMirrorFocus(m) {
+  activeMirrorId.value = m.id
 }
 
 function handleMirrorKeydown(e, m) {
@@ -118,7 +137,12 @@ onMounted(() => {
     if (!dialog) return
     dialog.addEventListener('close', onDialogClose)
     dialog.addEventListener('cancel', onDialogCancel)
-    dialog.showModal()
+    try {
+      dialog.showModal()
+    } catch (e) {
+      // showModal 可能因状态异常抛错（如已打开），降级处理避免未捕获异常
+      console.warn('[SiteModal] showModal 失败:', e)
+    }
     dialog.scrollTop = 0
     closeBtnRef.value?.focus()
   })
@@ -368,11 +392,14 @@ onBeforeUnmount(() => {
                 style="border-color: rgba(201, 165, 92, 0.2)"
                 role="listbox"
                 aria-label="GitHub 镜像源"
+                :aria-activedescendant="activeMirrorId ? `${safeId}-mirror-opt-${activeMirrorId}` : undefined"
               >
                 <div
                   v-for="m in GH_MIRRORS"
                   :key="m.id"
+                  :id="`${safeId}-mirror-opt-${m.id}`"
                   @click="selectMirror(m)"
+                  @focus="onMirrorFocus(m)"
                   class="mirror-option px-4 py-2 text-xs font-mono cursor-pointer transition flex items-center gap-2"
                   :class="{ 'is-active': selectedMirror?.id === m.id }"
                   role="option"
@@ -441,7 +468,8 @@ onBeforeUnmount(() => {
             class="btn-dark px-6 py-3.5 font-serif-cn font-bold text-base transition flex items-center justify-center gap-2"
             :title="isGitHub ? '复制当前镜像 URL' : '复制站点 URL'"
           >
-            <span v-if="!copied">抄 · 录</span>
+            <span v-if="copyError" class="text-[#a8161a]">复制失败</span>
+            <span v-else-if="!copied">抄 · 录</span>
             <span v-else class="text-[#a8161a]">已抄 ✓</span>
           </button>
         </div>

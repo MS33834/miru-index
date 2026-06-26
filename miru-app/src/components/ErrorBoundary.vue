@@ -2,6 +2,7 @@
 import { ref, onErrorCaptured } from 'vue'
 
 const error = ref(null)
+const resetKey = ref(0)
 
 onErrorCaptured((err) => {
   console.error('[ErrorBoundary] 捕获错误:', err)
@@ -12,6 +13,8 @@ onErrorCaptured((err) => {
 
 function reset() {
   error.value = null
+  // 递增 key 强制 slot 子树整体重建，清除可能残留的破损组件状态
+  resetKey.value++
 }
 
 function reload() {
@@ -36,10 +39,15 @@ function reload() {
       </div>
     </div>
   </div>
-  <slot v-else />
+  <div v-else :key="resetKey" class="error-boundary__slot">
+    <slot />
+  </div>
 </template>
 
 <style scoped>
+.error-boundary__slot {
+  display: contents;
+}
 .error-boundary {
   position: fixed;
   inset: 0;

@@ -91,13 +91,7 @@ const KNOWN_BLOCKED = [
   'sites.google.com',
   'hello.vrchat.com',
   'vrchat.com',
-  'wikipedia.org',
-  'commons.wikimedia.org',
-  'en.wikipedia.org',
-  'ja.wikipedia.org',
-  'zh.wikipedia.org',
   'translate.google.com',
-  'fonts.googleapis.com',
   'docs.qq.com',
 ]
 

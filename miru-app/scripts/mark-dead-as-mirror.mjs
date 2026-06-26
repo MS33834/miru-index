@@ -73,7 +73,7 @@ const KNOWN_BLOCKED_DOMAINS = new Set([
   // 补充：AI / 工具 / 设计
   'seaart.io', 'seaart.ai', 'pixlr.com', 'pika.art',
   'suno.com', 'suno.ai', 'greasyfork.org',
-  'openai.com', 'openai.com', 'dall-e-3',
+  'openai.com',
   'time.geekbang.org', 'geekbang.org',
   'tushuoapp.com', 'bbs.acg06.com', 'cnu.cc',
   'live2d.com', 'esotericsoftware.com',

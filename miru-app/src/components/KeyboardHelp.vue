@@ -22,7 +22,12 @@ watch(
   async (val) => {
     if (val) {
       await nextTick()
-      dialogRef.value?.showModal()
+      try {
+        dialogRef.value?.showModal()
+      } catch (e) {
+        // showModal 可能因状态异常抛错（如已打开），降级处理避免未捕获异常
+        console.warn('[KeyboardHelp] showModal 失败:', e)
+      }
     } else {
       dialogRef.value?.close()
     }

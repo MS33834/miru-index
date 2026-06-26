@@ -3,6 +3,7 @@
 import fs from 'fs/promises'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import { execFileSync } from 'node:child_process'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const ROOT = path.resolve(__dirname, '..')
@@ -313,4 +314,14 @@ if (!src.includes(insertAt)) {
 }
 src = src.replace(insertAt, '  },\n' + block + ',\n]\n\n/** 对现有分类的补充条目 */\nexport const extensionItems')
 await fs.writeFile(FILE, src)
+
+// 写入后语法校验：site-extensions.js 是 ESM 模块（含 import/export），不能用 new Function 校验，
+// 改用 `node --check` 子进程校验语法正确性，写入失败立即抛错避免产出损坏文件
+try {
+  execFileSync(process.execPath, ['--check', FILE], { stdio: 'pipe' })
+} catch (e) {
+  const detail = e.stderr ? e.stderr.toString().trim() : e.message
+  throw new Error('写入后语法校验失败: ' + detail, { cause: e })
+}
+
 console.log(`✓ 已追加 ${newCategories.length} 个分类，共 ${newCategories.reduce((n, c) => n + c.items.length, 0)} 条新条目`)

@@ -9,7 +9,6 @@ import { APP_CONFIG } from '../config/constants.js'
 // I18n — injected from App.vue
 const i18n = inject('i18n', null)
 const t = (path, ...args) => i18n?.t(path, args) ?? path
-const tc = (catId, fallback) => i18n?.tc(catId, fallback) ?? (fallback || catId)
 
 const props = defineProps({
   activeCategory: { type: String, required: true },

@@ -10,6 +10,10 @@ updates:
     labels:
       - "dependencies"
       - "ci"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
 
   - package-ecosystem: "npm"
     directory: "/miru-app"
@@ -20,3 +24,8 @@ updates:
     labels:
       - "dependencies"
       - "frontend"
+    groups:
+      dev-dependencies:
+        dependency-type: "development"
+        patterns:
+          - "*"

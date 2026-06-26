@@ -13,7 +13,7 @@
  *   const { t, locale } = useI18n()
  */
 
-import { ref, computed, watch, shallowRef } from 'vue'
+import { ref, computed, shallowRef } from 'vue'
 
 // ── Available locales ────────────────────────────────────────────────
 const LOCALES = ['zh', 'en', 'ja']

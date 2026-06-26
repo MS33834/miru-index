@@ -42,3 +42,25 @@ regexes = [
   '''(?i)(api[_-]?key|secret|token|password|passwd|access[_-]?key)\s*[:=]\s*['"]?(CHANGE_?ME|YOUR_|EXAMPLE_|PLACEHOLDER|XXXX|REDACTED|<|<%|<<|<<%)''',
   '''(?i)(api[_-]?key|secret|token|password)\s*[:=]\s*\$\{?[A-Z_][A-Z0-9_]*\}?''',
 ]
+
+# 国内云厂商密钥规则
+# Alibaba Cloud AccessKey ID（LTAI 前缀，共 24 位）与 AccessKey Secret（30 位 base64）
+[[rules]]
+id = "aliyun-access-key"
+description = "Alibaba Cloud AccessKey ID (LTAI prefix) and AccessKey Secret"
+regex = '''LTAI[A-Za-z0-9]{20}|(?i)access[_-]?key[_-]?secret\s*[:=]\s*['"][A-Za-z0-9/+=]{30}['"]'''
+keywords = ["ltai", "accesskeysecret", "access_key_secret"]
+
+# Tencent Cloud SecretId（AKID 前缀，共 36 位）与 SecretKey（32 位）
+[[rules]]
+id = "tencent-cloud-secret"
+description = "Tencent Cloud SecretId (AKID prefix) and SecretKey"
+regex = '''AKID[A-Za-z0-9]{32}|(?i)secret[_-]?key\s*[:=]\s*['"][A-Za-z0-9]{32}['"]'''
+keywords = ["akid", "secretkey", "secret_key"]
+
+# Qiniu Cloud AccessKey / SecretKey（均为 40 位字母数字，无固定前缀，需上下文）
+[[rules]]
+id = "qiniu-access-key"
+description = "Qiniu Cloud AccessKey/SecretKey (40-char tokens with qiniu context)"
+regex = '''(?i)qiniu.{0,80}(access[_-]?key|secret[_-]?key).{0,20}['"][A-Za-z0-9_-]{40}['"]'''
+keywords = ["qiniu"]

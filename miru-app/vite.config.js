@@ -41,8 +41,8 @@ export default defineConfig({
         assetFileNames: 'assets/[ext]/[name]-[hash].[ext]',
       },
     },
-    // 报告打包体积
-    reportCompressedSize: true,
+    // 报告打包体积（生产构建关闭以加速，纯信息性、不影响产物）
+    reportCompressedSize: false,
     // 限制 chunk 大小警告
     chunkSizeWarningLimit: 1000,
   },
