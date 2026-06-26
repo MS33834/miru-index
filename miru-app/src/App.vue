@@ -1,5 +1,16 @@
 <script setup>
-import { ref, computed, onMounted, onUnmounted, onBeforeUnmount, watch, nextTick, defineAsyncComponent, h, provide } from 'vue'
+import {
+  ref,
+  computed,
+  onMounted,
+  onUnmounted,
+  onBeforeUnmount,
+  watch,
+  nextTick,
+  defineAsyncComponent,
+  h,
+  provide,
+} from 'vue'
 import { categories } from './data/nav.js'
 import SidebarNav from './components/SidebarNav.vue'
 import SiteCard from './components/SiteCard.vue'
@@ -45,13 +56,15 @@ const helpOpen = ref(false)
 const loaded = ref(false)
 
 const SIDEBAR_KEY = STORAGE_KEYS.SIDEBAR_COLLAPSED
-const sidebarCollapsed = ref((() => {
-  try {
-    return typeof localStorage !== 'undefined' && localStorage.getItem(SIDEBAR_KEY) === 'true'
-  } catch {
-    return false
-  }
-})())
+const sidebarCollapsed = ref(
+  (() => {
+    try {
+      return typeof localStorage !== 'undefined' && localStorage.getItem(SIDEBAR_KEY) === 'true'
+    } catch {
+      return false
+    }
+  })()
+)
 
 const appState = useAppState()
 const recent = useRecentSearches()
@@ -116,13 +129,15 @@ const favoritesCount = computed(() => favorites.value.length)
 
 // 单字符快捷键开关（WCAG 2.1.4）：默认启用，可在键盘帮助面板关闭以避免与 SR 冲突
 const SHORTCUTS_KEY = STORAGE_KEYS.SHORTCUTS_ENABLED
-const shortcutsEnabled = ref((() => {
-  try {
-    return typeof localStorage !== 'undefined' ? localStorage.getItem(SHORTCUTS_KEY) !== 'false' : true
-  } catch {
-    return true
-  }
-})())
+const shortcutsEnabled = ref(
+  (() => {
+    try {
+      return typeof localStorage !== 'undefined' ? localStorage.getItem(SHORTCUTS_KEY) !== 'false' : true
+    } catch {
+      return true
+    }
+  })()
+)
 function onToggleShortcuts(val) {
   shortcutsEnabled.value = val
   try {
@@ -300,6 +315,15 @@ const singleCategory = computed(() => {
 
 // 空态判定：结果为空，或当前页因结果缩减/页码越界而无内容（避免分页器隐藏后出现既无卡片也无空态的空白页）
 const isEmpty = computed(() => filteredCount.value === 0 || paginatedItems.value.length === 0)
+
+// 空态文案：按当前过滤条件给出对应提示
+const emptyMessage = computed(() => {
+  if (searchQuery.value) return `未找到与「${searchQuery.value}」相关的结果`
+  if (selectedTags.value.size > 0 || proxyFilter.value !== 'all' || showFavoritesOnly.value) {
+    return '当前筛选条件下无匹配站点'
+  }
+  return '卷帙浩繁，未寻得所求之物……'
+})
 
 // 浮层（弹窗/抽屉/帮助）打开时锁定主内容区，但保留浮层自身可交互。
 // 仅锁定主内容子树，而非整个 .layout，避免把 Toast/PWA安装提示/更新提示等浮层一并 inert。
@@ -537,11 +561,7 @@ onUnmounted(() => {
       <a href="#main-content" class="skip-nav" :inert="overlayActive">{{ t('general.skipNav') }}</a>
 
       <!-- =================== 桌面端侧边栏 =================== -->
-      <div
-        class="hidden lg:block sidebar-shell"
-        :class="{ 'is-collapsed': sidebarCollapsed }"
-        :inert="overlayActive"
-      >
+      <div class="hidden lg:block sidebar-shell" :class="{ 'is-collapsed': sidebarCollapsed }" :inert="overlayActive">
         <SidebarNav
           :active-category="activeCategory"
           :search-query="searchQuery"
@@ -984,11 +1004,7 @@ onUnmounted(() => {
 
           <div v-if="isEmpty" class="empty">
             <div class="hanko-circle w-20 h-20 mx-auto mb-6 text-2xl">空</div>
-            <p class="font-kai-cn text-[#8a7a68] text-lg mb-6">
-              <template v-if="searchQuery">未找到与「{{ searchQuery }}」相关的结果</template>
-              <template v-else-if="selectedTags.size > 0 || proxyFilter !== 'all' || showFavoritesOnly">当前筛选条件下无匹配站点</template>
-              <template v-else>卷帙浩繁，未寻得所求之物……</template>
-            </p>
+            <p class="font-kai-cn text-[#8a7a68] text-lg mb-6">{{ emptyMessage }}</p>
             <div class="empty__actions">
               <button v-if="searchQuery" type="button" class="empty__btn" @click="onClearSearch">清空搜索</button>
               <button v-if="selectedTags.size > 0" type="button" class="empty__btn" @click="clearTags">清除标签</button>

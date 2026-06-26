@@ -44,8 +44,7 @@ function onAppInstalled() {
 
 onMounted(() => {
   // 检查是否已安装
-  if (typeof window.matchMedia === 'function' &&
-      window.matchMedia('(display-mode: standalone)').matches) {
+  if (typeof window.matchMedia === 'function' && window.matchMedia('(display-mode: standalone)').matches) {
     installed.value = true
     return
   }

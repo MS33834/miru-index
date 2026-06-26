@@ -13,12 +13,29 @@ const CONCURRENCY = 4
 const TIMEOUT_MS = 20000
 
 const ERROR_KEYWORDS = [
-  '404', 'not found', 'error', 'access denied', 'forbidden',
-  '无法访问', '找不到', '未找到', '拒绝访问', '禁止访问',
-  '域名出售', 'domain for sale', 'website is for sale',
-  'nginx', 'bad gateway', 'service unavailable', '503',
-  'this site can’t be reached', 'err_', 'dns_probe',
-  'unsupported protocol', 'invalid url', 'timed out',
+  '404',
+  'not found',
+  'error',
+  'access denied',
+  'forbidden',
+  '无法访问',
+  '找不到',
+  '未找到',
+  '拒绝访问',
+  '禁止访问',
+  '域名出售',
+  'domain for sale',
+  'website is for sale',
+  'nginx',
+  'bad gateway',
+  'service unavailable',
+  '503',
+  'this site can’t be reached',
+  'err_',
+  'dns_probe',
+  'unsupported protocol',
+  'invalid url',
+  'timed out',
 ]
 
 function isErrorResult(title, url, error) {
@@ -92,8 +109,7 @@ async function main() {
   }
 
   console.log(`启动浏览器验证 ${items.length} 条死链...\n`)
-  const executablePath =
-    process.env.PLAYWRIGHT_CHROME_EXECUTABLE || '/usr/bin/google-chrome-stable'
+  const executablePath = process.env.PLAYWRIGHT_CHROME_EXECUTABLE || '/usr/bin/google-chrome-stable'
   const browser = await chromium.launch({ headless: true, executablePath })
   const results = { ok: [], dead: [] }
 

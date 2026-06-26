@@ -11,10 +11,7 @@ import { fileURLToPath } from 'url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const ROOT = path.resolve(__dirname, '..')
-const FILES = [
-  path.resolve(ROOT, 'src/data/nav.js'),
-  path.resolve(ROOT, 'src/data/site-extensions.js'),
-]
+const FILES = [path.resolve(ROOT, 'src/data/nav.js'), path.resolve(ROOT, 'src/data/site-extensions.js')]
 
 // URL 替换：把失效域名换成可用的官方/镜像地址（仅加多/修复，不删除）
 const URL_REPLACEMENTS = {
@@ -81,67 +78,29 @@ const URL_REPLACEMENTS = {
 
 // GitHub 仓库镜像表（国内友好）：name → mirrors
 const GH_MIRRORS = {
-  'Motrix': [
+  Motrix: [
     'https://gh-proxy.com/https://github.com/agalwood/Motrix/releases',
     'https://mirror.ghproxy.com/https://github.com/agalwood/Motrix/releases',
   ],
-  'qBittorrent': [
-    'https://gh-proxy.com/https://github.com/qbittorrent/qBittorrent/releases',
-  ],
-  'Tachiyomi': [
-    'https://gh-proxy.com/https://github.com/tachiyomiorg/tachiyomi/releases',
-  ],
-  'Anikki': [
-    'https://gh-proxy.com/https://github.com/KomodoStack/Anikki/releases',
-  ],
-  'mpv': [
-    'https://gh-proxy.com/https://github.com/mpv-player/mpv/releases',
-  ],
-  'mpv.net': [
-    'https://gh-proxy.com/https://github.com/stax76/mpv.net/releases',
-  ],
-  'FFmpeg': [
-    'https://gh-proxy.com/https://github.com/BtbN/FFmpeg-Builds/releases',
-  ],
-  'mpvKt': [
-    'https://gh-proxy.com/https://github.com/abdallahmehiz/mpvKt/releases',
-  ],
-  'Stash': [
-    'https://gh-proxy.com/https://github.com/stashapp/stash/releases',
-  ],
-  'HandBrake': [
-    'https://gh-proxy.com/https://github.com/HandBrake/HandBrake/releases',
-  ],
-  'Peerflix': [
-    'https://gh-proxy.com/https://github.com/mafintosh/peerflix',
-  ],
-  'Popcorn-Time': [
-    'https://gh-proxy.com/https://github.com/popcorn-official/popcorn-desktop/releases',
-  ],
-  'yt-dlp': [
-    'https://gh-proxy.com/https://github.com/yt-dlp/yt-dlp/releases',
-  ],
-  'Annie': [
-    'https://gh-proxy.com/https://github.com/iawia002/lux/releases',
-  ],
-  'You-Get': [
-    'https://gh-proxy.com/https://github.com/soimort/you-get/releases',
-  ],
-  'Pillager': [
-    'https://gh-proxy.com/https://github.com/valkjsaaa/Pillager',
-  ],
-  'Eagle': [
-    'https://gh-proxy.com/https://github.com/eagle-app/eagle/releases',
-  ],
-  'Honeyview': [
-    'https://www.bandisoft.com/honeyview/',
-  ],
-  'Billfish': [
-    'https://www.billfish.cn/',
-  ],
-  'Pixcall': [
-    'https://pixcall.com/',
-  ],
+  qBittorrent: ['https://gh-proxy.com/https://github.com/qbittorrent/qBittorrent/releases'],
+  Tachiyomi: ['https://gh-proxy.com/https://github.com/tachiyomiorg/tachiyomi/releases'],
+  Anikki: ['https://gh-proxy.com/https://github.com/KomodoStack/Anikki/releases'],
+  mpv: ['https://gh-proxy.com/https://github.com/mpv-player/mpv/releases'],
+  'mpv.net': ['https://gh-proxy.com/https://github.com/stax76/mpv.net/releases'],
+  FFmpeg: ['https://gh-proxy.com/https://github.com/BtbN/FFmpeg-Builds/releases'],
+  mpvKt: ['https://gh-proxy.com/https://github.com/abdallahmehiz/mpvKt/releases'],
+  Stash: ['https://gh-proxy.com/https://github.com/stashapp/stash/releases'],
+  HandBrake: ['https://gh-proxy.com/https://github.com/HandBrake/HandBrake/releases'],
+  Peerflix: ['https://gh-proxy.com/https://github.com/mafintosh/peerflix'],
+  'Popcorn-Time': ['https://gh-proxy.com/https://github.com/popcorn-official/popcorn-desktop/releases'],
+  'yt-dlp': ['https://gh-proxy.com/https://github.com/yt-dlp/yt-dlp/releases'],
+  Annie: ['https://gh-proxy.com/https://github.com/iawia002/lux/releases'],
+  'You-Get': ['https://gh-proxy.com/https://github.com/soimort/you-get/releases'],
+  Pillager: ['https://gh-proxy.com/https://github.com/valkjsaaa/Pillager'],
+  Eagle: ['https://gh-proxy.com/https://github.com/eagle-app/eagle/releases'],
+  Honeyview: ['https://www.bandisoft.com/honeyview/'],
+  Billfish: ['https://www.billfish.cn/'],
+  Pixcall: ['https://pixcall.com/'],
 }
 
 // 把已知被墙的国际站自动加 proxy=true（不删除任何条目）

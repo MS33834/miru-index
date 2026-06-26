@@ -276,15 +276,26 @@ onBeforeUnmount(() => {
             <div class="flex items-start gap-2.5">
               <span class="text-lg shrink-0" aria-hidden="true">{{ item.health === 'blocked' ? '⊘' : '⚠' }}</span>
               <div>
-                <p class="font-serif-cn font-bold text-sm mb-1" :style="{ color: item.health === 'blocked' ? '#b85c1a' : '#7a5e20' }">
-                  {{ item.health === 'blocked' ? '⚠ 国内无法直接访问' : item.health === 'restricted' ? '⚠ 国内访问受限' : '⚠ 需要代理/梯子' }}
+                <p
+                  class="font-serif-cn font-bold text-sm mb-1"
+                  :style="{ color: item.health === 'blocked' ? '#b85c1a' : '#7a5e20' }"
+                >
+                  {{
+                    item.health === 'blocked'
+                      ? '⚠ 国内无法直接访问'
+                      : item.health === 'restricted'
+                        ? '⚠ 国内访问受限'
+                        : '⚠ 需要代理/梯子'
+                  }}
                 </p>
                 <p class="font-kai-cn text-xs leading-relaxed" style="color: #5a4a3a">
-                  {{ item.health === 'blocked'
-                    ? '此站点在大陆被屏蔽，需使用代理/梯子才能访问。'
-                    : item.health === 'restricted'
-                    ? '此站点在大陆访问受限，部分内容可能不可用，建议使用代理获得完整体验。'
-                    : '此站点需要代理或梯子才能访问，国内直连可能无法打开。' }}
+                  {{
+                    item.health === 'blocked'
+                      ? '此站点在大陆被屏蔽，需使用代理/梯子才能访问。'
+                      : item.health === 'restricted'
+                        ? '此站点在大陆访问受限，部分内容可能不可用，建议使用代理获得完整体验。'
+                        : '此站点需要代理或梯子才能访问，国内直连可能无法打开。'
+                  }}
                 </p>
               </div>
             </div>
@@ -452,7 +463,7 @@ onBeforeUnmount(() => {
               border: 1px solid #a8161a;
               box-shadow:
                 0 4px 14px rgba(255, 77, 79, 0.35),
-                  inset 0 1px 0 rgba(255, 255, 255, 0.15);
+                inset 0 1px 0 rgba(255, 255, 255, 0.15);
               border-radius: 2px;
               letter-spacing: 0.1em;
               cursor: pointer;

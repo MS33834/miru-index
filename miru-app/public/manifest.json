@@ -1,9 +1,9 @@
 {
-  "id": "/miru-index/?source=pwa",
+  "id": "/miru-index/",
   "name": "漫藏阁 - ACGN 资源导航",
   "short_name": "漫藏阁",
   "description": "ACGN 资源导航站，收录各类动漫、游戏、小说、工具等资源网站",
-  "start_url": "/miru-index/",
+  "start_url": "/miru-index/?source=pwa",
   "scope": "/miru-index/",
   "display": "standalone",
   "display_override": ["window-controls-overlay", "standalone"],
@@ -39,14 +39,7 @@
   "screenshots": [
     {
       "src": "/miru-index/og-image.png",
-      "sizes": "1080x1920",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "漫藏阁 - 移动端"
-    },
-    {
-      "src": "/miru-index/og-image.png",
-      "sizes": "1920x1080",
+      "sizes": "1200x630",
       "type": "image/png",
       "form_factor": "wide",
       "label": "漫藏阁 - 桌面端"

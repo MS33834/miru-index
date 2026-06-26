@@ -229,7 +229,8 @@ const messages = {
       gfwRestricted: '⚠ Restricted in mainland China',
       gfwProxy: '⚠ Proxy needed',
       gfwBlockedDesc: 'This site is blocked in mainland China. A VPN or proxy is required.',
-      gfwRestrictedDesc: 'This site has restricted access in mainland China. Some content may be unavailable without a proxy.',
+      gfwRestrictedDesc:
+        'This site has restricted access in mainland China. Some content may be unavailable without a proxy.',
       gfwProxyDesc: 'This site requires a proxy or VPN. Direct access from mainland China may fail.',
       tags: '▎TAGS',
       intro: '▎INTRO',
@@ -284,7 +285,8 @@ const messages = {
       kbFooter: 'Press ? to show · Esc to close',
       kbClose: 'Close',
       kbToggleLabel: 'Toggle keyboard help',
-      kbToggleHint: 'When turned off, only modifier-key shortcuts like Ctrl+K and Esc remain active, avoiding conflicts with screen readers.',
+      kbToggleHint:
+        'When turned off, only modifier-key shortcuts like Ctrl+K and Esc remain active, avoiding conflicts with screen readers.',
     },
   },
 
@@ -356,7 +358,8 @@ const messages = {
       gfwRestricted: '⚠ 中国本土から制限あり',
       gfwProxy: '⚠ VPN必要',
       gfwBlockedDesc: 'このサイトは中国本土でブロックされています。VPNまたはプロキシが必要です。',
-      gfwRestrictedDesc: 'このサイトは中国本土で制限されています。一部のコンテンツはプロキシなしでは利用できない場合があります。',
+      gfwRestrictedDesc:
+        'このサイトは中国本土で制限されています。一部のコンテンツはプロキシなしでは利用できない場合があります。',
       gfwProxyDesc: 'このサイトにはプロキシまたはVPNが必要です。中国本土からの直接アクセスは失敗する可能性があります。',
       tags: '▎TAGS',
       intro: '▎INTRO',
@@ -411,7 +414,8 @@ const messages = {
       kbFooter: '? で表示 · Esc で閉じる',
       kbClose: '閉じる',
       kbToggleLabel: 'キーボードヘルプを切替',
-      kbToggleHint: 'オフにすると、Ctrl+K と Esc などの修飾キーショートカットのみが残り、スクリーンリーダーとの競合を回避します。',
+      kbToggleHint:
+        'オフにすると、Ctrl+K と Esc などの修飾キーショートカットのみが残り、スクリーンリーダーとの競合を回避します。',
     },
   },
 }
@@ -427,19 +431,31 @@ function _loadSavedLocale() {
   try {
     const saved = localStorage.getItem('miru-locale')
     if (saved && LOCALES.includes(saved)) return saved
-  } catch { /* localStorage blocked */ }
+  } catch {
+    /* localStorage blocked */
+  }
   // Detect browser language
   try {
     const nav = (navigator.language || '').toLowerCase()
     if (nav.startsWith('zh')) return 'zh'
     if (nav.startsWith('ja')) return 'ja'
-  } catch { /* SSR guard */ }
+  } catch {
+    /* SSR guard */
+  }
   return 'zh'
 }
 
 function _saveLocale(locale) {
-  try { localStorage.setItem('miru-locale', locale) } catch { /* noop */ }
-  try { document.documentElement.lang = locale } catch { /* noop */ }
+  try {
+    localStorage.setItem('miru-locale', locale)
+  } catch {
+    /* noop */
+  }
+  try {
+    document.documentElement.lang = locale
+  } catch {
+    /* noop */
+  }
 }
 
 /**
@@ -536,7 +552,9 @@ export function useI18n() {
   // 首次构造即同步 <html lang>，否则用户保存的非默认语言在首屏会被 SR 按错误语言朗读
   try {
     document.documentElement.lang = localeRef.value
-  } catch { /* SSR guard */ }
+  } catch {
+    /* SSR guard */
+  }
 
   return _instance
 }

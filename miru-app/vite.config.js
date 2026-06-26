@@ -6,8 +6,10 @@ export default defineConfig({
   plugins: [vue(), tailwindcss()],
   base: '/miru-index/',
   esbuild: {
-    // 生产构建移除 console.debug/info/log，保留 console.error/warn
+    // 生产构建移除 console.debug/info，并用 pure 标记 console.log 为无副作用以一并删除，
+    // 保留 console.error/warn 用于线上排查。测试环境在 vitest.config.js 中覆盖为空以保留日志。
     drop: ['debug', 'info'],
+    pure: ['console.log'],
   },
   build: {
     outDir: '../docs',

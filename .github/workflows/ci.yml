@@ -37,6 +37,14 @@ jobs:
         working-directory: miru-app
         run: npm run audit
 
+      - name: Lint
+        working-directory: miru-app
+        run: npm run lint
+
+      - name: Check formatting
+        working-directory: miru-app
+        run: npm run format:check
+
       - name: Run unit tests
         working-directory: miru-app
         run: npm test
@@ -70,13 +78,17 @@ jobs:
         working-directory: miru-app
         run: npm ci
 
+      - name: Build (e2e 必须测试当前源码产物，而非仓库里已提交的旧 docs/)
+        working-directory: miru-app
+        run: npm run build
+
       - name: Install Playwright browsers
         working-directory: miru-app
-        run: npx playwright install --with-deps firefox
+        # 与 playwright.config.js 的 chromium / firefox / Mobile Chrome 三个 project 对齐
+        run: npx playwright install --with-deps chromium firefox
 
-      - name: Start dev server and run E2E
+      - name: Run E2E
         working-directory: miru-app
-        run: |
-          npx vite preview --port 4173 &
-          sleep 3
-          npx playwright test
+        # 不再手动起 vite preview：由 playwright.config.js 的 webServer 统一管理，
+        # 避免与 webServer 重复占用 4173 端口导致 EADDRINUSE
+        run: npx playwright test

@@ -31,7 +31,8 @@ const SRC = path.resolve(__dirname, '../src/data')
 function extractEntries(content) {
   const entries = []
   // 匹配每个条目块：{ name: '...', url: '...', ... }
-  const itemRegex = /\{\s*\n\s*name:\s*'([^']+)',\s*\n\s*(?:url:\s*'([^']+)'|health:\s*'[^']+',\s*\n\s*url:\s*'([^']+)')/g
+  const itemRegex =
+    /\{\s*\n\s*name:\s*'([^']+)',\s*\n\s*(?:url:\s*'([^']+)'|health:\s*'[^']+',\s*\n\s*url:\s*'([^']+)')/g
   let match
   while ((match = itemRegex.exec(content)) !== null) {
     const name = match[1]
@@ -139,10 +140,10 @@ async function audit(options = {}) {
   }
 
   // 检查重复分类 ID
-  const allCatIds = [...navCats.map(c => c.id), ...extCats.map(c => c.id)]
+  const allCatIds = [...navCats.map((c) => c.id), ...extCats.map((c) => c.id)]
   const dupCats = allCatIds.filter((id, i) => allCatIds.indexOf(id) !== i)
   for (const id of [...new Set(dupCats)]) {
-    const names = [...navCats, ...extCats].filter(c => c.id === id).map(c => c.name)
+    const names = [...navCats, ...extCats].filter((c) => c.id === id).map((c) => c.name)
     issues.push({
       severity: 'error',
       type: 'dup_category',
@@ -179,10 +180,10 @@ async function audit(options = {}) {
   stats.mergedTotalItems = mergedCategories.reduce((a, c) => a + c.items.length, 0)
 
   // 检查跨分类丢失：源中唯一的 URL，但合并后不存在
-  const allSourceUrls = new Set([...navEntries.map(e => e.url), ...extEntries.map(e => e.url)])
+  const allSourceUrls = new Set([...navEntries.map((e) => e.url), ...extEntries.map((e) => e.url)])
   stats.sourceUniqueUrls = allSourceUrls.size
 
-  const lostUrls = [...allSourceUrls].filter(u => !mergedUrls.has(u))
+  const lostUrls = [...allSourceUrls].filter((u) => !mergedUrls.has(u))
   stats.lostCount = lostUrls.length
 
   for (const url of lostUrls) {
@@ -190,11 +191,19 @@ async function audit(options = {}) {
     let source = 'unknown'
     let name = 'unknown'
     for (const e of navEntries) {
-      if (e.url === url) { source = 'nav.js'; name = e.name; break }
+      if (e.url === url) {
+        source = 'nav.js'
+        name = e.name
+        break
+      }
     }
     if (source === 'unknown') {
       for (const e of extEntries) {
-        if (e.url === url) { source = 'site-extensions.js'; name = e.name; break }
+        if (e.url === url) {
+          source = 'site-extensions.js'
+          name = e.name
+          break
+        }
       }
     }
     issues.push({
@@ -209,7 +218,7 @@ async function audit(options = {}) {
   }
 
   // 检查空分类
-  const emptyCats = mergedCategories.filter(c => c.items.length === 0)
+  const emptyCats = mergedCategories.filter((c) => c.items.length === 0)
   for (const cat of emptyCats) {
     issues.push({
       severity: 'warn',
@@ -243,8 +252,8 @@ async function audit(options = {}) {
     console.log(`   合并后唯一 URL:        ${stats.mergedUniqueUrls}`)
     console.log()
 
-    const errors = issues.filter(i => i.severity === 'error' || i.severity === 'fatal')
-    const warns = issues.filter(i => i.severity === 'warn')
+    const errors = issues.filter((i) => i.severity === 'error' || i.severity === 'fatal')
+    const warns = issues.filter((i) => i.severity === 'warn')
 
     if (errors.length > 0) {
       console.log(`❌ 发现 ${errors.length} 个错误：\n`)
@@ -282,7 +291,9 @@ const options = {
   fix: args.includes('--fix'),
 }
 
-audit(options).then(code => process.exit(code)).catch(err => {
-  console.error('审计脚本错误:', err.message)
-  process.exit(2)
-})
+audit(options)
+  .then((code) => process.exit(code))
+  .catch((err) => {
+    console.error('审计脚本错误:', err.message)
+    process.exit(2)
+  })

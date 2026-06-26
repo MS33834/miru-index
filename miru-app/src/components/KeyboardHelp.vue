@@ -31,7 +31,7 @@ watch(
     } else {
       dialogRef.value?.close()
     }
-  },
+  }
 )
 
 const shortcuts = [
@@ -102,11 +102,7 @@ const shortcuts = [
       </ul>
 
       <label class="kb-toggle">
-        <input
-          type="checkbox"
-          :checked="shortcutsEnabled"
-          @change="emit('toggle-shortcuts', $event.target.checked)"
-        />
+        <input type="checkbox" :checked="shortcutsEnabled" @change="emit('toggle-shortcuts', $event.target.checked)" />
         <span class="kb-toggle__label">启用单字符快捷键（? / v / f）</span>
       </label>
       <p class="kb-toggle__hint">关闭后仅保留 Ctrl+K 与 Esc 等修饰键快捷键，避免与屏幕阅读器冲突</p>

@@ -71,18 +71,14 @@ describe('mergeCategories', () => {
   })
 
   it('默认 health 填充', () => {
-    const base = [
-      { id: 'a', name: 'A', items: [{ name: 'x', url: 'https://x.com' }] },
-    ]
+    const base = [{ id: 'a', name: 'A', items: [{ name: 'x', url: 'https://x.com' }] }]
     const result = mergeCategories(base, [], {})
     expect(result[0].items[0].health).toBe('ok')
   })
 
   it('扩展分类合并', () => {
     const base = [{ id: 'a', name: 'A', items: [] }]
-    const extCats = [
-      { id: 'b', name: 'B', items: [{ name: 'z', url: 'https://z.com' }] },
-    ]
+    const extCats = [{ id: 'b', name: 'B', items: [{ name: 'z', url: 'https://z.com' }] }]
     const result = mergeCategories(base, extCats, {})
     expect(result).toHaveLength(2)
     expect(result[1].name).toBe('B')
@@ -90,9 +86,7 @@ describe('mergeCategories', () => {
   })
 
   it('扩展条目追加到基础分类', () => {
-    const base = [
-      { id: 'a', name: 'A', items: [{ name: 'x', url: 'https://x.com' }] },
-    ]
+    const base = [{ id: 'a', name: 'A', items: [{ name: 'x', url: 'https://x.com' }] }]
     const extItems = { a: [{ name: 'y', url: 'https://y.com' }] }
     const result = mergeCategories(base, [], extItems)
     expect(result[0].items).toHaveLength(2)

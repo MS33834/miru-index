@@ -768,10 +768,10 @@ body::after {
 /* 在 Hero 区切换为不同壁纸，增加层次感 */
 @media (min-width: 768px) {
   /* 用 nth-child 变体给不同「卷册」轮换背景 */
-  .chapter-card:nth-child(3n+1) {
+  .chapter-card:nth-child(3n + 1) {
     position: relative;
   }
-  .chapter-card:nth-child(3n+1)::after {
+  .chapter-card:nth-child(3n + 1)::after {
     content: '';
     position: absolute;
     inset: 0;
@@ -781,7 +781,7 @@ body::after {
     pointer-events: none;
     border-radius: inherit;
   }
-  .chapter-card:nth-child(3n+2)::after {
+  .chapter-card:nth-child(3n + 2)::after {
     content: '';
     position: absolute;
     inset: 0;

@@ -3108,7 +3108,8 @@ export const extensionCategories = [
         name: 'Danbooru',
         url: 'https://danbooru.donmai.us/',
         desc: '二次元标签化图库',
-        fullDesc: 'Danbooru 是最大的二次元标签图站，拥有最完善的标签系统和角色考据 wiki，支持按角色、画师、作品检索数百万张图片。',
+        fullDesc:
+          'Danbooru 是最大的二次元标签图站，拥有最完善的标签系统和角色考据 wiki，支持按角色、画师、作品检索数百万张图片。',
         tags: ['图站', '标签', '二次元'],
         features: ['标签系统', '角色考据', '海量图片'],
         proxy: true,
@@ -3117,7 +3118,8 @@ export const extensionCategories = [
         name: 'Gelbooru',
         url: 'https://gelbooru.com/',
         desc: '大型二次元图片库',
-        fullDesc: 'Gelbooru 是知名的大型二次元图片分享站点，标签标注完善，可按角色、画师、作品、分辨率检索，图库极为庞大。',
+        fullDesc:
+          'Gelbooru 是知名的大型二次元图片分享站点，标签标注完善，可按角色、画师、作品、分辨率检索，图库极为庞大。',
         tags: ['图站', '标签', '海量'],
         features: ['标签检索', '超大图库', 'API'],
         proxy: true,
@@ -3126,7 +3128,8 @@ export const extensionCategories = [
         name: 'Safebooru',
         url: 'https://safebooru.org/',
         desc: '全年龄二次元图站',
-        fullDesc: 'Safebooru 是 Danbooru 的全年龄安全版本，过滤成人内容，仅保留一般向二次元插画与壁纸，国内可直接访问。',
+        fullDesc:
+          'Safebooru 是 Danbooru 的全年龄安全版本，过滤成人内容，仅保留一般向二次元插画与壁纸，国内可直接访问。',
         tags: ['图站', '全年龄', '安全'],
         features: ['全年龄', '国内可访', '壁纸'],
         proxy: false,
@@ -3135,7 +3138,8 @@ export const extensionCategories = [
         name: 'Konachan',
         url: 'https://konachan.net/',
         desc: '动漫壁纸图站',
-        fullDesc: 'Konachan 专注高清动漫壁纸的 Moebooru 图站，大量 1920+ 壁纸，konachan.net 为永久域名，konachan.com 需代理。',
+        fullDesc:
+          'Konachan 专注高清动漫壁纸的 Moebooru 图站，大量 1920+ 壁纸，konachan.net 为永久域名，konachan.com 需代理。',
         tags: ['图站', '壁纸', '高清'],
         features: ['永久域名.net', '2K/4K', '壁纸为主'],
         proxy: true,
@@ -3153,7 +3157,8 @@ export const extensionCategories = [
         name: 'Sankaku Channel',
         url: 'https://sankaku.app/',
         desc: '动漫图片推荐社区',
-        fullDesc: 'Sankaku Channel（新版 sankaku.app）是日本大型动漫图片社区，AI推荐与标签系统结合，个性化浏览。chan.sankakucomplex.com 为旧版永久入口。',
+        fullDesc:
+          'Sankaku Channel（新版 sankaku.app）是日本大型动漫图片社区，AI推荐与标签系统结合，个性化浏览。chan.sankakucomplex.com 为旧版永久入口。',
         tags: ['图站', '推荐', 'AI'],
         features: ['AI推荐', '标签', '社区'],
         proxy: true,
@@ -3187,7 +3192,8 @@ export const extensionCategories = [
         name: '2DFan',
         url: 'https://2dfan.org/',
         desc: 'GalGame资料与补丁',
-        fullDesc: '2DFan 是国内最专业的 GalGame/视觉小说 资料、补丁、CG存档综合站，收录作品资料与中文补丁，2dfan.com 为国际永久域名(需代理)，2dfan.org 国内可用。',
+        fullDesc:
+          '2DFan 是国内最专业的 GalGame/视觉小说 资料、补丁、CG存档综合站，收录作品资料与中文补丁，2dfan.com 为国际永久域名(需代理)，2dfan.org 国内可用。',
         tags: ['GalGame', '补丁', '资料'],
         features: ['补丁', '存档', '资料库'],
         proxy: false,
@@ -3214,7 +3220,8 @@ export const extensionCategories = [
         name: 'TouchGal',
         url: 'https://www.touchgal.ink/',
         desc: '一站式GalGame社区',
-        fullDesc: 'TouchGal 国内新兴一站式 GalGame 文化社区与下载站，收录资源、评测、资讯，备用域名 touchgal.top，发布页 gal.red。',
+        fullDesc:
+          'TouchGal 国内新兴一站式 GalGame 文化社区与下载站，收录资源、评测、资讯，备用域名 touchgal.top，发布页 gal.red。',
         tags: ['GalGame', '社区', '下载'],
         features: ['下载', '评测', '资讯'],
         proxy: false,
@@ -3223,7 +3230,8 @@ export const extensionCategories = [
         name: '鲲Galgame',
         url: 'https://www.kungal.com/',
         desc: '开源免费补丁站',
-        fullDesc: '鲲Galgame 以开源为核心精神的 GalGame 补丁发布与资源站，完全免费，GitHub: github.com/KunMoe，发布页: nav.kungal.org。',
+        fullDesc:
+          '鲲Galgame 以开源为核心精神的 GalGame 补丁发布与资源站，完全免费，GitHub: github.com/KunMoe，发布页: nav.kungal.org。',
         tags: ['GalGame', '补丁', '开源'],
         features: ['开源', '免费', '补丁'],
         proxy: false,
@@ -3327,7 +3335,8 @@ export const extensionCategories = [
         name: 'MangaUpdates',
         url: 'https://www.mangaupdates.com/',
         desc: '漫画信息追踪数据库',
-        fullDesc: 'MangaUpdates 英文圈最大的漫画信息数据库与追踪站，收录漫画/轻小说信息、翻译进度、评分，是漫画考据首选。',
+        fullDesc:
+          'MangaUpdates 英文圈最大的漫画信息数据库与追踪站，收录漫画/轻小说信息、翻译进度、评分，是漫画考据首选。',
         tags: ['数据库', '漫画', '追踪'],
         features: ['作品信息', '翻译追踪', '评分'],
         proxy: false,
@@ -3415,7 +3424,8 @@ export const extensionCategories = [
         name: 'Awesome ACG',
         url: 'https://github.com/soruly/awesome-acg',
         desc: 'ACG资源 GitHub 清单',
-        fullDesc: 'GitHub 上知名 awesome-acg 项目，收集大量 ACG 相关开源工具、API、数据集与资源链接，极客级 ACG 资源索引。',
+        fullDesc:
+          'GitHub 上知名 awesome-acg 项目，收集大量 ACG 相关开源工具、API、数据集与资源链接，极客级 ACG 资源索引。',
         tags: ['GitHub', '清单', '开源'],
         features: ['开源', '持续更新', '工具丰富'],
         proxy: false,

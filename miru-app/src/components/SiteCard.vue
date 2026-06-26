@@ -168,7 +168,10 @@ const ariaLabel = computed(() => {
             <span v-if="item.tags?.length > 1" class="tag-stamp tag-extra" :class="compact ? 'tag-sm' : 'tag-normal'">
               +{{ item.tags.length - 1 }}
             </span>
-            <span class="card-proxy" :class="{ 'is-proxy': item.proxy, 'is-blocked': health === 'blocked' || health === 'restricted' }">
+            <span
+              class="card-proxy"
+              :class="{ 'is-proxy': item.proxy, 'is-blocked': health === 'blocked' || health === 'restricted' }"
+            >
               {{ item.proxy ? '需梯' : '直连' }}
             </span>
             <span v-if="health === 'blocked' || health === 'restricted'" class="card-gfw-tip" :title="healthInfo.tip">

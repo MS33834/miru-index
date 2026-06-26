@@ -28,7 +28,12 @@ async function generateIcon(svgContent, size, outputPath) {
   const page = await browser.newPage()
   await page.setViewportSize({ width: size, height: size })
   await page.setContent(`<!DOCTYPE html><html><body style="margin:0;padding:0;">${svgContent}</body></html>`)
-  await page.screenshot({ path: outputPath, type: 'png', omitBackground: false, clip: { x: 0, y: 0, width: size, height: size } })
+  await page.screenshot({
+    path: outputPath,
+    type: 'png',
+    omitBackground: false,
+    clip: { x: 0, y: 0, width: size, height: size },
+  })
   await browser.close()
   console.log(`✓ ${path.relative(process.cwd(), outputPath)} (${size}x${size})`)
 }

@@ -5,10 +5,17 @@
 
 title = "badhope gitleaks config"
 
+# 继承 gitleaks 内置默认规则集（GitHub/AWS/Stripe/Slack/PEM/通用高熵等 100+ 条）。
+# 缺少此段时自定义 config 会完全替换默认规则，导致主流凭据类型漏报。
+[extend]
+useDefault = true
+
 [allowlist]
 description = "Global allowlist for known false-positive categories"
 
 # Test files, fixtures, snapshots, and generated test data
+# Documentation and example files (curl examples, README snippets)
+# 注：gitleaks allowlist 不支持 paths2 之类多键，所有路径白名单必须合并进单个 paths 数组。
 paths = [
   '''(^|/)tests?/.*''',
   '''(^|/)__tests__/.*''',
@@ -22,10 +29,6 @@ paths = [
   '''.*test_[^/]*\.py$''',
   '''.*_fixture\.(json|ya?ml|toml)$''',
   '''.*\.spec\.(ts|js|tsx|jsx)$''',
-]
-
-# Documentation and example files (curl examples, README snippets)
-paths2 = [
   '''(^|/)docs?/.*\.(md|mdx|rst|txt)$''',
   '''(^|/)README\.(md|rst|txt)$''',
   '''(^|/)CHANGELOG\.(md|rst|txt)$''',
