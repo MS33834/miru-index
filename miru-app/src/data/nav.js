@@ -1956,7 +1956,7 @@ const baseCategories = [
         proxy: false,
       },
       {
-        name: '萌购',
+        name: 'AmiAmi',
         url: 'https://www.amiami.com/',
         health: 'crawl',
         desc: '日淘手办',
@@ -2762,10 +2762,10 @@ const baseCategories = [
 // 3. extensionCategories 作为新增分类追加到末尾
 // 4. 未来接入 CMS 时，只需把 CMS JSON 映射为 extensionCategories / extensionItems 即可
 
-function mergeCategories(base, extensionCats, extensionItemsMap) {
+export function mergeCategories(base, extensionCats, extensionItemsMap) {
   // 分类内按 URL 去重（同一分类中不出现重复 URL），但允许同一站点跨分类出现。
   // 同时给缺失 health 的条目填充默认值。
-  const drops = [] // 收集被丢弃的条目，供审计使用
+  const drops = [] // 收集被丢弃的条目，供审计使用（ground truth）
   const normalize = (items, catId = 'unknown') => {
     const seen = new Set()
     return items
@@ -2816,7 +2816,10 @@ function mergeCategories(base, extensionCats, extensionItemsMap) {
     }
   }
 
-  return merged
+  return { categories: merged, drops }
 }
 
-export const categories = mergeCategories(baseCategories, extensionCategories, extensionItems)
+// mergeDrops 是合并过程中被丢弃条目的权威清单（intra_cat_dup / no_url），
+// 审计脚本以此为准，避免基于正则的误判。
+const { categories, drops: mergeDrops } = mergeCategories(baseCategories, extensionCategories, extensionItems)
+export { categories, mergeDrops }

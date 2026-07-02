@@ -795,15 +795,6 @@ export const extensionCategories = [
         proxy: false,
       },
       {
-        name: 'MikuMikuDance 中文社区',
-        url: 'https://tieba.baidu.com/f?kw=mikumikudance',
-        desc: 'MMD 中文资源',
-        fullDesc: 'MikuMikuDance 中文资源与教程站点，提供软件下载、模型、动作、教程与创作交流，是国内 MMD 新手入门站。',
-        tags: ['MMD', '中文', '资源'],
-        features: ['软件下载', '模型', '教程'],
-        proxy: false,
-      },
-      {
         name: '3DNchu',
         url: 'https://3dnchu.com/',
         health: 'unstable',
@@ -3438,24 +3429,6 @@ export const extensionCategories = [
 export const extensionItems = {
   nav: [
     {
-      name: 'ACG喵导航',
-      url: 'https://www.miaoaaa.com/',
-      desc: 'ACG 综合导航',
-      fullDesc: '老牌 ACG 资源导航站，收录动画、漫画、游戏、轻小说、图库、工具等多类站点，分类清晰，更新勤快。',
-      tags: ['导航', '综合', 'ACG'],
-      features: ['分类全', '更新快', '收录多'],
-      proxy: false,
-    },
-    {
-      name: 'YOUFAV',
-      url: 'https://www.youfav.com/',
-      desc: 'ACG 网址导航',
-      fullDesc: '简洁的 ACG 导航站点，收录常用番剧、漫画、轻小说、资源站点，界面干净，适合作为浏览器首页。',
-      tags: ['导航', '首页', '简洁'],
-      features: ['界面清爽', '常用站', '快速访问'],
-      proxy: false,
-    },
-    {
       name: '次元导航',
       url: 'https://www.ciyuanmao.com/',
       desc: '二次元资源导航',
@@ -3547,15 +3520,6 @@ export const extensionItems = {
       tags: ['模玩', '预订', '国模'],
       features: ['预订情报', '评测', '价格'],
       proxy: false,
-    },
-    {
-      name: 'AmiAmi',
-      url: 'https://www.amiami.com/',
-      desc: '日本最大手办商城',
-      fullDesc: '日本最大手办 / 周边网上商城，中文界面，支持直邮 / 转运，价格比国内便宜，是手办党日淘首选。',
-      tags: ['日淘', '手办', '商城'],
-      features: ['日淘', '中文', '转运'],
-      proxy: true,
     },
     {
       name: 'HobbySearch',
@@ -3762,15 +3726,6 @@ export const extensionItems = {
       fullDesc: '中文 Web 小说与轻小说平台，支持作者投稿与读者追更，作品涵盖奇幻、恋爱、科幻等多种题材。',
       tags: ['Web小说', '投稿', '中文'],
       features: ['投稿平台', '题材多', '追更'],
-      proxy: false,
-    },
-    {
-      name: '轻小说文库',
-      url: 'https://www.wenku8.cc/',
-      desc: '日轻文库',
-      fullDesc: '老牌日本轻小说中文站，收录大量文库作品，提供在线阅读与下载，是日轻读者的经典选择。',
-      tags: ['轻小说', '日轻', '文库'],
-      features: ['文库全', '在线阅读', '下载'],
       proxy: false,
     },
     {
@@ -3988,15 +3943,6 @@ export const extensionItems = {
       tags: ['漫画', '正版', 'Jump'],
       features: ['同步更新', '多语言', '正版'],
       proxy: true,
-    },
-    {
-      name: '腾讯动漫',
-      url: 'https://ac.qq.com/',
-      desc: '国漫与日漫正版',
-      fullDesc: '腾讯动漫是国内领先的正版漫画平台，国漫、日漫、条漫资源丰富，支持追更、评论与社区互动。',
-      tags: ['漫画', '国漫', '正版'],
-      features: ['正版', '国漫', '社区'],
-      proxy: false,
     },
     {
       name: '快看漫画',

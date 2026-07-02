@@ -2,16 +2,19 @@
 /**
  * 数据完整性审计脚本
  *
- * 扫描 nav.js 和 site-extensions.js 中的所有源数据 URL，
- * 与 mergeCategories 合并后的结果对比，检测：
- * 1. 被静默丢弃的条目（同一分类内 URL 重复）
- * 2. 跨分类被误杀重（不同分类中同一 URL 被错误去重）
- * 3. 无 URL 的无效条目
- * 4. 重复分类 ID
+ * 以 mergeCategories 的合并结果与 drops 为权威数据来源（ground truth），
+ * 而非对源文件做正则猜测。检测：
+ * 1. 合并过程中被丢弃的条目（同分类内 URL 重复 / 缺少 URL）—— 来自 mergeDrops
+ * 2. 跨分类被误杀的条目（源中存在但合并后消失）
+ * 3. 重复的分类 ID（结构性问题，mergeCategories 会把同 id 分类合并）
+ * 4. 空分类
+ * 5. 跨分类收录统计（同一站点出现在多个分类，属正常，仅作信息展示）
+ *
+ * 注意：同一站点跨分类出现是合法的（mergeCategories 允许），不再作为警告。
  *
  * 退出码：
- *   0 - 全部通过（无丢失）
- *   1 - 有丢失条目（CI 会失败）
+ *   0 - 全部通过（无错误）
+ *   1 - 有错误（被丢弃条目 / 丢失条目 / 重复分类 ID）
  *   2 - 脚本执行错误
  *
  * 用法：
@@ -27,7 +30,7 @@ import { fileURLToPath } from 'url'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const SRC = path.resolve(__dirname, '../src/data')
 
-// ====== 读取并扫描文件 ======
+// ====== 源文件轻量扫描（仅用于统计与结构性检查，不用于去重判断） ======
 function extractEntries(content) {
   const entries = []
   // 匹配每个条目块：{ name: '...', url: '...', ... }
@@ -58,11 +61,10 @@ async function audit(options = {}) {
   const issues = []
   const stats = {}
 
-  // 读取源文件
+  // 读取源文件（用于统计与结构性检查）
   const navContent = fs.readFileSync(path.join(SRC, 'nav.js'), 'utf8')
   const extContent = fs.readFileSync(path.join(SRC, 'site-extensions.js'), 'utf8')
 
-  // 扫描所有条目
   const navEntries = extractEntries(navContent)
   const extEntries = extractEntries(extContent)
   stats.navEntries = navEntries.length
@@ -75,71 +77,70 @@ async function audit(options = {}) {
   stats.navCategories = navCats.length
   stats.extCategories = extCats.length
 
-  // 跨文件重复 URL 检查
-  const navUrls = new Map()
-  for (const e of navEntries) {
-    if (!navUrls.has(e.url)) navUrls.set(e.url, [])
-    navUrls.get(e.url).push(e.name)
+  // 通过动态导入获取合并后的数据（ground truth）
+  let mergedCategories = []
+  let mergeDrops = []
+  try {
+    const mod = await import(path.join(SRC, 'nav.js'))
+    mergedCategories = mod.categories
+    mergeDrops = mod.mergeDrops || []
+  } catch (e) {
+    issues.push({
+      severity: 'fatal',
+      type: 'import_error',
+      message: `无法加载合并数据：${e.message}`,
+    })
   }
 
-  const extUrls = new Map()
-  for (const e of extEntries) {
-    if (!extUrls.has(e.url)) extUrls.set(e.url, [])
-    extUrls.get(e.url).push(e.name)
-  }
-
-  // 检查同文件内重复 URL（这些会在分类内被去重）
-  for (const [url, names] of navUrls) {
-    if (names.length > 1) {
-      issues.push({
-        severity: 'warn',
-        type: 'intra_file_dup',
-        file: 'nav.js',
-        url,
-        names: [...new Set(names)],
-        message: `nav.js 内重复 URL（${names.length}次），会被去重只保留第一个：${names[0]}`,
-      })
+  stats.mergedCategories = mergedCategories.length
+  const mergedUrls = new Set()
+  for (const cat of mergedCategories) {
+    for (const item of cat.items) {
+      mergedUrls.add(item.url)
     }
   }
+  stats.mergedUniqueUrls = mergedUrls.size
+  stats.mergedTotalItems = mergedCategories.reduce((a, c) => a + c.items.length, 0)
 
-  for (const [url, names] of extUrls) {
-    if (names.length > 1) {
-      issues.push({
-        severity: 'warn',
-        type: 'intra_file_dup',
-        file: 'site-extensions.js',
-        url,
-        names: [...new Set(names)],
-        message: `site-extensions.js 内重复 URL（${names.length}次），会被去重只保留第一个：${names[0]}`,
-      })
-    }
+  // 1) mergeDrops：合并过程中被丢弃的条目（权威来源）
+  stats.droppedCount = mergeDrops.length
+  for (const d of mergeDrops) {
+    issues.push({
+      severity: 'error',
+      type: d.reason === 'no_url' ? 'no_url' : 'intra_cat_dup',
+      source: 'mergeDrops',
+      category: d.cat,
+      name: d.name,
+      url: d.url || '',
+      message:
+        d.reason === 'no_url'
+          ? `条目被丢弃（缺少 URL）：分类=${d.cat} 名称=${d.name}`
+          : `条目被丢弃（同分类内 URL 重复，仅保留首个）：分类=${d.cat} 名称=${d.name} URL=${d.url}`,
+      fix_suggestion: fix
+        ? d.reason === 'no_url'
+          ? `为 ${d.name} 补充 url 字段，或删除该条目`
+          : `在分类 ${d.cat} 中删除 ${d.name}（${d.url}）的重复条目，保留元数据更完整的一个`
+        : undefined,
+    })
   }
 
-  // 检查无 URL 条目
-  for (const e of navEntries) {
-    if (!e.url) {
-      issues.push({
-        severity: 'error',
-        type: 'no_url',
-        file: 'nav.js',
-        name: e.name,
-        message: `nav.js 中缺少 URL：${e.name}`,
-      })
-    }
-  }
-  for (const e of extEntries) {
-    if (!e.url) {
-      issues.push({
-        severity: 'error',
-        type: 'no_url',
-        file: 'site-extensions.js',
-        name: e.name,
-        message: `site-extensions.js 中缺少 URL：${e.name}`,
-      })
-    }
+  // 2) 跨分类丢失：源中存在的 URL，合并后不存在
+  const allSourceUrls = new Set([...navEntries.map((e) => e.url), ...extEntries.map((e) => e.url)])
+  stats.sourceUniqueUrls = allSourceUrls.size
+  const lostUrls = [...allSourceUrls].filter((u) => u && !mergedUrls.has(u))
+  stats.lostCount = lostUrls.length
+  for (const url of lostUrls) {
+    const src = navEntries.find((e) => e.url === url) || extEntries.find((e) => e.url === url)
+    issues.push({
+      severity: 'error',
+      type: 'lost_entry',
+      url,
+      name: src ? src.name : 'unknown',
+      message: `条目丢失：${src ? src.name : 'unknown'}（${url}）在源文件中存在但合并后消失`,
+    })
   }
 
-  // 检查重复分类 ID
+  // 3) 重复分类 ID（结构性问题）
   const allCatIds = [...navCats.map((c) => c.id), ...extCats.map((c) => c.id)]
   const dupCats = allCatIds.filter((id, i) => allCatIds.indexOf(id) !== i)
   for (const id of [...new Set(dupCats)]) {
@@ -149,76 +150,13 @@ async function audit(options = {}) {
       type: 'dup_category',
       id,
       names: [...new Set(names)],
-      message: `重复分类 ID "${id}"：${[...new Set(names)].join('、')}`,
+      message: `重复分类 ID "${id}"：${[...new Set(names)].join('、')}（mergeCategories 会将其条目合并到首个同名分类）`,
     })
   }
 
-  // 通过动态导入获取合并后的数据
-  let mergedCategories
-  try {
-    const mod = await import(path.join(SRC, 'nav.js'))
-    mergedCategories = mod.categories
-  } catch (e) {
-    issues.push({
-      severity: 'fatal',
-      type: 'import_error',
-      message: `无法加载合并数据：${e.message}`,
-    })
-    mergedCategories = []
-  }
-
-  stats.mergedCategories = mergedCategories.length
-  const mergedUrls = new Set()
-  const mergedUrlToName = new Map()
-  for (const cat of mergedCategories) {
-    for (const item of cat.items) {
-      mergedUrls.add(item.url)
-      mergedUrlToName.set(item.url, item.name)
-    }
-  }
-  stats.mergedUniqueUrls = mergedUrls.size
-  stats.mergedTotalItems = mergedCategories.reduce((a, c) => a + c.items.length, 0)
-
-  // 检查跨分类丢失：源中唯一的 URL，但合并后不存在
-  const allSourceUrls = new Set([...navEntries.map((e) => e.url), ...extEntries.map((e) => e.url)])
-  stats.sourceUniqueUrls = allSourceUrls.size
-
-  const lostUrls = [...allSourceUrls].filter((u) => !mergedUrls.has(u))
-  stats.lostCount = lostUrls.length
-
-  for (const url of lostUrls) {
-    // 找出哪个源文件的哪个条目丢失了
-    let source = 'unknown'
-    let name = 'unknown'
-    for (const e of navEntries) {
-      if (e.url === url) {
-        source = 'nav.js'
-        name = e.name
-        break
-      }
-    }
-    if (source === 'unknown') {
-      for (const e of extEntries) {
-        if (e.url === url) {
-          source = 'site-extensions.js'
-          name = e.name
-          break
-        }
-      }
-    }
-    issues.push({
-      severity: 'error',
-      type: 'lost_entry',
-      source,
-      url,
-      name,
-      message: `条目丢失：${name}（${url}）在源文件 ${source} 中存在但合并后消失`,
-      fix_suggestion: fix ? `建议检查 ${source} 中是否有同名条目与其他分类的 URL 重复` : undefined,
-    })
-  }
-
-  // 检查空分类
+  // 4) 空分类
   const emptyCats = mergedCategories.filter((c) => c.items.length === 0)
+  stats.emptyCategories = emptyCats.length
   for (const cat of emptyCats) {
     issues.push({
       severity: 'warn',
@@ -228,10 +166,22 @@ async function audit(options = {}) {
       message: `空分类：${cat.name}（id: ${cat.id}）没有任何条目`,
     })
   }
-  stats.emptyCategories = emptyCats.length
+
+  // 5) 跨分类收录统计（合法行为，仅信息）
+  const urlToCats = new Map()
+  for (const cat of mergedCategories) {
+    for (const item of cat.items) {
+      if (!urlToCats.has(item.url)) urlToCats.set(item.url, new Set())
+      urlToCats.get(item.url).add(cat.id)
+    }
+  }
+  const crossCategoryUrls = [...urlToCats.entries()].filter(([, cats]) => cats.size > 1)
+  stats.crossCategoryCount = crossCategoryUrls.length
 
   // ====== 输出 ======
-  const exitCode = lostUrls.length > 0 ? 1 : 0
+  const errors = issues.filter((i) => i.severity === 'error' || i.severity === 'fatal')
+  const warns = issues.filter((i) => i.severity === 'warn')
+  const exitCode = errors.length > 0 ? 1 : 0
 
   if (json) {
     console.log(JSON.stringify({ stats, issues, exitCode }, null, 2))
@@ -250,10 +200,9 @@ async function audit(options = {}) {
     console.log(`   分类数:               ${stats.mergedCategories}`)
     console.log(`   总条目（含跨分类）:    ${stats.mergedTotalItems}`)
     console.log(`   合并后唯一 URL:        ${stats.mergedUniqueUrls}`)
+    console.log(`   跨分类收录站点:        ${stats.crossCategoryCount}（正常）`)
+    console.log(`   合并丢弃条目:          ${stats.droppedCount}`)
     console.log()
-
-    const errors = issues.filter((i) => i.severity === 'error' || i.severity === 'fatal')
-    const warns = issues.filter((i) => i.severity === 'warn')
 
     if (errors.length > 0) {
       console.log(`❌ 发现 ${errors.length} 个错误：\n`)
@@ -277,7 +226,7 @@ async function audit(options = {}) {
     } else if (errors.length === 0) {
       console.log('✅ 无严重问题，但存在警告。\n')
     } else {
-      console.log('❌ 审计失败，发现数据丢失！请修复后重新检查。\n')
+      console.log('❌ 审计失败，发现数据问题！请修复后重新检查。\n')
     }
   }
 
